@@ -8,7 +8,8 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.12"
 typer = "^0.17.4"
-
+pandas = "^2.3.2"
+yfinance = "^0.2.65"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.4.2"
@@ -19,3 +20,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 backtester = "backtester.cli:app"
+
+[tool.ruff]
+indent-width = 2
