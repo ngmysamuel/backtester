@@ -32,7 +32,7 @@ class CSVDataHandler(DataHandler):
     pandas DataFrames within a symbol dictionary. Assumes the format
     of the CSV files: date, open, high, low, close, volume
     """
-    comb_index = None
+    combined_index = None
 
     for s in self.symbol_list:
       # Load the CSV file with no header information, indexed on date
@@ -47,26 +47,24 @@ class CSVDataHandler(DataHandler):
           "high",
           "low",
           "close",
-          "volume",
-          "dividends",
-          "stocksplits"
+          "volume"
         ],
       )
 
-      df.sort_index(inplace=True)
+      df.sort_index(inplace=True) # ensure data is sorted
 
       self.symbol_data[s] = df
       self.latest_symbol_data[s] = []
 
-      if comb_index is None:
-        comb_index = df.index
-      else: # include any dates not in the previous file
-        comb_index = comb_index.union(df.index)
+      if combined_index is None:
+        combined_index = df.index
+      else: # include any dates not in the previous files
+        combined_index = combined_index.union(df.index)
 
     # Reindex the dataframes to the same index
     for s in self.symbol_list:
       self.symbol_data[s] = (
-        self.symbol_data[s].reindex(index=comb_index, method="pad").iterrows()
+        self.symbol_data[s].reindex(index=combined_index, method="pad").iterrows()
       )
 
   def _get_new_bar(self, symbol):
@@ -82,10 +80,18 @@ class CSVDataHandler(DataHandler):
     Pushes the latest bar to the latest_symbol_data structure for all
     symbols in the symbol list. This will also generate a MarketEvent.
     """
-    pass
+    for s in self.symbol_list:
+      try:
+        bar = next(self._get_new_bar(s))
+      except StopIteration:
+        self.continue_backtest = False
+      else:
+        if bar is not None:
+          self.latest_symbol_data[s].append(bar)
+    # After updating all symbols, push a MarketEvent to the event queue
 
-  def get_latest_bars(self, symbol, N=1):
+  def get_latest_bars(self, symbol, n=1):
     """
     Returns the last N bars from the latest_symbol_data
     """
-    return self.latest_symbol_data[symbol][-N:]
+    return self.latest_symbol_data[symbol][-n:]
