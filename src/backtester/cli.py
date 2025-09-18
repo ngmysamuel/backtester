@@ -15,6 +15,8 @@ def run(data_dir: str,
   """
   Run the backtester with a given strategy and date range.
   args:
+      data_dir (str): Directory containing CSV data files.
+      symbol_list (List[str]): List of ticker symbols to include in the backtest.
       strategy (str): Path to the strategy file.
       start_date (str): Start date in YYYY-MM-DD format.
   """
@@ -22,7 +24,7 @@ def run(data_dir: str,
   typer.echo(f"Symbols: {symbol_list}")
   typer.echo(f"Running backtest for strategy: {strategy}")
   typer.echo(f"Starting from: {start_date}")
-  
+
   event_queue = collections.deque()
   data_handler = CSVDataHandler(event_queue, data_dir, symbol_list)
   while data_handler.continue_backtest:
