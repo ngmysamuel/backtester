@@ -1,6 +1,7 @@
-from data_handler import DataHandler
+from backtester.data.data_handler import DataHandler
 import pandas as pd
 import os
+from backtester.events.market_event import MarketEvent
 
 class CSVDataHandler(DataHandler):
   """
@@ -35,23 +36,17 @@ class CSVDataHandler(DataHandler):
     combined_index = None
 
     for s in self.symbol_list:
-      # Load the CSV file with no header information, indexed on date
+      # Load the CSV file
       df = pd.read_csv(
         os.path.join(self.csv_dir, f"{s}.csv"),
         header=0,
-        index_col=0,
         parse_dates=True,
-        names=[
-          "date",
-          "open",
-          "high",
-          "low",
-          "close",
-          "volume"
-        ],
+        usecols=lambda x: x.lower() in ["open", "close", "high", "low", "volume", "date"],
       )
 
+      df.set_index("Date", inplace=True)
       df.sort_index(inplace=True) # ensure data is sorted
+      df.columns = [col.lower() for col in df.columns]
 
       self.symbol_data[s] = df
       self.latest_symbol_data[s] = []
@@ -88,7 +83,15 @@ class CSVDataHandler(DataHandler):
       else:
         if bar is not None:
           self.latest_symbol_data[s].append(bar)
-    # After updating all symbols, push a MarketEvent to the event queue
+          self.event_queue.append(MarketEvent(
+            s,
+            bar[1]["open"],
+            bar[1]["high"],
+            bar[1]["low"],
+            bar[1]["close"],
+            bar[1]["volume"]
+          ))
+
 
   def get_latest_bars(self, symbol, n=1):
     """

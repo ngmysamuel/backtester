@@ -1,16 +1,16 @@
 import typer
-from typing import Optional
-from data.csv_data_hanlder import CSVDataHandler
+from typing import Optional, List
+from backtester.data.csv_data_handler import CSVDataHandler
 import collections
 
 app = typer.Typer()
 
 
 @app.command()
-def run(strategy: Optional[str] = None,
-        start_date: Optional[str] = None,
-        data_dir: Optional[str] = None,
-        symbol_list: Optional[str] = None
+def run(data_dir: str,
+        symbol_list: List[str],
+        strategy: Optional[str] = None,
+        start_date: Optional[str] = None
       ):
   """
   Run the backtester with a given strategy and date range.
@@ -18,17 +18,20 @@ def run(strategy: Optional[str] = None,
       strategy (str): Path to the strategy file.
       start_date (str): Start date in YYYY-MM-DD format.
   """
+  typer.echo(f"Data directory: {data_dir}")
+  typer.echo(f"Symbols: {symbol_list}")
   typer.echo(f"Running backtest for strategy: {strategy}")
   typer.echo(f"Starting from: {start_date}")
-  # --- TO BE IMPLEMENTED ---
+  
   event_queue = collections.deque()
-  data_handler = CSVDataHandler(event_queue, data_dir, symbol_list)  # Placeholder for actual data handler initialization
+  data_handler = CSVDataHandler(event_queue, data_dir, symbol_list)
   while data_handler.continue_backtest:
     data_handler.update_bars()
     # Process events from the event queue
     while event_queue:
       event = event_queue.popleft()
       # Handle the event (e.g., generate signals, execute orders, etc.)
+      print(f"Processing event: {event.type}. Ticker: {getattr(event, 'ticker', 'N/A')}, Close: {getattr(event, 'close', 'N/A')}")
 
 
 @app.command()
