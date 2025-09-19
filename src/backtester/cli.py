@@ -33,7 +33,9 @@ def run(data_dir: str,
     while event_queue:
       event = event_queue.popleft()
       # Handle the event (e.g., generate signals, execute orders, etc.)
-      print(f"Processing event: {event.type}. Ticker: {getattr(event, 'ticker', 'N/A')}, Close: {getattr(event, 'close', 'N/A')}")
+      if event.type == "MARKET":
+         # For demonstration, just print the event
+        print(f"Processing event: {event.type}. Ticker: {getattr(event, 'ticker', 'N/A')}")
 
 
 @app.command()

@@ -44,22 +44,22 @@ class CSVDataHandler(DataHandler):
         usecols=lambda x: x.lower() in ["open", "close", "high", "low", "volume", "date"],
       )
 
+      self.symbol_data[s] = df
+      self.latest_symbol_data[s] = []
+
       df.set_index("Date", inplace=True)
       df.sort_index(inplace=True) # ensure data is sorted
       df.columns = [col.lower() for col in df.columns]
 
-      self.symbol_data[s] = df
-      self.latest_symbol_data[s] = []
-
       if combined_index is None:
         combined_index = df.index
-      else: # include any dates not in the previous files
-        combined_index = combined_index.union(df.index)
+      else:
+        combined_index = combined_index.union(df.index) # include any dates not in the previous files
 
     # Reindex the dataframes to the same index
     for s in self.symbol_list:
       self.symbol_data[s] = (
-        self.symbol_data[s].reindex(index=combined_index, method="pad").iterrows()
+        self.symbol_data[s].reindex(index=combined_index, method="pad").itertuples()
       )
 
   def _get_new_bar(self, symbol):
@@ -83,14 +83,7 @@ class CSVDataHandler(DataHandler):
       else:
         if bar is not None:
           self.latest_symbol_data[s].append(bar)
-          self.event_queue.append(MarketEvent(
-            s,
-            bar[1]["open"],
-            bar[1]["high"],
-            bar[1]["low"],
-            bar[1]["close"],
-            bar[1]["volume"]
-          ))
+          self.event_queue.append(MarketEvent(s))
 
 
   def get_latest_bars(self, symbol, n=1):

@@ -4,14 +4,9 @@ class MarketEvent(Event):
   """
   Handles the event of receiving a new market update with corresponding bars.
   """
-  def __init__(self, ticker, op, high, low, close, volume):
+  def __init__(self, ticker):
     """
-    Initialises the MarketEvent.
+    Initialises the MarketEvent with a ticker indicating this ticker has a new movement in its price.
     """
     self.type = "MARKET"
     self.ticker = ticker
-    self.open = op
-    self.high = high
-    self.low = low
-    self.close = close
-    self.volume = volume
