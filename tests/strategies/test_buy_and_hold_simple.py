@@ -19,6 +19,7 @@ class FakeEvent:
     def __init__(self, type, ticker):
         self.type = type
         self.ticker = ticker
+        self.timestamp = 1234567890  # Fixed timestamp for testing
 
 
 def test_initialization_sets_bought_flags():

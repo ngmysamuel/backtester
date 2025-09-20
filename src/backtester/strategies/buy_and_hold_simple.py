@@ -14,6 +14,7 @@ class BuyAndHoldSimple(Strategy):
     self.bought = {sym: False for sym in self.symbol_list}
 
   def generate_signals(self, event: Event):
+    timestamp = event.timestamp
     ticker = event.ticker
     # Validate event type and ticker
     if event.type != "MARKET" or ticker not in self.symbol_list:
@@ -29,4 +30,4 @@ class BuyAndHoldSimple(Strategy):
 
     if not self.bought[ticker]:
       self.bought[ticker] = True
-      self.events.append(SignalEvent(ticker, SignalType.LONG))
+      self.events.append(SignalEvent(timestamp, ticker, SignalType.LONG))
