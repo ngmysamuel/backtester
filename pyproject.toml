@@ -10,6 +10,7 @@ python = "^3.12"
 typer = "^0.17.4"
 pandas = "^2.3.2"
 yfinance = "^0.2.65"
+pyyaml = "^6.0.2"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.4.2"
