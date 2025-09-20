@@ -21,6 +21,7 @@ class FakeEvent:
     def __init__(self, type, ticker):
         self.type = type
         self.ticker = ticker
+        self.timestamp = 1234567890  # Fixed timestamp for testing
 
 
 def make_bars(values):
