@@ -1,0 +1,11 @@
+backtester_settings:
+  symbol_list: ["MSFT"]
+
+strategies:
+  buy_and_hold_simple:
+    name: "backtester.strategies.buy_and_hold_simple.BuyAndHoldSimple"
+  moving_average:
+    name: "backtester.strategies.moving_average_crossover.MovingAverageCrossover"
+    additional_parameters:
+      long_window: 50
+      short_window: 20

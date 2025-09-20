@@ -62,7 +62,7 @@ class CSVDataHandler(DataHandler):
         self.symbol_data[s].reindex(index=combined_index, method="pad").itertuples()
       )
 
-  def _get_new_bar(self, symbol):
+  def _get_new_bar(self, symbol: str):
     """
     Returns the latest bar from the data feed as a tuple of
     (datetime, open, high, low, close, volume).
@@ -86,7 +86,7 @@ class CSVDataHandler(DataHandler):
           self.event_queue.append(MarketEvent(s))
 
 
-  def get_latest_bars(self, symbol, n=1):
+  def get_latest_bars(self, symbol: str, n: int = 1):
     """
     Returns the last N bars from the latest_symbol_data
     """
