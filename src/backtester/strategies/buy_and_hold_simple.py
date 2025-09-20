@@ -15,10 +15,18 @@ class BuyAndHoldSimple(Strategy):
 
   def generate_signals(self, event: Event):
     ticker = event.ticker
+    # Validate event type and ticker
     if event.type != "MARKET" or ticker not in self.symbol_list:
       raise ValueError("Invalid event type or ticker symbol")
+
+    # Retrieve latest bar(s) for ticker. If no data is available, do not generate a signal.
     ohlcv_data = self.data_handler.get_latest_bars(ticker, n=1)
     print(f"Received MARKET event for {ticker}. Latest OHLCV: {ohlcv_data}")
+
+    # No market data available for this ticker at the moment; skip signal generation.
+    if not ohlcv_data:
+      return
+
     if not self.bought[ticker]:
       self.bought[ticker] = True
       self.events.append(SignalEvent(ticker, SignalType.LONG))

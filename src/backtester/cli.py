@@ -37,7 +37,7 @@ def run(data_dir: str,
   Run the backtester with a given strategy and date range.
   args:
       data_dir (str): Directory containing CSV data files.
-      strategy (str): the strategy to backtest.
+      strategy (str): the strategy to backtest; this name should match those found in config.yaml.
   """
   typer.echo(f"Data directory: {data_dir}")
   typer.echo(f"Running backtest for strategy: {strategy}")
