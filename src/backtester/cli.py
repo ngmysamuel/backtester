@@ -1,11 +1,12 @@
 import typer
-from typing import Optional, List
+from typing import Optional
 from backtester.data.csv_data_handler import CSVDataHandler
 import collections
-from backtester.strategies.strategy import Strategy
 import yaml
 import importlib.resources
 import importlib
+from backtester.portfolios.naive_portfolio import NaivePortfolio
+import pandas as pd
 
 app = typer.Typer()
 
@@ -47,9 +48,9 @@ def run(data_dir: str,
   symbol_list = config["backtester_settings"]["symbol_list"]
   typer.echo(f"Symbols: {symbol_list}")
 
-  interval = config["backtester_settings"].get("interval", "1d")
-  exchange_closing = config["backtester_settings"].get("exchange", {}).get("closing", "16:00")
-  typer.echo(f"Data interval: {interval}, Exchange closing time: {exchange_closing}")
+  initial_capital = config["backtester_settings"]["initial_capital"]
+  start_timestamp = pd.to_datetime(config["backtester_settings"]["start_date"]).timestamp()
+  typer.echo(f"Initial Capital: {initial_capital}")
 
   StrategyClass = load_class(config["strategies"][strategy]["name"])
   additional_params = config["strategies"][strategy].get("additional_parameters", {})
@@ -57,17 +58,23 @@ def run(data_dir: str,
   event_queue = collections.deque()
   data_handler = CSVDataHandler(event_queue, data_dir, symbol_list)
   strategy_instance = StrategyClass(event_queue, data_handler, **additional_params)
+  portfolio = NaivePortfolio(data_handler,initial_capital,symbol_list,event_queue,start_timestamp)
   
   while data_handler.continue_backtest:
     data_handler.update_bars()
-    # Process events from the event queue
+    # Process events from the event queue (e.g., generate signals, execute orders, etc.)
     while event_queue:
       event = event_queue.popleft()
-      # Handle the event (e.g., generate signals, execute orders, etc.)
       if event.type == "MARKET":
         strategy_instance.generate_signals(event)
+        portfolio.on_market(event)
       elif event.type == "SIGNAL":
-         typer.echo(f"Signal generated: {event.symbol} {event.signal_type} at {event.timestamp}")
+         portfolio.on_signal(event)
+      elif event.type == "ORDER":
+        print(f"Processing ORDER event: {event.type} for {event.ticker} {event.direction} {event.quantity} shares")
+
+  portfolio.create_equity_curve()
+  print(portfolio.equity_curve)
 
 
 @app.command()

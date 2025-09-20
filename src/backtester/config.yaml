@@ -6,6 +6,7 @@ backtester_settings:
     opening: "09:30"
     closing: "16:00"
   initial_capital: 100000.0
+  start_date: "9/14/2020 00:00:00"
 
 strategies:
   buy_and_hold_simple:
