@@ -42,6 +42,7 @@ class CSVDataHandler(DataHandler):
         header=0,
         parse_dates=True,
         usecols=lambda x: x.lower() in ["open", "close", "high", "low", "volume", "date"],
+        converters={"Date": lambda x: pd.to_datetime(x)}
       )
 
       self.symbol_data[s] = df
@@ -83,7 +84,7 @@ class CSVDataHandler(DataHandler):
       else:
         if bar is not None:
           self.latest_symbol_data[s].append(bar)
-          self.event_queue.append(MarketEvent(s))
+          self.event_queue.append(MarketEvent(bar.Index.timestamp(), s))
 
 
   def get_latest_bars(self, symbol: str, n: int = 1):

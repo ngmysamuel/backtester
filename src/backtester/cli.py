@@ -47,6 +47,10 @@ def run(data_dir: str,
   symbol_list = config["backtester_settings"]["symbol_list"]
   typer.echo(f"Symbols: {symbol_list}")
 
+  interval = config["backtester_settings"].get("interval", "1d")
+  exchange_closing = config["backtester_settings"].get("exchange", {}).get("closing", "16:00")
+  typer.echo(f"Data interval: {interval}, Exchange closing time: {exchange_closing}")
+
   StrategyClass = load_class(config["strategies"][strategy]["name"])
   additional_params = config["strategies"][strategy].get("additional_parameters", {})
 
@@ -61,9 +65,9 @@ def run(data_dir: str,
       event = event_queue.popleft()
       # Handle the event (e.g., generate signals, execute orders, etc.)
       if event.type == "MARKET":
-         strategy_instance.generate_signals(event)
+        strategy_instance.generate_signals(event)
       elif event.type == "SIGNAL":
-         typer.echo(f"Signal generated: {event.symbol} {event.signal_type} at {event.datetime}")
+         typer.echo(f"Signal generated: {event.symbol} {event.signal_type} at {event.timestamp}")
 
 
 @app.command()
