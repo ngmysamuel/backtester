@@ -50,6 +50,8 @@ class NaivePortfolio(Portfolio):
     self.current_holdings["total"] = initial_capital
     self.current_holdings["commissions"] = 0.0
     self.current_holdings["timestamp"] = start_date
+    self.current_holdings["net_position_change"] = 0
+    self.current_holdings["position"] = 0
     self.historical_holdings = [self.current_holdings.copy()]
 
   def on_market(self, event):
@@ -64,16 +66,23 @@ class NaivePortfolio(Portfolio):
     if self.current_holdings["timestamp"] != timestamp:
       self.current_holdings = self.current_holdings.copy()
       self.current_holdings["timestamp"] = timestamp
+      self.current_holdings["net_position_change"] = 0
+      self.current_holdings["order"] = ""
+      self.current_holdings["commissions"] = 0.0
       self.historical_holdings.append(self.current_holdings)
     latest_bar = self.data_handler.get_latest_bars(ticker)[0]
     self.current_holdings[ticker] = self.current_positions[ticker] * latest_bar.close # use closing price to evaluate portfolio value
     self.current_holdings["total"] += self.current_holdings[ticker] - old_holding
 
   def on_fill(self, event):
-    direction = event.direction.value
-    self.current_positions[event.ticker] += direction * event.quantity
-    self.current_holdings[event.ticker] += event.fill_cost
-    self.current_holdings["cash"] -= event.fill_cost
+    bar = self.data_handler.get_latest_bars(event.ticker)[0]
+    self.current_positions[event.ticker] += event.direction.value * event.quantity
+    self.current_holdings[event.ticker] = self.current_positions[event.ticker] * bar.close
+    self.current_holdings["cash"] -= event.fill_cost + event.commission
+    self.current_holdings["total"] -= event.commission
+    self.current_holdings["commissions"] += event.commission
+    self.current_holdings["net_position_change"] += event.quantity * event.direction.value
+    self.current_holdings["position"] = self.current_positions[event.ticker]
 
   def on_signal(self, event):
     order = None
@@ -83,17 +92,18 @@ class NaivePortfolio(Portfolio):
     quantity = self.position_size * event.strength
  
     if event.signal_type.value == -1: # SHORT
-      order = OrderEvent(DirectionType(-1), ticker, order_type, quantity)
+      order = OrderEvent(DirectionType(-1), ticker, order_type, quantity, event.timestamp)
     elif event.signal_type.value == 1 and self.current_holdings[ticker] < self.current_holdings["total"] * self.allocation: # LONG
-      order = OrderEvent(DirectionType(1), ticker, order_type, quantity)
+      order = OrderEvent(DirectionType(1), ticker, order_type, quantity, event.timestamp)
     else:
       if cur_quantity > 0: # EXIT a long position
-        order = OrderEvent(DirectionType(-1), ticker, order_type, abs(cur_quantity))
+        order = OrderEvent(DirectionType(-1), ticker, order_type, abs(cur_quantity), event.timestamp)
       elif cur_quantity < 0: # EXIT a short position
-        order = OrderEvent(DirectionType(1), ticker, order_type, abs(cur_quantity))
+        order = OrderEvent(DirectionType(1), ticker, order_type, abs(cur_quantity), event.timestamp)
 
     if order:
       self.events.append(order)
+      self.current_holdings["order"] = order.direction
 
 
   def create_equity_curve(self):

@@ -7,6 +7,7 @@ import importlib.resources
 import importlib
 from backtester.portfolios.naive_portfolio import NaivePortfolio
 import pandas as pd
+from backtester.execution.execution_handler import ExecutionHandler
 
 app = typer.Typer()
 
@@ -59,6 +60,7 @@ def run(data_dir: str,
   data_handler = CSVDataHandler(event_queue, data_dir, symbol_list)
   strategy_instance = StrategyClass(event_queue, data_handler, **additional_params)
   portfolio = NaivePortfolio(data_handler,initial_capital,symbol_list,event_queue,start_timestamp)
+  execution_handler = ExecutionHandler(event_queue, data_handler)
   
   while data_handler.continue_backtest:
     data_handler.update_bars()
@@ -68,13 +70,17 @@ def run(data_dir: str,
       if event.type == "MARKET":
         strategy_instance.generate_signals(event)
         portfolio.on_market(event)
+        execution_handler.on_market(event)
       elif event.type == "SIGNAL":
          portfolio.on_signal(event)
       elif event.type == "ORDER":
-        print(f"Processing ORDER event: {event.type} for {event.ticker} {event.direction} {event.quantity} shares")
+        execution_handler.on_order(event)
+      elif event.type == "FILL":
+        print(f"Processing FILL event: {event.ticker}, {event.quantity} shares at cost {event.fill_cost}")
+        portfolio.on_fill(event)
 
   portfolio.create_equity_curve()
-  print(portfolio.equity_curve)
+  portfolio.equity_curve.to_csv("equity_curve.csv")
 
 
 @app.command()
