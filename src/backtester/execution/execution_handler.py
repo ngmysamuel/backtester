@@ -1,7 +1,6 @@
 from collections import deque
 from backtester.events.fill_event import FillEvent
 import pandas as pd
-import datetime
 
 class ExecutionHandler:
   def __init__(self, events, data_handler, exch_closing, interval="1d"):

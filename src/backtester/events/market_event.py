@@ -1,5 +1,4 @@
 from backtester.events.event import Event
-import time
 
 class MarketEvent(Event):
   """
@@ -10,7 +9,6 @@ class MarketEvent(Event):
     Initialises the MarketEvent with a ticker indicating this ticker has a new movement in its price.
     Parameters:
     timestamp - The timestamp at which the market event was generated - simulated.
-    ticker - The ticker symbol, e.g. 'MSFT'.
     """
     self.type = "MARKET"
     self.timestamp = timestamp

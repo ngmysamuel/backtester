@@ -68,15 +68,14 @@ def run(data_dir: str,
     while event_queue:
       event = event_queue.popleft()
       if event.type == "MARKET":
-        strategy_instance.generate_signals(event)
-        portfolio.on_market(event)
-        execution_handler.on_market(event)
+        portfolio.on_market(event) # update portfolio valuation
+        execution_handler.on_market(event) # check if any orders can be filled, if so, it will update the portfolio via a FILL event
+        strategy_instance.generate_signals(event) # generate signals based on market event for the fill in the next interval
       elif event.type == "SIGNAL":
          portfolio.on_signal(event)
       elif event.type == "ORDER":
         execution_handler.on_order(event)
       elif event.type == "FILL":
-        print(f"Processing FILL event: {event.ticker}, {event.quantity} shares at cost {event.fill_cost}")
         portfolio.on_fill(event)
 
   portfolio.create_equity_curve()
