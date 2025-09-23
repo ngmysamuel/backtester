@@ -24,6 +24,11 @@ df = dat.history(period='5y') # period must be one of: 1d, 5d, 1mo, 3mo, 6mo, 1y
 df.to_csv("MSFT.csv")
 ```
 
+### Notes
+1. Value of positions are valued using the closing price of each interval. 
+2. An order is filled at the opening price of the next interval.
+3. Short sold position in a stock is possible but many assumptions are made. You can borrow the shares indefinitely. 
+
 ### Learnings
 
 An event driven backtester is a pure chronological construct unlike a vectorized backtester which has the prices at all time periods already.

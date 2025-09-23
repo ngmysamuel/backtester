@@ -30,7 +30,7 @@ class NaivePortfolio(Portfolio):
     symbol_list (list): List of ticker symbols to include in the portfolio.
     events (deque): The event queue to communicate with other components.
     start_date (float): The starting timestamp for the portfolio.
-    allocation (float): The fixed percentage of the portfolio to allocate to each asset (default is 1).
+    allocation (float): The percentage of the portfolio that an asset is maximally allowed to take (default is 1).
     """
     self.data_handler = data_handler
     self.initial_capital = initial_capital
@@ -97,9 +97,9 @@ class NaivePortfolio(Portfolio):
       order = OrderEvent(DirectionType(1), ticker, order_type, quantity, event.timestamp)
     else:
       if cur_quantity > 0: # EXIT a long position
-        order = OrderEvent(DirectionType(-1), ticker, order_type, abs(cur_quantity), event.timestamp)
+        order = OrderEvent(DirectionType(-1), ticker, order_type, cur_quantity + self.position_size, event.timestamp)
       elif cur_quantity < 0: # EXIT a short position
-        order = OrderEvent(DirectionType(1), ticker, order_type, abs(cur_quantity), event.timestamp)
+        order = OrderEvent(DirectionType(1), ticker, order_type, cur_quantity + self.position_size, event.timestamp)
 
     if order:
       self.events.append(order)

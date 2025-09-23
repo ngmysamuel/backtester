@@ -9,7 +9,6 @@ class MovingAverageCrossover:
     self.symbol_list = data_handler.symbol_list
     self.short_window = short_window
     self.long_window = long_window
-    self.current_positions = {sym: 0 for sym in self.symbol_list}  # 1 for short > long | -1 for short < long | 0 for neutral
 
   def generate_signals(self, event):
     timestamp = event.timestamp
@@ -26,9 +25,7 @@ class MovingAverageCrossover:
       long_avg += bar.close
     short_avg /= self.short_window
     long_avg /= self.long_window
-    if self.current_positions[ticker] >= 0 and short_avg < long_avg: # short_avg has just crossed below the long_avg
-      self.current_positions[ticker] = -1
+    if short_avg < long_avg: # GO SHORT
       self.events.append(SignalEvent(timestamp, ticker, SignalType.SHORT))
-    elif self.current_positions[ticker] <= 0 and short_avg > long_avg: # short_avg has just crossed above the long_avg
-      self.current_positions[ticker] = 1
+    else: # GO LONG
       self.events.append(SignalEvent(timestamp, ticker, SignalType.LONG))
