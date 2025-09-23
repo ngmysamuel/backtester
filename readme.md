@@ -28,6 +28,9 @@ df.to_csv("MSFT.csv")
 1. Value of positions are valued using the closing price of each interval. 
 2. An order is filled at the opening price of the next interval.
 3. Short sold position in a stock is possible but many assumptions are made. You can borrow the shares indefinitely. 
+4. Borrow costs are calculated on a new trading day using that day's open price
+5. Market Orders are filled at open. Market On Close are filled at close when the current interval of market data is the last slice of the day.
+6. All orders are filled entirely i.e. no partial filling
 
 ### Learnings
 

@@ -84,7 +84,7 @@ class CSVDataHandler(DataHandler):
       else:
         if bar is not None:
           self.latest_symbol_data[s].append(bar)
-          self.event_queue.append(MarketEvent(bar.Index.timestamp(), s))
+    self.event_queue.append(MarketEvent(bar.Index.timestamp()))
 
 
   def get_latest_bars(self, symbol: str, n: int = 1):
