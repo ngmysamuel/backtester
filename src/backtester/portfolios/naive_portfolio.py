@@ -42,7 +42,7 @@ class NaivePortfolio(Portfolio):
     self.events = events
     self.current_date = pd.to_datetime(start_date, unit='s')
     self.allocation = allocation
-    self.borrow_cost = borrow_cost
+    self.daily_borrow_rate = borrow_cost / 252 # assuming 252 trading days in a year
     self.maintenance_margin = maintenance_margin
 
     self.initial_short_value = {}
@@ -62,22 +62,22 @@ class NaivePortfolio(Portfolio):
     Calculate the borrow costs for all short positions in the portfolio.
     This method will be called daily to update the borrow costs.
     """
-    total_open_value = 0
     total_short_value = 0
+    self.current_holdings["total"] = 0
     for ticker in self.symbol_list:
       latest_bar = self.data_handler.get_latest_bars(ticker)[0]
-      if self.current_holdings[f"{ticker} position"] < 0: # only apply borrow cost to short positions
+      if self.current_holdings[f"{ticker} position"] < 0: # a short position
         short_value = abs(self.current_holdings[f"{ticker} position"]) * latest_bar.open
-        daily_borrow_cost = short_value * (self.borrow_cost / 252) # assuming 252 trading days in a year
+        daily_borrow_cost = short_value * self.daily_borrow_rate 
         self.current_holdings["cash"] -= daily_borrow_cost
         self.current_holdings["total"] -= daily_borrow_cost
         self.current_holdings["borrow_costs"] += daily_borrow_cost
-        total_open_value += self.initial_short_value[ticker] - abs(self.current_positions[ticker]) * latest_bar.open # Cash Proceeds from Initial Short Sales - Current Market Value of Short Stocks
+        self.current_holdings["total"] += self.initial_short_value[ticker] - abs(self.current_positions[ticker]) * latest_bar.open # Cash Proceeds from Initial Short Sales - Current Market Value of Short Stocks
         total_short_value += short_value
       else: # LONG
-        total_open_value += self.current_positions[ticker] * latest_bar.open # use opening price to evaluate portfolio value
+        self.current_holdings["total"] += self.current_positions[ticker] * latest_bar.open
 
-    if total_open_value + self.current_holdings["cash"] < (1+self.maintenance_margin) * total_short_value:
+    if self.current_holdings["total"] + self.current_holdings["cash"] < (1+self.maintenance_margin) * total_short_value:
       print("WARNING: Portfolio equity has fallen below maintenance margin requirements!")
       self.current_holdings["order"] += " | Portfolio equity has fallen below maintenance margin."
 
@@ -91,7 +91,7 @@ class NaivePortfolio(Portfolio):
     self.current_holdings["order"] = ""
     self.current_holdings["commissions"] = 0.0
     self.current_holdings["borrow_costs"] = 0.0
-    self.current_holdings["total"] = 0.0
+    self.current_holdings["total"] = 0.0 # will be recalculated from scratch
     self.historical_holdings.append(self.current_holdings)
 
     # START of day
@@ -104,8 +104,11 @@ class NaivePortfolio(Portfolio):
     # simply a valuation of current positions - will be updated again as orders are filled
     for ticker in self.symbol_list:
       latest_bar = self.data_handler.get_latest_bars(ticker)[0]
-      self.current_holdings[ticker] = self.current_positions[ticker] * latest_bar.close # use closing price to evaluate portfolio value
-      self.current_holdings["total"] += self.current_holdings[ticker]
+      if self.current_holdings[f"{ticker} position"] < 0: # a short position
+        self.current_holdings["total"] += self.initial_short_value[ticker] - abs(self.current_positions[ticker]) * latest_bar.close # Cash Proceeds from Initial Short Sales - Current Market Value of Short Stocks
+      else:
+        self.current_holdings[ticker] = self.current_positions[ticker] * latest_bar.close # use closing price to evaluate portfolio value
+        self.current_holdings["total"] += self.current_holdings[ticker]
 
 
   def on_fill(self, event):
