@@ -7,6 +7,8 @@ import importlib.resources
 import importlib
 from backtester.portfolios.naive_portfolio import NaivePortfolio
 import pandas as pd
+from backtester.execution.simulated_execution_handler import SimulatedExecutionHandler
+from backtester.exceptions.negative_cash_exception import NegativeCashException
 
 app = typer.Typer()
 
@@ -32,7 +34,8 @@ def load_class(path_to_class: str):
 
 @app.command()
 def run(data_dir: str,
-        strategy: Optional[str] = "buy_and_hold_simple"
+        strategy: Optional[str] = "buy_and_hold_simple",
+        exception_contd: Optional[int] = 0
       ):
   """
   Run the backtester with a given strategy and date range.
@@ -50,31 +53,50 @@ def run(data_dir: str,
 
   initial_capital = config["backtester_settings"]["initial_capital"]
   start_timestamp = pd.to_datetime(config["backtester_settings"]["start_date"]).timestamp()
+  interval = config["backtester_settings"]["interval"]
+  exchange_closing_time = config["backtester_settings"]["exchange_closing_time"]
   typer.echo(f"Initial Capital: {initial_capital}")
+  
 
   StrategyClass = load_class(config["strategies"][strategy]["name"])
   additional_params = config["strategies"][strategy].get("additional_parameters", {})
 
   event_queue = collections.deque()
-  data_handler = CSVDataHandler(event_queue, data_dir, symbol_list)
+  data_handler = CSVDataHandler(event_queue, data_dir, symbol_list, interval, exchange_closing_time)
   strategy_instance = StrategyClass(event_queue, data_handler, **additional_params)
   portfolio = NaivePortfolio(data_handler,initial_capital,symbol_list,event_queue,start_timestamp)
+  execution_handler = SimulatedExecutionHandler(event_queue, data_handler)
   
+  mkt_close = False
+
   while data_handler.continue_backtest:
     data_handler.update_bars()
     # Process events from the event queue (e.g., generate signals, execute orders, etc.)
     while event_queue:
       event = event_queue.popleft()
       if event.type == "MARKET":
-        strategy_instance.generate_signals(event)
-        portfolio.on_market(event)
+        mkt_close = event.is_eod
+        try:
+          portfolio.on_market(event) # update portfolio valuation
+        except NegativeCashException as e:
+          if exception_contd:
+            print(e)
+          else:
+            raise e
+        execution_handler.on_market(event, mkt_close) # check if any orders can be filled, if so, it will update the portfolio via a FILL event
+        strategy_instance.generate_signals(event) # generate signals based on market event
       elif event.type == "SIGNAL":
          portfolio.on_signal(event)
       elif event.type == "ORDER":
-        print(f"Processing ORDER event: {event.type} for {event.ticker} {event.direction} {event.quantity} shares")
+        execution_handler.on_order(event)
+      elif event.type == "FILL":
+        portfolio.on_fill(event)
+    if mkt_close:
+      portfolio.end_of_day() # deduct borrow costs and calculate margin
+      mkt_close = False
 
   portfolio.create_equity_curve()
-  print(portfolio.equity_curve)
+  portfolio.equity_curve.to_csv("equity_curve.csv")
 
 
 @app.command()

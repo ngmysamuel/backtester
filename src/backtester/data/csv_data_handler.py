@@ -9,7 +9,7 @@ class CSVDataHandler(DataHandler):
   historical data for each symbol from CSV files.
   """
 
-  def __init__(self, event_queue: list, csv_dir: str, symbol_list: str):
+  def __init__(self, event_queue: list, csv_dir: str, symbol_list: str, interval: int, exchange_closing_time: str):
     """
     Initializes the CSVDataHandler
     args:
@@ -20,6 +20,8 @@ class CSVDataHandler(DataHandler):
     self.event_queue = event_queue
     self.csv_dir = csv_dir
     self.symbol_list = symbol_list
+    self.interval = interval
+    self.exchange_closing_time = exchange_closing_time
 
     self.symbol_data = {}
     self.latest_symbol_data = {}
@@ -84,7 +86,8 @@ class CSVDataHandler(DataHandler):
       else:
         if bar is not None:
           self.latest_symbol_data[s].append(bar)
-          self.event_queue.append(MarketEvent(bar.Index.timestamp(), s))
+    mkt_close = bar.Index + pd.Timedelta(self.interval) >= bar.Index.replace(hour=int(self.exchange_closing_time.split(":")[0]),minute=int(self.exchange_closing_time.split(":")[1]))
+    self.event_queue.append(MarketEvent(bar.Index.timestamp()), mkt_close)
 
 
   def get_latest_bars(self, symbol: str, n: int = 1):

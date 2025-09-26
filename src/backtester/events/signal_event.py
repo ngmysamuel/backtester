@@ -1,5 +1,4 @@
 from backtester.events.event import Event
-import time
 from backtester.enums.signal_type import SignalType
 
 class SignalEvent(Event):
