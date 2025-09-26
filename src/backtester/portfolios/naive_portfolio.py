@@ -5,6 +5,8 @@ from backtester.enums.direction_type import DirectionType
 from backtester.enums.order_type import OrderType
 from backtester.events.order_event import OrderEvent
 import pandas as pd
+import collections
+from backtester.exceptions.negative_cash_exception import NegativeCashException
 
 class NaivePortfolio(Portfolio):
   """
@@ -35,51 +37,30 @@ class NaivePortfolio(Portfolio):
     allocation (float): The percentage of the portfolio that an asset is maximally allowed to take (default is 1).
     borrow_cost (float): The annualized interest rate for borrowing stocks to short sell (default is 0.01, i.e., 1%).
     maintenance_margin (float): The minimum equity percentage required to maintain a short position (default is 0.3, i.e., 30%).
+
+    Attributes:
+    current_holdings: polarity of values indicate a short (<0) or long (>0) position
     """
     self.data_handler = data_handler
     self.initial_capital = initial_capital
     self.symbol_list = symbol_list
     self.events = events
-    self.current_date = pd.to_datetime(start_date, unit='s')
     self.allocation = allocation
     self.daily_borrow_rate = borrow_cost / 252 # assuming 252 trading days in a year
     self.maintenance_margin = maintenance_margin
 
-    self.initial_short_value = {}
+    self.margin_holdings = collections.defaultdict(int)
     self.order_queue = deque
     self.position_size = 100  # to be derived
 
-    self.current_holdings = {sym: 0.0 for sym in self.symbol_list} | {sym + " position": 0 for sym in self.symbol_list}
+    self.current_holdings = {sym: {"position": 0, "value": 0.0} for sym in self.symbol_list}
     self.current_holdings["cash"] = initial_capital
     self.current_holdings["total"] = initial_capital
     self.current_holdings["commissions"] = 0.0
     self.current_holdings["timestamp"] = start_date
-    self.current_holdings["position"] = 0
+    self.current_holdings["borrow_costs"] = 0.0
+    self.current_holdings["order"] = ""
     self.historical_holdings = [self.current_holdings.copy()]
-
-  def _calc_short_borrow_costs(self):
-    """
-    Calculate the borrow costs for all short positions in the portfolio.
-    This method will be called daily to update the borrow costs.
-    """
-    total_short_value = 0
-    self.current_holdings["total"] = 0
-    for ticker in self.symbol_list:
-      latest_bar = self.data_handler.get_latest_bars(ticker)[0]
-      if self.current_holdings[f"{ticker} position"] < 0: # a short position
-        short_value = abs(self.current_holdings[f"{ticker} position"]) * latest_bar.open
-        daily_borrow_cost = short_value * self.daily_borrow_rate 
-        self.current_holdings["cash"] -= daily_borrow_cost
-        self.current_holdings["total"] -= daily_borrow_cost
-        self.current_holdings["borrow_costs"] += daily_borrow_cost
-        self.current_holdings["total"] += self.initial_short_value[ticker] - abs(self.current_positions[ticker]) * latest_bar.open # Cash Proceeds from Initial Short Sales - Current Market Value of Short Stocks
-        total_short_value += short_value
-      else: # LONG
-        self.current_holdings["total"] += self.current_positions[ticker] * latest_bar.open
-
-    if self.current_holdings["total"] + self.current_holdings["cash"] < (1+self.maintenance_margin) * total_short_value:
-      print("WARNING: Portfolio equity has fallen below maintenance margin requirements!")
-      self.current_holdings["order"] += " | Portfolio equity has fallen below maintenance margin."
 
   def on_market(self, event):
     """
@@ -87,71 +68,72 @@ class NaivePortfolio(Portfolio):
     This method is called whenever a new market event is received.
     """
     self.current_holdings = self.current_holdings.copy()
-    self.current_holdings["timestamp"] = event.timestamp
-    self.current_holdings["order"] = ""
     self.current_holdings["commissions"] = 0.0
+    self.current_holdings["timestamp"] = event.timestamp
     self.current_holdings["borrow_costs"] = 0.0
-    self.current_holdings["total"] = 0.0 # will be recalculated from scratch
+    self.current_holdings["order"] = ""
     self.historical_holdings.append(self.current_holdings)
 
-    # START of day
-    event_datetime = pd.to_datetime(event.timestamp, unit='s')
-    if event_datetime - self.current_date >= pd.Timedelta("1D"): # check if a new trading day has started
-      self._calc_short_borrow_costs()
-      self.current_date = event_datetime
+    if self.current_holdings["cash"] < 0:
+      raise NegativeCashException(self.current_holdings["cash"])
 
-    # END of day
-    # simply a valuation of current positions - will be updated again as orders are filled
-    for ticker in self.symbol_list:
-      latest_bar = self.data_handler.get_latest_bars(ticker)[0]
-      if self.current_holdings[f"{ticker} position"] < 0: # a short position
-        self.current_holdings["total"] += self.initial_short_value[ticker] - abs(self.current_positions[ticker]) * latest_bar.close # Cash Proceeds from Initial Short Sales - Current Market Value of Short Stocks
-      else:
-        self.current_holdings[ticker] = self.current_positions[ticker] * latest_bar.close # use closing price to evaluate portfolio value
-        self.current_holdings["total"] += self.current_holdings[ticker]
-
-
-  def on_fill(self, event):
-    """
-    Updates the portfolio's positions and holdings based on a FillEvent.
-    """
-    bar = self.data_handler.get_latest_bars(event.ticker)[0]
-    initial_position = self.current_holdings[f"{event.ticker} position"]
-    self.current_holdings[f"{event.ticker} position"] += event.direction.value * event.quantity
-    self.current_holdings[event.ticker] = abs(self.current_holdings[f"{event.ticker} position"]) * bar.close # use closing price to evaluate portfolio value
-    self.current_holdings["cash"] -= event.fill_cost + event.commission
-    self.current_holdings["total"] -= event.commission
-    self.current_holdings["commissions"] += event.commission
-    self.current_holdings["order"] += f" | {event.direction.name} {event.quantity} {event.ticker}"
-    if initial_position >= 0 and self.current_holdings[f"{event.ticker} position"] < 0: # just entered a short position
-      self.initial_short_value[event.ticker] = self.current_holdings[event.ticker] # record the initial value of the short position
-    elif initial_position < 0 and self.current_holdings[f"{event.ticker} position"] >= 0: # just exited a short position
-      self.initial_short_value[event.ticker] = 0 # srub the initial short position value
 
   def on_signal(self, event):
     order = None
     ticker = event.ticker
     order_type = OrderType.MKT
     cur_quantity = self.current_positions[ticker]
-    quantity = self.position_size * event.strength
+    to_be_quantity = self.position_size * event.strength
  
     if event.signal_type.value == -1: # SHORT
       if self.current_holdings[ticker] > 0: # currently LONG, need to exit first
-        quantity += self.current_holdings[ticker]
-      order = OrderEvent(DirectionType(-1), ticker, order_type, quantity, event.timestamp)
+        to_be_quantity += self.current_holdings[ticker]["position"]
+      order = OrderEvent(DirectionType(-1), ticker, order_type, to_be_quantity, event.timestamp)
     elif event.signal_type.value == 1: # LONG
       if self.current_holdings[ticker] < 0: # currently SHORT, need to exit first
-        quantity += abs(self.current_holdings[ticker])
-      order = OrderEvent(DirectionType(1), ticker, order_type, quantity, event.timestamp)
-    else:
+        to_be_quantity += abs(self.current_holdings[ticker]["position"])
+      order = OrderEvent(DirectionType(1), ticker, order_type, to_be_quantity, event.timestamp)
+    else: # EXIT
       if cur_quantity > 0: # EXIT a long position
         order = OrderEvent(DirectionType(-1), ticker, order_type, cur_quantity, event.timestamp)
       elif cur_quantity < 0: # EXIT a short position
-        order = OrderEvent(DirectionType(1), ticker, order_type, cur_quantity + self.position_size, event.timestamp)
+        order = OrderEvent(DirectionType(1), ticker, order_type, cur_quantity, event.timestamp)
 
     if order:
       self.events.append(order)
-      self.current_holdings["order"] = order.direction
+
+  def on_fill(self, event):
+    """
+    Updates the portfolio's positions and holdings based on a FillEvent.
+    """
+    bar = self.data_handler.get_latest_bars(event.ticker)[0]
+    initial_holding = self.current_holdings[event.ticker]["value"]
+    self.current_holdings[event.ticker]["position"] += event.direction.value * event.quantity
+    self.current_holdings[event.ticker]["value"] = self.current_holdings[event.ticker]["position"] * bar.close # use closing price to evaluate portfolio value
+    self.current_holdings["total"] += (self.current_holdings[event.ticker] - initial_holding - event.commission) # subtract a negative number makes a plus
+    self.current_holdings["cash"] += -1 * event.direction.value * event.fill_cost - event.commission # less the actual cost to buy/sell the stock, 
+    self.current_holdings["commissions"] += event.commission
+    self.current_holdings["order"] += f" | {event.direction.name} {event.quantity} {event.ticker}"
+
+  def end_of_day(self):
+    self.current_holdings["total"] = 0 # recalculate
+    for ticker in self.symbol_list:
+      latest_bar = self.data_handler.get_latest_bars(ticker)[0]
+      self.current_holdings[ticker]["value"] = self.current_holdings[ticker]["position"] * latest_bar.close
+      if self.current_holdings[ticker]["position"] < 0: # nett SHORT position
+        # MARGIN
+        margin_diff = self.margin_holdings[ticker] - (abs(self.current_holdings[ticker]["value"]) * (1+self.maintenance_margin)) # margin change
+        self.current_holdings["cash"] += margin_diff # cash frozen for margin, reduction if margin_diff is -ve
+        # BORROW COSTS
+        daily_borrow_cost = self.current_holdings[ticker]["value"] * self.daily_borrow_rate
+        self.current_holdings["cash"] -= daily_borrow_cost
+        self.current_holdings["total"] += (self.current_holdings[ticker]["value"] - daily_borrow_cost)
+        self.current_holdings["borrow_costs"] += daily_borrow_cost
+      else: # nett LONG position
+        self.current_holdings["cash"] += self.margin_holdings[ticker] # release any margin being held
+        self.margin_holdings[ticker] = 0 # reset margin
+        self.current_holdings["total"] += self.current_holdings[ticker]["value"]
+
 
 
   def create_equity_curve(self):
