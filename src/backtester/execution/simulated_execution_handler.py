@@ -1,16 +1,25 @@
 from collections import deque
 from backtester.events.fill_event import FillEvent
-import pandas as pd
+
 
 class SimulatedExecutionHandler:
-  def __init__(self, events, data_handler, exch_closing, interval="1d"):
+  """
+  SimulatedExecutionHandler simulates the execution of orders as soon as
+  they are received, assuming that all orders are filled at the next market
+  open price. This class handles both Market and Market-On-Close orders.
+  """
+  def __init__(self, events, data_handler):
+    """
+    Initializes the SimulatedExecutionHandler
+    args:
+        events: the Event Queue
+        data_handler: the DataHandler object with current market data
+    """
     self.events = events
     self.data_handler = data_handler
-    self.exch_closing = exch_closing
-    self.interval = interval
     self.order_queue = deque()
     self.mkt_close = False
-    
+
   def on_market(self, event, mkt_close):
     """
     On a MarketEvent, check which order can be executed. All orders, if can be filled, will be filled entirely.
@@ -30,7 +39,9 @@ class SimulatedExecutionHandler:
       else:
         self.order_queue.append(order)  # put it back and wait for next market event
         continue
-      fill_event = FillEvent(current_time, order.ticker, "ARCA", order.quantity, order.direction, fill_cost)
+      fill_event = FillEvent(
+        current_time, order.ticker, "ARCA", order.quantity, order.direction, fill_cost
+      )
       self.events.append(fill_event)
 
   def on_order(self, event, mkt_close):

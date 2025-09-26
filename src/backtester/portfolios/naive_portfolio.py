@@ -28,18 +28,21 @@ class NaivePortfolio(Portfolio):
     """
     Initializes the NaivePortfolio with initial capital, a list of symbols, an event queue, and allocation percentage.
 
-    Parameters:
-    data_handler (DataHandler): The data handler object to fetch market data.
-    initial_capital (float): The starting capital for the portfolio.
-    symbol_list (list): List of ticker symbols to include in the portfolio.
-    events (deque): The event queue to communicate with other components.
-    start_date (float): The starting timestamp for the portfolio.
-    allocation (float): The percentage of the portfolio that an asset is maximally allowed to take (default is 1).
-    borrow_cost (float): The annualized interest rate for borrowing stocks to short sell (default is 0.01, i.e., 1%).
-    maintenance_margin (float): The minimum equity percentage required to maintain a short position (default is 0.3, i.e., 30%).
+    args:
+      data_handler (DataHandler): The data handler object to fetch market data.
+      initial_capital (float): The starting capital for the portfolio.
+      symbol_list (list): List of ticker symbols to include in the portfolio.
+      events (deque): The event queue to communicate with other components.
+      start_date (float): The starting timestamp for the portfolio.
+      allocation (float): The percentage of the portfolio that an asset is maximally allowed to take (default is 1).
+      borrow_cost (float): The annualized interest rate for borrowing stocks to short sell (default is 0.01, i.e., 1%).
+      maintenance_margin (float): The minimum equity percentage required to maintain a short position (default is 0.3, i.e., 30%).
 
     Attributes:
-    current_holdings: polarity of values indicate a short (<0) or long (>0) position
+      daily_borrow_rate: the daily interest rate for borrowing stocks to short sell
+      margin_holdings: tracks the margin held for each symbol when shorting
+      order_queue: a queue to hold orders before execution
+      current_holdings: polarity of values indicate a short (<0) or long (>0) position
     """
     self.data_handler = data_handler
     self.initial_capital = initial_capital
