@@ -24,7 +24,7 @@ class NaivePortfolio(Portfolio):
     start_date: float,
     allocation: float = 1,
     borrow_cost: float = 0.01,
-    maintenance_margin: float = 0.3
+    maintenance_margin: float = 0.2
   ):
     """
     Initializes the NaivePortfolio with initial capital, a list of symbols, an event queue, and allocation percentage.
@@ -37,7 +37,7 @@ class NaivePortfolio(Portfolio):
       start_date (float): The starting timestamp for the portfolio.
       allocation (float): The percentage of the portfolio that an asset is maximally allowed to take (default is 1).
       borrow_cost (float): The annualized interest rate for borrowing stocks to short sell (default is 0.01, i.e., 1%).
-      maintenance_margin (float): The minimum equity percentage required to maintain a short position (default is 0.3, i.e., 30%).
+      maintenance_margin (float): The minimum equity percentage required to maintain a short position (default is 0.2, i.e., 20%).
 
     Attributes:
       daily_borrow_rate: the daily interest rate for borrowing stocks to short sell
@@ -101,7 +101,7 @@ class NaivePortfolio(Portfolio):
       if cur_quantity > 0: # EXIT a long position
         order = OrderEvent(DirectionType(-1), ticker, order_type, cur_quantity, event.timestamp)
       elif cur_quantity < 0: # EXIT a short position
-        order = OrderEvent(DirectionType(1), ticker, order_type, cur_quantity, event.timestamp)
+        order = OrderEvent(DirectionType(1), ticker, order_type, abs(cur_quantity), event.timestamp)
 
     if order:
       self.events.append(order)
@@ -124,21 +124,21 @@ class NaivePortfolio(Portfolio):
     for ticker in self.symbol_list:
       latest_bar = self.data_handler.get_latest_bars(ticker)[0]
       self.current_holdings[ticker]["value"] = self.current_holdings[ticker]["position"] * latest_bar.close
+      self.current_holdings["total"] += self.current_holdings[ticker]["value"] # add value of current position
       if self.current_holdings[ticker]["position"] < 0: # nett SHORT position
         # MARGIN
-        margin_diff = self.margin_holdings[ticker] + (self.current_holdings[ticker]["value"]) * (1+self.maintenance_margin) # margin change
+        margin_diff = self.margin_holdings[ticker] + (self.current_holdings[ticker]["value"]) * (1 + self.maintenance_margin) # margin change
         self.current_holdings["cash"] += margin_diff # cash frozen for margin, reduction if margin_diff is -ve
         self.margin_holdings[ticker] -= margin_diff
+        self.current_holdings["total"] += self.margin_holdings[ticker] # total portfolio value is inclusive of margin
         # BORROW COSTS
-        daily_borrow_cost = self.current_holdings[ticker]["value"] * self.daily_borrow_rate
+        daily_borrow_cost = abs(self.current_holdings[ticker]["value"]) * self.daily_borrow_rate
         self.current_holdings["cash"] -= daily_borrow_cost
-        self.current_holdings["total"] += (self.current_holdings[ticker]["value"] - daily_borrow_cost)
         self.current_holdings["borrow_costs"] += daily_borrow_cost
       else: # nett LONG position
         self.current_holdings["cash"] += self.margin_holdings[ticker] # release any margin being held
         self.margin_holdings[ticker] = 0 # reset margin
-        self.current_holdings["total"] += self.current_holdings[ticker]["value"]
-    self.current_holdings["total"] += self.current_holdings["cash"] + self.margin_holdings[ticker]
+    self.current_holdings["total"] += self.current_holdings["cash"]
     self.current_holdings["margin"] = self.margin_holdings.copy()
 
   def liquidate(self):
