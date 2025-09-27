@@ -24,18 +24,28 @@ df = dat.history(period='5y') # period must be one of: 1d, 5d, 1mo, 3mo, 6mo, 1y
 df.to_csv("MSFT.csv")
 ```
 
-### Notes
-1. Value of positions are valued using the closing price of each interval. 
+### Implementation Details
+1. Portfolio
+    1. Value of positions are calculated using the closing price of each interval. 
+    2. Total portfolio value is calculated as the sum of the useable cash, value of positions (shorts are considered negative), and margin locked up
+    3. Cash shown is useable cash i.e. not locked up as margin
 2. Shorting
+<<<<<<< HEAD
     1. Short sold position in a stock is possible but many assumptions are made. You can borrow the shares indefinitely. 
     2. Borrow costs and margin are calculated at the end of the trading day
     3. Required margin is immediately deducted from cash balance
     4. If there is a negative cash balance at the start of a bar, an exception is raised (pass continue=1 to continue)
+=======
+  1. Short sold position in a stock is possible but many assumptions are made. You can borrow the shares indefinitely. 
+  2. Borrow costs and margin are calculated at the end of the trading day
+  3. Required margin is immediately deducted from the useable cash balance
+  4. If there is a negative cash balance at the start of a bar, an exception is raised (pass continue=1 to continue)
+>>>>>>> main
 3. Simulated Execution
     1. Market Orders are filled at open i.e. at the opening price of the next interval from the order placed. Market On Close are filled at close when the current interval of market data is the last slice of the day.
     2. All orders are filled entirely i.e. no partial filling
 
-### Learnings
+### Notes
 
 An event driven backtester is a pure chronological construct unlike a vectorized backtester which has the prices at all time periods already.
 

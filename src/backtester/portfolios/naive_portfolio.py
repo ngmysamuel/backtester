@@ -9,6 +9,7 @@ import numpy as np
 import collections
 from backtester.exceptions.negative_cash_exception import NegativeCashException
 import math
+from copy import deepcopy
 
 class NaivePortfolio(Portfolio):
   """
@@ -41,7 +42,7 @@ class NaivePortfolio(Portfolio):
       start_date (float): The starting timestamp for the portfolio.
       allocation (float): The percentage of the portfolio that an asset is maximally allowed to take (default is 1).
       borrow_cost (float): The annualized interest rate for borrowing stocks to short sell (default is 0.01, i.e., 1%).
-      maintenance_margin (float): The minimum equity percentage required to maintain a short position (default is 0.3, i.e., 30%).
+      maintenance_margin (float): The minimum equity percentage required to maintain a short position (default is 0.2, i.e., 20%).
 
     Attributes:
       daily_borrow_rate: the daily interest rate for borrowing stocks to short sell
@@ -78,7 +79,7 @@ class NaivePortfolio(Portfolio):
     Updates the portfolio's positions and holdings based on the latest market data.
     This method is called whenever a new market event is received.
     """
-    self.current_holdings = self.current_holdings.copy()
+    self.current_holdings = deepcopy(self.current_holdings)
     self.current_holdings["commissions"] = 0.0
     self.current_holdings["timestamp"] = event.timestamp
     self.current_holdings["borrow_costs"] = 0.0
@@ -98,22 +99,22 @@ class NaivePortfolio(Portfolio):
     order = None
     ticker = event.ticker
     order_type = OrderType.MKT
-    cur_quantity = self.current_positions[ticker]
+    cur_quantity = self.current_holdings[ticker]["position"]
     to_be_quantity = self.position_size * event.strength
  
     if event.signal_type.value == -1: # SHORT
-      if self.current_holdings[ticker] > 0: # currently LONG, need to exit first
-        to_be_quantity += self.current_holdings[ticker]["position"]
+      if cur_quantity > 0: # currently LONG, need to exit first
+        to_be_quantity += cur_quantity
       order = OrderEvent(DirectionType(-1), ticker, order_type, to_be_quantity, event.timestamp)
     elif event.signal_type.value == 1: # LONG
-      if self.current_holdings[ticker] < 0: # currently SHORT, need to exit first
-        to_be_quantity += abs(self.current_holdings[ticker]["position"])
+      if cur_quantity < 0: # currently SHORT, need to exit first
+        to_be_quantity += abs(cur_quantity)
       order = OrderEvent(DirectionType(1), ticker, order_type, to_be_quantity, event.timestamp)
     else: # EXIT
       if cur_quantity > 0: # EXIT a long position
         order = OrderEvent(DirectionType(-1), ticker, order_type, cur_quantity, event.timestamp)
       elif cur_quantity < 0: # EXIT a short position
-        order = OrderEvent(DirectionType(1), ticker, order_type, cur_quantity, event.timestamp)
+        order = OrderEvent(DirectionType(1), ticker, order_type, abs(cur_quantity), event.timestamp)
 
     if order:
       self.events.append(order)
@@ -126,7 +127,7 @@ class NaivePortfolio(Portfolio):
     initial_holding = self.current_holdings[event.ticker]["value"]
     self.current_holdings[event.ticker]["position"] += event.direction.value * event.quantity
     self.current_holdings[event.ticker]["value"] = self.current_holdings[event.ticker]["position"] * bar.close # use closing price to evaluate portfolio value
-    self.current_holdings["total"] += (self.current_holdings[event.ticker] - initial_holding - event.commission) # subtract a negative number makes a plus
+    self.current_holdings["total"] += (self.current_holdings[event.ticker]["value"] - initial_holding - event.commission) # subtract a negative number makes a plus
     self.current_holdings["cash"] += -1 * event.direction.value * event.fill_cost - event.commission # less the actual cost to buy/sell the stock, 
     self.current_holdings["commissions"] += event.commission
     self.current_holdings["order"] += f" | {event.direction.name} {event.quantity} {event.ticker}"
@@ -136,19 +137,38 @@ class NaivePortfolio(Portfolio):
     for ticker in self.symbol_list:
       latest_bar = self.data_handler.get_latest_bars(ticker)[0]
       self.current_holdings[ticker]["value"] = self.current_holdings[ticker]["position"] * latest_bar.close
+      self.current_holdings["total"] += self.current_holdings[ticker]["value"] # add value of current position
       if self.current_holdings[ticker]["position"] < 0: # nett SHORT position
         # MARGIN
-        margin_diff = self.margin_holdings[ticker] - (abs(self.current_holdings[ticker]["value"]) * (1+self.maintenance_margin)) # margin change
+        margin_diff = self.margin_holdings[ticker] + (self.current_holdings[ticker]["value"]) * (1 + self.maintenance_margin) # margin change
         self.current_holdings["cash"] += margin_diff # cash frozen for margin, reduction if margin_diff is -ve
+        self.margin_holdings[ticker] -= margin_diff
+        self.current_holdings["total"] += self.margin_holdings[ticker] # total portfolio value is inclusive of margin
         # BORROW COSTS
-        daily_borrow_cost = self.current_holdings[ticker]["value"] * self.daily_borrow_rate
+        daily_borrow_cost = abs(self.current_holdings[ticker]["value"]) * self.daily_borrow_rate
         self.current_holdings["cash"] -= daily_borrow_cost
-        self.current_holdings["total"] += (self.current_holdings[ticker]["value"] - daily_borrow_cost)
         self.current_holdings["borrow_costs"] += daily_borrow_cost
       else: # nett LONG position
         self.current_holdings["cash"] += self.margin_holdings[ticker] # release any margin being held
         self.margin_holdings[ticker] = 0 # reset margin
-        self.current_holdings["total"] += self.current_holdings[ticker]["value"]
+    self.current_holdings["total"] += self.current_holdings["cash"]
+    self.current_holdings["margin"] = self.margin_holdings.copy()
+
+  def liquidate(self):
+    self.current_holdings = deepcopy(self.current_holdings)
+    self.current_holdings["commissions"] = 0.0
+    self.current_holdings["borrow_costs"] = 0.0
+    self.current_holdings["order"] = ""
+    self.historical_holdings.append(self.current_holdings)
+    for ticker in self.symbol_list:
+      latest_bar = self.data_handler.get_latest_bars(ticker)[0]
+      if self.current_holdings[ticker]["position"] < 0: # nett SHORT position
+        self.current_holdings["cash"] += self.margin_holdings[ticker] # release any margin being held
+      self.current_holdings["cash"] += self.current_holdings[ticker]["position"] * latest_bar.close
+      self.current_holdings[ticker]["position"] = 0
+      self.current_holdings[ticker]["value"] = 0
+      self.current_holdings["margin"][ticker] = 0
+    self.current_holdings["total"] = self.current_holdings["cash"]
 
   def _calc_atr(self):
     atr_data = self.data_handler.get_latest_bars(self.atr_period+1)
@@ -163,6 +183,7 @@ class NaivePortfolio(Portfolio):
 
   def create_equity_curve(self):
     curve = pd.DataFrame(self.historical_holdings)
+    curve["timestamp"] = pd.to_datetime(curve["timestamp"], unit="s")
     curve.set_index("timestamp", inplace=True)
     curve["returns"] = curve["total"].pct_change()
     curve["equity_curve"] = (1.0 + curve["returns"]).cumprod()

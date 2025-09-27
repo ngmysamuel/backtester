@@ -15,12 +15,12 @@ class MovingAverageCrossover:
 
   def generate_signals(self, event):
     timestamp = event.timestamp
-    ticker = event.ticker
     for ticker in self.symbol_list:
-      data = self.data_handler.get_latest_bars(ticker, n=self.long_window)
-      if len(data) < self.long_window:
+      data = self.data_handler.get_latest_bars(ticker, n=self.long_window+1)
+      if len(data) < self.long_window+1:
         return  # Not enough data to compute moving averages
       short_avg = long_avg = 0
+      data = data[:-1] # do not use future data
       for idx, bar in enumerate(data[::-1]):
         if idx < self.short_window:
           short_avg += bar.close
@@ -32,4 +32,4 @@ class MovingAverageCrossover:
         self.history[ticker] = -1
       elif short_avg > long_avg and self.history[ticker] <= 0: # GO LONG
         self.events.append(SignalEvent(timestamp, ticker, SignalType.LONG))
-        self.history[ticker] = -1
+        self.history[ticker] = 1

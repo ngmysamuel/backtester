@@ -25,9 +25,15 @@ class SimulatedExecutionHandler:
     On a MarketEvent, check which order can be executed. All orders, if can be filled, will be filled entirely.
     """
     self.mkt_close = mkt_close
-    while self.order_queue:
+    checked_orders = 0
+    orders_to_check = len(self.order_queue)
+    while checked_orders < orders_to_check:
+      checked_orders += 1
       order = self.order_queue.popleft()
-      bar = self.data_handler.get_latest_bars(order.ticker)[0]
+      bar = self.data_handler.get_latest_bars(order.ticker)
+      if not bar:
+        raise IndexError(f"There is no data for {order.ticker}")
+      bar = bar[0]
       current_time = bar.Index.timestamp()
       if order.timestamp >= current_time:
         self.order_queue.appendleft(order)  # put it back and wait for next market event
@@ -44,7 +50,7 @@ class SimulatedExecutionHandler:
       )
       self.events.append(fill_event)
 
-  def on_order(self, event, mkt_close):
+  def on_order(self, event):
     """
     Processes an OrderEvent to execute trades.
     """
