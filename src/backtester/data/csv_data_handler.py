@@ -86,8 +86,8 @@ class CSVDataHandler(DataHandler):
       else:
         if bar is not None:
           self.latest_symbol_data[s].append(bar)
-    mkt_close = bar.Index + pd.Timedelta(self.interval) >= bar.Index.replace(hour=int(self.exchange_closing_time.split(":")[0]),minute=int(self.exchange_closing_time.split(":")[1]))
-    self.event_queue.append(MarketEvent(bar.Index.timestamp()), mkt_close)
+          mkt_close = bar.Index + pd.Timedelta(self.interval) >= bar.Index.replace(hour=int(self.exchange_closing_time.split(":")[0]),minute=int(self.exchange_closing_time.split(":")[1]))
+          self.event_queue.append(MarketEvent(bar.Index.timestamp(), mkt_close))
 
 
   def get_latest_bars(self, symbol: str, n: int = 1):
