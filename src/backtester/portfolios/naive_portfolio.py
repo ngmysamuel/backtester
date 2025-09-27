@@ -138,9 +138,24 @@ class NaivePortfolio(Portfolio):
         self.current_holdings["cash"] += self.margin_holdings[ticker] # release any margin being held
         self.margin_holdings[ticker] = 0 # reset margin
         self.current_holdings["total"] += self.current_holdings[ticker]["value"]
+    self.current_holdings["total"] += self.current_holdings["cash"] + self.margin_holdings[ticker]
     self.current_holdings["margin"] = self.margin_holdings.copy()
 
-
+  def liquidate(self):
+    self.current_holdings = deepcopy(self.current_holdings)
+    self.current_holdings["commissions"] = 0.0
+    self.current_holdings["borrow_costs"] = 0.0
+    self.current_holdings["order"] = ""
+    self.historical_holdings.append(self.current_holdings)
+    for ticker in self.symbol_list:
+      latest_bar = self.data_handler.get_latest_bars(ticker)[0]
+      if self.current_holdings[ticker]["position"] < 0: # nett SHORT position
+        self.current_holdings["cash"] += self.margin_holdings[ticker] # release any margin being held
+      self.current_holdings["cash"] += self.current_holdings[ticker]["position"] * latest_bar.close
+      self.current_holdings[ticker]["position"] = 0
+      self.current_holdings[ticker]["value"] = 0
+      self.current_holdings["margin"][ticker] = 0
+    self.current_holdings["total"] = self.current_holdings["cash"]
 
   def create_equity_curve(self):
     curve = pd.DataFrame(self.historical_holdings)
