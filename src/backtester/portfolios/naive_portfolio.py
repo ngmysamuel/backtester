@@ -5,8 +5,10 @@ from backtester.enums.direction_type import DirectionType
 from backtester.enums.order_type import OrderType
 from backtester.events.order_event import OrderEvent
 import pandas as pd
+import numpy as np
 import collections
 from backtester.exceptions.negative_cash_exception import NegativeCashException
+import math
 
 class NaivePortfolio(Portfolio):
   """
@@ -23,7 +25,10 @@ class NaivePortfolio(Portfolio):
     start_date: float,
     allocation: float = 1,
     borrow_cost: float = 0.01,
-    maintenance_margin: float = 0.3
+    maintenance_margin: float = 0.3,
+    risk_per_trade: float = 0.01,
+    atr_period: int = 14,
+    atr_multiplier: int = 2
   ):
     """
     Initializes the NaivePortfolio with initial capital, a list of symbols, an event queue, and allocation percentage.
@@ -51,6 +56,9 @@ class NaivePortfolio(Portfolio):
     self.allocation = allocation
     self.daily_borrow_rate = borrow_cost / 252 # assuming 252 trading days in a year
     self.maintenance_margin = maintenance_margin
+    self.risk_per_trade = risk_per_trade
+    self.atr_period = atr_period
+    self.atr_multiplier - atr_multiplier
 
     self.margin_holdings = collections.defaultdict(int)
     self.order_queue = deque
@@ -76,6 +84,11 @@ class NaivePortfolio(Portfolio):
     self.current_holdings["borrow_costs"] = 0.0
     self.current_holdings["order"] = ""
     self.historical_holdings.append(self.current_holdings)
+
+    atr = self._calc_atr()
+    if atr:
+      capital_to_risk = min(self.current_holdings["cash"], self.risk_per_trade * self.current_holdings["total"])
+      self.position_size = math.floor(capital_to_risk * atr)
 
     if self.current_holdings["cash"] < 0:
       raise NegativeCashException(self.current_holdings["cash"])
@@ -137,7 +150,16 @@ class NaivePortfolio(Portfolio):
         self.margin_holdings[ticker] = 0 # reset margin
         self.current_holdings["total"] += self.current_holdings[ticker]["value"]
 
-
+  def _calc_atr(self):
+    atr_data = self.data_handler.get_latest_bars(self.atr_period+1)
+    if atr_data.shape[0] < self.atr_period + 1:
+      return
+    atr_data = atr_data.iloc[:-1] # do not use future dated information
+    atr_data["h-l"] = atr_data["high"] - atr_data["low"]
+    atr_data["h-prev"] = atr_data["high"] - atr_data["close"].shift(periods=1) 
+    atr_data["l-prev"] = atr_data["low"] - atr_data["close"].shift(periods=1) 
+    atr_data["tr"] = np.max(atr_data["h-l"], atr_data["h-prev"], atr_data["l-prev"])
+    return atr_data["tr"].mean()
 
   def create_equity_curve(self):
     curve = pd.DataFrame(self.historical_holdings)
