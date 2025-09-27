@@ -95,6 +95,7 @@ def run(data_dir: str,
       portfolio.end_of_day() # deduct borrow costs and calculate margin
       mkt_close = False
 
+  portfolio.liquidate()
   portfolio.create_equity_curve()
   portfolio.equity_curve.to_csv("equity_curve.csv")
 

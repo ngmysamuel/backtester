@@ -44,7 +44,7 @@ class SimulatedExecutionHandler:
       )
       self.events.append(fill_event)
 
-  def on_order(self, event, mkt_close):
+  def on_order(self, event):
     """
     Processes an OrderEvent to execute trades.
     """
