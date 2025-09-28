@@ -38,7 +38,8 @@ def portfolio(mock_data_handler):
         initial_capital=100000.0,
         symbol_list=["MSFT", "AAPL"],
         events=events,
-        start_date=pd.to_datetime("2023-01-01").timestamp()
+        start_date=pd.to_datetime("2023-01-01").timestamp(),
+        interval="1d"
     )
 
 # --- Test Cases ---

@@ -9,6 +9,7 @@ from backtester.portfolios.naive_portfolio import NaivePortfolio
 import pandas as pd
 from backtester.execution.simulated_execution_handler import SimulatedExecutionHandler
 from backtester.exceptions.negative_cash_exception import NegativeCashException
+import quantstats as qs
 
 app = typer.Typer()
 
@@ -57,14 +58,13 @@ def run(data_dir: str,
   exchange_closing_time = config["backtester_settings"]["exchange_closing_time"]
   typer.echo(f"Initial Capital: {initial_capital}")
   
-
   StrategyClass = load_class(config["strategies"][strategy]["name"])
   additional_params = config["strategies"][strategy].get("additional_parameters", {})
 
   event_queue = collections.deque()
   data_handler = CSVDataHandler(event_queue, data_dir, symbol_list, interval, exchange_closing_time)
   strategy_instance = StrategyClass(event_queue, data_handler, **additional_params)
-  portfolio = NaivePortfolio(data_handler,initial_capital,symbol_list,event_queue,start_timestamp)
+  portfolio = NaivePortfolio(data_handler,initial_capital,symbol_list,event_queue,start_timestamp, interval)
   execution_handler = SimulatedExecutionHandler(event_queue, data_handler)
   
   mkt_close = False
@@ -99,8 +99,9 @@ def run(data_dir: str,
   portfolio.liquidate()
   portfolio.create_equity_curve()
   portfolio.equity_curve.to_csv("equity_curve.csv")
-  stats = portfolio.create_statistics()
-  print(stats)
+  # stats = portfolio.create_statistics()
+  # print(portfolio.equity_curve["returns"])
+  # qs.reports.html(portfolio.equity_curve["returns"], benchmark="SPY", output='strategy_report.html', title='My Awesome Strategy')
 
 
 @app.command()
