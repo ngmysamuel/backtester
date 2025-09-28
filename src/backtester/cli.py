@@ -99,6 +99,8 @@ def run(data_dir: str,
   portfolio.liquidate()
   portfolio.create_equity_curve()
   portfolio.equity_curve.to_csv("equity_curve.csv")
+  stats = portfolio.create_statistics()
+  print(stats)
 
 
 @app.command()

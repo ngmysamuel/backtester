@@ -8,8 +8,8 @@ import pandas as pd
 import numpy as np
 import collections
 from backtester.exceptions.negative_cash_exception import NegativeCashException
-import math
 from copy import deepcopy
+from backtester.metrics.performance import calc_sharpe_ratio, calc_drawdowns
 
 class NaivePortfolio(Portfolio):
   """
@@ -218,3 +218,12 @@ class NaivePortfolio(Portfolio):
     curve["returns"] = curve["total"].pct_change()
     curve["equity_curve"] = (1.0 + curve["returns"]).cumprod()
     self.equity_curve = curve
+
+  def create_statistics(self):
+    sharpe_ratio = calc_sharpe_ratio(self.equity_curve["returns"])
+    max_dd, dd_duration = calc_drawdowns(self.equity_curve["equity_curve"])
+    return {
+      "sharpe": sharpe_ratio,
+      "max_dd": max_dd,
+      "dd_duration": dd_duration
+    }
