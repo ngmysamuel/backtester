@@ -10,6 +10,9 @@ import pandas as pd
 from backtester.execution.simulated_execution_handler import SimulatedExecutionHandler
 from backtester.exceptions.negative_cash_exception import NegativeCashException
 import quantstats as qs
+from pathlib import Path
+import sys
+import runpy
 
 app = typer.Typer()
 
@@ -103,13 +106,15 @@ def run(data_dir: str,
 
 
 @app.command()
-def plot_results():
+def dashboard():
   """
   Plot the results of the last backtest.
   """
   typer.echo("Plotting results...")
-  # --- TO BE IMPLEMENTED ---
-
+  streamlit_script_path = Path("src/backtester/metrics/dashboard/overview.py").resolve()
+  typer.echo(streamlit_script_path)
+  sys.argv = ["streamlit", "run", streamlit_script_path]
+  runpy.run_module("streamlit", run_name="__main__")
 
 if __name__ == "__main__":
   app()

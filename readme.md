@@ -16,6 +16,11 @@ poetry run backtester run
 poetry run pytest
 ```
 
+### Dashboard
+```
+poetry run backtester dashboard
+```
+
 ### Pulling CSV data
 ```
 import yfinance as yf
