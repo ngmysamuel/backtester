@@ -62,7 +62,7 @@ class NaivePortfolio(Portfolio):
 
     self.margin_holdings = collections.defaultdict(int)
     self.position_size = {sym: 100 for sym in self.symbol_list}  # to be derived
-    self.historical_atr = {sym: None for sym in self.symbol_list}
+    self.historical_atr = {sym: [] for sym in self.symbol_list}
 
     self.current_holdings = {sym: {"position": 0, "value": 0.0} for sym in self.symbol_list}
     self.current_holdings["cash"] = initial_capital
@@ -88,9 +88,6 @@ class NaivePortfolio(Portfolio):
     if self.current_holdings["cash"] < 0:
       raise NegativeCashException(self.current_holdings["cash"])
 
-    for ticker in self.symbol_list:
-      self.historical_atr[ticker].append(self._calc_atr(ticker))
-
 
   def on_signal(self, event):
     order = None
@@ -98,10 +95,12 @@ class NaivePortfolio(Portfolio):
     order_type = OrderType.MKT
     cur_quantity = self.current_holdings[ticker]["position"]
 
-    atr = self.historical_atr[ticker][-1]
-    if atr is not None and atr > 0: # check for ATR > 0 to prevent ZeroDivisionError, else, reuse previous position size
-      capital_to_risk = min(self.current_holdings["cash"], self.risk_per_trade * self.current_holdings["total"])
-      self.position_size[ticker] = capital_to_risk // (atr * self.atr_multiplier)
+    atr_list = self.historical_atr[ticker]
+    if len(atr_list) > 0: # check for ATR > 0 to prevent ZeroDivisionError, else, reuse previous position size
+      atr = self.historical_atr[ticker][-1]
+      if atr:
+        capital_to_risk = min(self.current_holdings["cash"], self.risk_per_trade * self.current_holdings["total"])
+        self.position_size[ticker] = capital_to_risk // (atr * self.atr_multiplier)
 
     to_be_quantity = self.position_size[ticker] * event.strength
  
@@ -136,6 +135,9 @@ class NaivePortfolio(Portfolio):
     self.current_holdings["order"] += f" | {event.direction.name} {event.quantity} {event.ticker}"
 
   def end_of_day(self):
+    """
+    The end of the trading day - perform mark to market activities like margin calculation and borrow costs
+    """
     self.current_holdings["total"] = 0 # recalculate
     for ticker in self.symbol_list:
       latest_bar = self.data_handler.get_latest_bars(ticker)[0]
@@ -156,6 +158,13 @@ class NaivePortfolio(Portfolio):
         self.margin_holdings[ticker] = 0 # reset margin
     self.current_holdings["total"] += self.current_holdings["cash"]
     self.current_holdings["margin"] = self.margin_holdings.copy()
+  
+  def end_of_interval(self):
+    """
+    The end of a trading interval e.g. 5mins, 1day - perform tasks that can only take place only take place at the END of the current interval
+    """
+    for ticker in self.symbol_list:
+      self.historical_atr[ticker].append(self._calc_atr(ticker))
 
   def liquidate(self):
     self.current_holdings = deepcopy(self.current_holdings)
@@ -179,7 +188,6 @@ class NaivePortfolio(Portfolio):
       if len(bar_data) < self.atr_period + 1:
         return
 
-      # not needed to throw latest bar away. Used for position sizing, the trade will take place the next day, hence the information from the latest bar is already available
       bar_data = pd.DataFrame(bar_data)
       bar_data["h-l"] = bar_data["high"] - bar_data["low"]
       bar_data["h-prev"] = (bar_data["high"] - bar_data["close"].shift(periods=1)).abs()

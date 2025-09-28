@@ -91,6 +91,7 @@ def run(data_dir: str,
         execution_handler.on_order(event)
       elif event.type == "FILL":
         portfolio.on_fill(event)
+    portfolio.end_of_interval()
     if mkt_close:
       portfolio.end_of_day() # deduct borrow costs and calculate margin
       mkt_close = False
