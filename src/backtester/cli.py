@@ -99,9 +99,7 @@ def run(data_dir: str,
   portfolio.liquidate()
   portfolio.create_equity_curve()
   portfolio.equity_curve.to_csv("equity_curve.csv")
-  # stats = portfolio.create_statistics()
-  # print(portfolio.equity_curve["returns"])
-  # qs.reports.html(portfolio.equity_curve["returns"], benchmark="SPY", output='strategy_report.html', title='My Awesome Strategy')
+  qs.reports.html(portfolio.equity_curve["returns"], benchmark="SPY", output='strategy_report.html', title=strategy)
 
 
 @app.command()

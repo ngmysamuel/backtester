@@ -14,5 +14,5 @@ strategies:
   moving_average:
     name: "backtester.strategies.moving_average_crossover.MovingAverageCrossover"
     additional_parameters:
-      long_window: 50
-      short_window: 20
+      long_window: 200
+      short_window: 50
