@@ -39,11 +39,12 @@ df.to_csv("MSFT.csv")
     2. All orders are filled entirely i.e. no partial filling
 4. Position Sizing
     1. Implemented in the portfolio module with attributes defined in config.yaml
-    2. position_size = capital_to_risk // (atr * atr_multiplier) where
-    3. position_size = number of stocks to buy
-    4. captial_to_risk = risk_per_trade * total_portfolio_value where
+    2. Calculated at the end of the interval, before new bars are added
+    3. position_size = capital_to_risk // (atr * atr_multiplier) where
+    4. position_size = number of stocks to buy
+    5. captial_to_risk = risk_per_trade * total_portfolio_value where
         1. risk_per_trade = a percent that you are willing lose in a single trade
-    5. atr = average true range where
+    6. atr = average true range where
         1. Wilder's Smoothing Method
             1. https://www.macroption.com/atr-calculation/#exponential-moving-average-ema-method
             2. https://www.macroption.com/atr-excel-wilder/
