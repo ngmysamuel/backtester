@@ -45,6 +45,8 @@ df.to_csv("MSFT.csv")
         1. risk_per_trade = a percent that you are willing lose in a single trade
     5. atr = average true range where
         1. Wilder's Smoothing Method
+            1. https://www.macroption.com/atr-calculation/#exponential-moving-average-ema-method
+            2. https://www.macroption.com/atr-excel-wilder/
         2. initialization is handled with a simple average of the true range over the number of periods
 
 
