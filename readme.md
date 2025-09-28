@@ -30,13 +30,26 @@ df.to_csv("MSFT.csv")
     2. Total portfolio value is calculated as the sum of the useable cash, value of positions (shorts are considered negative), and margin locked up
     3. Cash shown is useable cash i.e. not locked up as margin
 2. Shorting
-  1. Short sold position in a stock is possible but many assumptions are made. You can borrow the shares indefinitely. 
-  2. Borrow costs and margin are calculated at the end of the trading day
-  3. Required margin is immediately deducted from the useable cash balance
-  4. If there is a negative cash balance at the start of a bar, an exception is raised (pass continue=1 to continue)
+    1. Short sold position in a stock is possible but many assumptions are made. You can borrow the shares indefinitely. 
+    2. Borrow costs and margin are calculated at the end of the trading day
+    3. Required margin is immediately deducted from the useable cash balance
+    4. If there is a negative cash balance at the start of a bar, an exception is raised (pass continue=1 to continue)
 3. Simulated Execution
-  1. Market Orders are filled at open i.e. at the opening price of the next interval from the order placed. Market On Close are filled at close when the current interval of market data is the last slice of the day.
-  2. All orders are filled entirely i.e. no partial filling
+    1. Market Orders are filled at open i.e. at the opening price of the next interval from the order placed. Market On Close are filled at close when the current interval of market data is the last slice of the day.
+    2. All orders are filled entirely i.e. no partial filling
+4. Position Sizing
+    1. Implemented in the portfolio module with attributes defined in config.yaml
+    2. Calculated at the end of the interval, before new bars are added
+    3. position_size = capital_to_risk // (atr * atr_multiplier) where
+    4. position_size = number of stocks to buy
+    5. captial_to_risk = risk_per_trade * total_portfolio_value where
+        1. risk_per_trade = a percent that you are willing lose in a single trade
+    6. atr = average true range where
+        1. Wilder's Smoothing Method
+            1. https://www.macroption.com/atr-calculation/#exponential-moving-average-ema-method
+            2. https://www.macroption.com/atr-excel-wilder/
+        2. initialization is handled with a simple average of the true range over the number of periods
+
 
 ### Notes
 

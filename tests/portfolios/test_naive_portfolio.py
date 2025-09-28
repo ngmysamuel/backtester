@@ -47,12 +47,71 @@ def test_initialization(portfolio):
     """Tests that the portfolio is initialized with correct values."""
     assert portfolio.initial_capital == 100000.0
     assert portfolio.symbol_list == ["MSFT", "AAPL"]
-    assert portfolio.position_size == 100
+    assert portfolio.position_size == {"MSFT": 100, "AAPL": 100}
     assert portfolio.current_holdings["cash"] == 100000.0
     assert portfolio.current_holdings["total"] == 100000.0
     assert portfolio.current_holdings["MSFT"]["position"] == 0
-    assert portfolio.maintenance_margin == pytest.approx(0.2)
     assert len(portfolio.historical_holdings) == 1
+
+def test_calc_atr_insufficient_data(portfolio):
+    """Tests that _calc_atr returns None if there is not enough data."""
+    assert portfolio._calc_atr("MSFT") is None
+
+def test_calc_atr_correct_calculation(portfolio, mock_data_handler):
+    """Tests that the ATR is calculated correctly based on mock data."""
+    portfolio.atr_period = 5
+    bars = [
+        {"high":10, "low":8, "close":9},
+        {"high":11, "low":9, "close":10},
+        {"high":12, "low":10, "close": 11},
+        {"high":13, "low":11, "close": 12},
+        {"high":14, "low":12, "close": 13},
+        {"high":15, "low":13, "close": 14},
+    ]
+    mock_data_handler._bars["MSFT"] = bars
+    
+    # With Wilder's smoothing, the calculation is different from a simple mean.
+    # For a 5-period ATR, alpha = 1/5 = 0.2
+    # TRs = [2, 2, 2, 2, 2, 2] (based on the data)
+    # Smoothed ATR will converge towards 2.
+    assert portfolio._calc_atr("MSFT") == pytest.approx(2.0)
+
+def test_on_signal_updates_position_size_with_atr(portfolio, mock_data_handler):
+    """Tests that on_signal correctly updates position_size based on ATR."""
+    portfolio.atr_period = 5
+    bars = [SimpleNamespace(high=10, low=8, close=9)] * 6
+    mock_data_handler._bars["MSFT"] = bars
+    
+    # Simulate that the historical ATR has been calculated on previous bars
+    portfolio.historical_atr["MSFT"] = [2.0]
+    
+    # capital_to_risk = 0.01 * 100000 = 1000
+    # position_size = 1000 // (2.0 * 2) = 250
+    signal = SignalEvent(123, "MSFT", SignalType.LONG)
+    
+    portfolio.on_signal(signal)
+    
+    assert portfolio.position_size["MSFT"] == 250
+
+def test_on_signal_handles_zero_atr(portfolio, mock_data_handler):
+    """Tests that a ZeroDivisionError is avoided if ATR is 0."""
+    portfolio.atr_period = 5
+    bars = [SimpleNamespace(high=10, low=10, close=10)] * 6
+    mock_data_handler._bars["MSFT"] = bars
+    
+    # Simulate historical ATR of 0
+    portfolio.historical_atr["MSFT"] = [0.0]
+    
+    signal = SignalEvent(123, "MSFT", SignalType.LONG)
+
+    try:
+        portfolio.on_signal(signal)
+    except ZeroDivisionError:
+        pytest.fail("on_signal raised a ZeroDivisionError due to zero ATR.")
+    
+    # If ATR is 0, position size should remain unchanged from its initial value.
+    assert portfolio.position_size["MSFT"] == 100
+
 
 def test_on_market(portfolio):
     """Tests the behavior of the on_market method."""

@@ -5,8 +5,10 @@ from backtester.enums.direction_type import DirectionType
 from backtester.enums.order_type import OrderType
 from backtester.events.order_event import OrderEvent
 import pandas as pd
+import numpy as np
 import collections
 from backtester.exceptions.negative_cash_exception import NegativeCashException
+import math
 from copy import deepcopy
 
 class NaivePortfolio(Portfolio):
@@ -24,7 +26,10 @@ class NaivePortfolio(Portfolio):
     start_date: float,
     allocation: float = 1,
     borrow_cost: float = 0.01,
-    maintenance_margin: float = 0.2
+    maintenance_margin: float = 0.3,
+    risk_per_trade: float = 0.01,
+    atr_period: int = 14,
+    atr_multiplier: int = 2
   ):
     """
     Initializes the NaivePortfolio with initial capital, a list of symbols, an event queue, and allocation percentage.
@@ -42,7 +47,6 @@ class NaivePortfolio(Portfolio):
     Attributes:
       daily_borrow_rate: the daily interest rate for borrowing stocks to short sell
       margin_holdings: tracks the margin held for each symbol when shorting
-      order_queue: a queue to hold orders before execution
       current_holdings: polarity of values indicate a short (<0) or long (>0) position
     """
     self.data_handler = data_handler
@@ -52,10 +56,13 @@ class NaivePortfolio(Portfolio):
     self.allocation = allocation
     self.daily_borrow_rate = borrow_cost / 252 # assuming 252 trading days in a year
     self.maintenance_margin = maintenance_margin
+    self.risk_per_trade = risk_per_trade
+    self.atr_period = atr_period
+    self.atr_multiplier = atr_multiplier
 
     self.margin_holdings = collections.defaultdict(int)
-    self.order_queue = deque
-    self.position_size = 100  # to be derived
+    self.position_size = {sym: 100 for sym in self.symbol_list}  # to be derived
+    self.historical_atr = {sym: [] for sym in self.symbol_list}
 
     self.current_holdings = {sym: {"position": 0, "value": 0.0} for sym in self.symbol_list}
     self.current_holdings["cash"] = initial_capital
@@ -87,7 +94,15 @@ class NaivePortfolio(Portfolio):
     ticker = event.ticker
     order_type = OrderType.MKT
     cur_quantity = self.current_holdings[ticker]["position"]
-    to_be_quantity = self.position_size * event.strength
+
+    atr_list = self.historical_atr[ticker]
+    if len(atr_list) > 0: # check for ATR > 0 to prevent ZeroDivisionError, else, reuse previous position size
+      atr = self.historical_atr[ticker][-1]
+      if atr:
+        capital_to_risk = min(self.current_holdings["cash"], self.risk_per_trade * self.current_holdings["total"])
+        self.position_size[ticker] = capital_to_risk // (atr * self.atr_multiplier)
+
+    to_be_quantity = self.position_size[ticker] * event.strength
  
     if event.signal_type.value == -1: # SHORT
       if cur_quantity > 0: # currently LONG, need to exit first
@@ -120,6 +135,9 @@ class NaivePortfolio(Portfolio):
     self.current_holdings["order"] += f" | {event.direction.name} {event.quantity} {event.ticker}"
 
   def end_of_day(self):
+    """
+    The end of the trading day - perform mark to market activities like margin calculation and borrow costs
+    """
     self.current_holdings["total"] = 0 # recalculate
     for ticker in self.symbol_list:
       latest_bar = self.data_handler.get_latest_bars(ticker)[0]
@@ -140,6 +158,15 @@ class NaivePortfolio(Portfolio):
         self.margin_holdings[ticker] = 0 # reset margin
     self.current_holdings["total"] += self.current_holdings["cash"]
     self.current_holdings["margin"] = self.margin_holdings.copy()
+  
+  def end_of_interval(self):
+    """
+    The end of a trading interval e.g. 5mins, 1day - perform tasks that can only take place only take place at the END of the current interval
+    """
+    for ticker in self.symbol_list:
+      atr = self._calc_atr(ticker)
+      if atr:
+        self.historical_atr[ticker].append(atr)
 
   def liquidate(self):
     self.current_holdings = deepcopy(self.current_holdings)
@@ -156,6 +183,33 @@ class NaivePortfolio(Portfolio):
       self.current_holdings[ticker]["value"] = 0
       self.current_holdings["margin"][ticker] = 0
     self.current_holdings["total"] = self.current_holdings["cash"]
+
+  def _calc_atr(self, ticker): # # Use Wilder's Smoothing 
+    if len(self.historical_atr[ticker]) < 1: # initialization of average true range uses simple arithmetic mean
+      bar_data = self.data_handler.get_latest_bars(ticker, self.atr_period + 1)
+      if len(bar_data) < self.atr_period + 1:
+        return
+
+      bar_data = pd.DataFrame(bar_data)
+      bar_data["h-l"] = bar_data["high"] - bar_data["low"]
+      bar_data["h-prev"] = (bar_data["high"] - bar_data["close"].shift(periods=1)).abs()
+      bar_data["l-prev"] = (bar_data["low"] - bar_data["close"].shift(periods=1)).abs()
+      
+      tr = np.nanmax(bar_data[["h-l","h-prev","l-prev"]], axis=1)
+      
+      atr = tr.mean()
+    else:
+      bar_data = self.data_handler.get_latest_bars(ticker, 2)
+      bar_data = pd.DataFrame(bar_data)
+      bar_data["h-l"] = bar_data["high"] - bar_data["low"]
+      bar_data["h-prev"] = (bar_data["high"] - bar_data["close"].shift(periods=1)).abs()
+      bar_data["l-prev"] = (bar_data["low"] - bar_data["close"].shift(periods=1)).abs()
+
+      tr = np.nanmax(bar_data[["h-l","h-prev","l-prev"]], axis=1)[-1]
+      atr = 1/self.atr_period * tr + (1- 1/self.atr_period) * self.historical_atr[ticker][-1]
+
+    return atr 
+
 
   def create_equity_curve(self):
     curve = pd.DataFrame(self.historical_holdings)

@@ -1,11 +1,12 @@
 backtester_settings:
   symbol_list: ["MSFT"]
   interval: "1d" # if using CSV data, this must match it
-  exchange_closing_time: "16:00"
+  exchange_closing_time: "16:00" # 24h time format - HH:MM
   initial_capital: 100000.0
   start_date: "9/14/2020 00:00:00"
   borrow_cost: 0.01 # interest on short sold stock - 1%
   maintenance_margin: 0.3 # margin to hold on short positions - 30%
+  risk_per_trade: 0.01 # percentage of total portfolio value willing to risk in a single trade
 
 strategies:
   buy_and_hold_simple:
