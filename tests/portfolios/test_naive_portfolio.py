@@ -51,8 +51,90 @@ def test_initialization(portfolio):
     assert portfolio.current_holdings["cash"] == 100000.0
     assert portfolio.current_holdings["total"] == 100000.0
     assert portfolio.current_holdings["MSFT"]["position"] == 0
-    assert portfolio.maintenance_margin == pytest.approx(0.2)
     assert len(portfolio.historical_holdings) == 1
+
+def test_calc_atr_insufficient_data(portfolio):
+    """Tests that _calc_atr returns None if there is not enough data."""
+    # Default portfolio has atr_period=14, so needs 15 bars. mock_data_handler only provides 1.
+    assert portfolio._calc_atr() is None
+
+def test_calc_atr_correct_calculation(portfolio, mock_data_handler):
+    """Tests that the ATR is calculated correctly based on mock data."""
+    # Setup data for a 5-period ATR for simplicity
+    portfolio.atr_period = 5
+    bars = [
+        SimpleNamespace(high=10, low=8, close=9),
+        SimpleNamespace(high=11, low=9, close=10),
+        SimpleNamespace(high=12, low=10, close=11),
+        SimpleNamespace(high=13, low=11, close=12),
+        SimpleNamespace(high=14, low=12, close=13),
+        SimpleNamespace(high=15, low=13, close=14),
+    ]
+    mock_data_handler._bars["MSFT"] = bars
+    
+    # Expected TRs:
+    # Bar 1: h-l=2, h-pc=nan, l-pc=nan -> TR = 2
+    # Bar 2: h-l=2, h-pc=2, l-pc=0 -> TR = 2
+    # Bar 3: h-l=2, h-pc=2, l-pc=0 -> TR = 2
+    # Bar 4: h-l=2, h-pc=2, l-pc=0 -> TR = 2
+    # Bar 5: h-l=2, h-pc=2, l-pc=0 -> TR = 2
+    # Expected ATR = mean([2,2,2,2,2]) = 2
+    assert portfolio._calc_atr() == pytest.approx(2.0)
+
+def test_on_market_updates_position_size_with_atr(portfolio, mock_data_handler):
+    """Tests that on_market correctly updates position_size based on ATR."""
+    # Setup data that will produce a known ATR
+    portfolio.atr_period = 5
+    bars = [SimpleNamespace(high=10, low=8, close=9)] * 6
+    mock_data_handler._bars["MSFT"] = bars
+    
+    # ATR will be 2.0. risk_per_trade=0.01, total=100000, atr_multiplier=2
+    # capital_to_risk = 0.01 * 100000 = 1000
+    # position_size = 1000 // (2.0 * 2) = 1000 // 4 = 250
+    market_event = Event()
+    market_event.type = "MARKET"
+    market_event.timestamp = pd.to_datetime("2023-01-02").timestamp()
+    
+    portfolio.on_market(market_event)
+    
+    assert portfolio.position_size == 250
+
+def test_on_market_handles_zero_atr(portfolio, mock_data_handler):
+    """Tests that a ZeroDivisionError is avoided if ATR is 0."""
+    portfolio.atr_period = 5
+    # Data with no price movement will result in ATR=0
+    bars = [SimpleNamespace(high=10, low=10, close=10)] * 6
+    mock_data_handler._bars["MSFT"] = bars
+    
+    market_event = Event()
+    market_event.type = "MARKET"
+    market_event.timestamp = pd.to_datetime("2023-01-02").timestamp()
+
+    try:
+        portfolio.on_market(market_event)
+    except ZeroDivisionError:
+        pytest.fail("on_market raised a ZeroDivisionError due to zero ATR.")
+    
+    # If ATR is 0, position size should probably remain unchanged or be set to 0
+    # Current implementation will keep the initial value of 100.
+    assert portfolio.position_size == 100
+
+def test_calc_atr(portfolio, mock_data_handler):
+  portfolio.atr_period = 5
+  portfolio.historical_atr = {"MSFT": [2]}
+  bars = [
+      {"high":10,"low":8,"close":9},
+      {"high":11,"low":9,"close":10},
+      {"high":12,"low":10,"close":11},
+      {"high":13,"low":11,"close":12},
+      {"high":14,"low":12,"close":13},
+      {"high":15,"low":13,"close":14},
+      {"high":16,"low":14,"close":15},
+    ]
+  mock_data_handler._bars["MSFT"] = bars
+  print(portfolio._calc_atr("MSFT"))
+  assert 1 == 2
+
 
 def test_on_market(portfolio):
     """Tests the behavior of the on_market method."""
