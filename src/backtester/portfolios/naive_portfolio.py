@@ -164,7 +164,9 @@ class NaivePortfolio(Portfolio):
     The end of a trading interval e.g. 5mins, 1day - perform tasks that can only take place only take place at the END of the current interval
     """
     for ticker in self.symbol_list:
-      self.historical_atr[ticker].append(self._calc_atr(ticker))
+      atr = self._calc_atr(ticker)
+      if atr:
+        self.historical_atr[ticker].append(atr)
 
   def liquidate(self):
     self.current_holdings = deepcopy(self.current_holdings)
