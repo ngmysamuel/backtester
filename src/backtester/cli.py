@@ -99,9 +99,10 @@ def run(data_dir: str,
       portfolio.end_of_day() # deduct borrow costs and calculate margin
       mkt_close = False
 
-  portfolio.liquidate()
+  # portfolio.liquidate()
   portfolio.create_equity_curve()
-  portfolio.equity_curve.to_csv("equity_curve.csv")
+  # portfolio.equity_curve.to_csv("equity_curve.csv")
+  print(portfolio.equity_curve["returns"].head())
   qs.reports.html(portfolio.equity_curve["returns"], benchmark="SPY", output='strategy_report.html', title=strategy)
 
 

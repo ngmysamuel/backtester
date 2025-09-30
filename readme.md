@@ -54,6 +54,18 @@ df.to_csv("MSFT.csv")
             1. https://www.macroption.com/atr-calculation/#exponential-moving-average-ema-method
             2. https://www.macroption.com/atr-excel-wilder/
         2. initialization is handled with a simple average of the true range over the number of periods
+5. Metrics
+    1. Quantstats
+        1. https://github.com/ranaroussi/quantstats/blob/main/quantstats/reports.py
+        2. https://github.com/ranaroussi/quantstats/blob/main/quantstats/stats.py
+    2. Streamlit
+    3. Note that there are differnces in the values you see in the tearsheet versus what I've calculated and presented via Steamlit
+        1. For example, Quantstats starts their calculation from the first date where there is a non-zero return. Refer to _match_dates() in reports.py. For e.g. CAGR is 1.6% if we go by the full time span while Quanstats, relying on a smaller time period, returns a larger CAGR - 1.9%
+        2. Another example, Longest Drawdown Duration is present by Quantstats as the number of days from start to end while I present the number of trading intervals
+6. Transaction Cost Modelling
+    1. Commisions
+    2. Bid-Ask Spread
+    3. Slippage
 
 
 ### Notes
@@ -69,3 +81,7 @@ When a company pays a dividend, its stock price typically drops by the dividend 
 If a strategy depends on detecting sudden price drops (e.g., a "buy the dip" strategy), using adjusted prices would remove these drops from the historical data, causing the backtest to miss valid trading signals. 
 3. Using next-bar data  
 A strategy that buys a stock if the closing price is higher than the opening price. On Monday morning, the backtest looks at Monday's historical data, sees that the closing price was indeed higher than the opening price, and records a profitable trade. 
+
+#### Numpy and Pandas
+1. Standard Deviation
+    1. Numpy assumes population level s.d. (ddof = 0) while pandas assumes sample (ddof = 1)

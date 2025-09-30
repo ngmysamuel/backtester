@@ -1118,6 +1118,16 @@ files = [
 ]
 
 [[package]]
+name = "millify"
+version = "0.1.1"
+description = "Convert long numbers into a human-readable format in Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "millify-0.1.1.tar.gz", hash = "sha256:619defdc98b6d23f941b5ce4aaf4bf87a0e0f64cd0446ffa299be94486597f1a"},
+]
+
+[[package]]
 name = "multitasking"
 version = "0.0.12"
 description = "Non-blocking Python methods using decorators"
@@ -2536,4 +2546,4 @@ repair = ["scipy (>=1.6.3)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "a8fc98020aa20fdcf90080ad01b71be85452a48b6dd6db025dbfb5b6de19b4c5"
+content-hash = "f0c7eb4ffd3bc778c3ebff834ef2cf120a90420309c1fe070263e93faa6ac581"
