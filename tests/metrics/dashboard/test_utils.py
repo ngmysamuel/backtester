@@ -2,6 +2,7 @@ import pandas as pd
 import pytest
 import numpy as np
 from backtester.metrics.dashboard import _util as utils
+import plotly
 
 # --- Fixtures for Mock Data ---
 
@@ -83,7 +84,13 @@ def test_get_calmar(mock_equity_curve_with_drawdown):
     assert utils.get_calmar(mock_equity_curve_with_drawdown) == pytest.approx(expected_calmar)
 
 def test_get_equity_curve(mock_equity_curve_simple):
-    """Tests that the function returns the correct equity curve series."""
-    assert isinstance(utils.get_equity_curve(mock_equity_curve_simple), pd.Series)
-    assert utils.get_equity_curve(mock_equity_curve_simple).name == "equity_curve"
-    assert len(utils.get_equity_curve(mock_equity_curve_simple)) == 4
+    """Tests that the function returns a valid Plotly figure."""
+    fig = utils.get_equity_curve(mock_equity_curve_simple)
+    
+    assert isinstance(fig, plotly.graph_objects.Figure)
+    # Check that there is one line trace in the figure
+    assert len(fig.data) == 1
+    # Check that the data in the trace matches the mock data
+    trace = fig.data[0]
+    assert list(trace.y) == list(mock_equity_curve_simple["equity_curve"])
+    assert list(trace.x) == list(mock_equity_curve_simple.index)

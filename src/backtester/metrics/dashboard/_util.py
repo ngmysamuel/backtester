@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import plotly.express as px
+import plotly
 
 DAYS_IN_YEAR = 365
 
@@ -84,6 +86,8 @@ def get_calmar(df: pd.DataFrame) -> float:
       return np.inf # or 0.0, depending on convention
   return cagr / max_drawdown
 
-def get_equity_curve(df: pd.DataFrame) -> pd.Series:
+def get_equity_curve(df: pd.DataFrame) -> plotly.graph_objs.Figure:
   """Returns the equity curve series from the DataFrame."""
-  return df["equity_curve"]
+  fig = px.line(df, x=df.index, y="equity_curve")
+  fig.update_layout(xaxis_title="Date", yaxis_title="Returns")
+  return fig

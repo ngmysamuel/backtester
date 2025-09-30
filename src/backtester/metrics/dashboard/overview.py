@@ -50,4 +50,4 @@ if df is not None:
 
     # --- Equity Curve Chart ---
     st.header("Equity Curve")
-    st.line_chart(utils.get_equity_curve(df), width='stretch')
+    st.plotly_chart(utils.get_equity_curve(df), config={"width":"stretch"})
