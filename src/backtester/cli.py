@@ -56,9 +56,10 @@ def run(data_dir: str,
   typer.echo(f"Symbols: {symbol_list}")
 
   initial_capital = config["backtester_settings"]["initial_capital"]
-  start_timestamp = pd.to_datetime(config["backtester_settings"]["start_date"]).timestamp()
+  start_timestamp = pd.to_datetime(config["backtester_settings"]["start_date"], dayfirst=True).timestamp()
   interval = config["backtester_settings"]["interval"]
   exchange_closing_time = config["backtester_settings"]["exchange_closing_time"]
+  benchmark_ticker = config["backtester_settings"]["benchmark"]
   typer.echo(f"Initial Capital: {initial_capital}")
   
   StrategyClass = load_class(config["strategies"][strategy]["name"])
@@ -101,9 +102,13 @@ def run(data_dir: str,
 
   # portfolio.liquidate()
   portfolio.create_equity_curve()
-  # portfolio.equity_curve.to_csv("equity_curve.csv")
-  print(portfolio.equity_curve["returns"].head())
-  qs.reports.html(portfolio.equity_curve["returns"], benchmark="SPY", output='strategy_report.html', title=strategy)
+  portfolio.equity_curve.to_csv("equity_curve.csv")
+
+  benchmark_data_handler = CSVDataHandler(event_queue, data_dir, [benchmark_ticker], interval, exchange_closing_time)
+  benchmark_data = benchmark_data_handler.symbol_raw_data["SPY"]
+  benchmark_returns = benchmark_data["close"].pct_change()
+  benchmark_returns.name = benchmark_ticker
+  qs.reports.html(portfolio.equity_curve["returns"], benchmark=benchmark_returns, output='strategy_report.html', title=strategy, match_dates=False)
 
 
 @app.command()
