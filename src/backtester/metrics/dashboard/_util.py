@@ -34,6 +34,8 @@ def get_annualization_factor(interval: str) -> float:
         return 12
       case "3mo":
         return 4
+      case _:
+        raise ValueError(f"{interval} is not supported")
 
 def get_total_return(df: pd.DataFrame) -> float:
   """Calculates the total return from an equity curve."""
@@ -47,13 +49,14 @@ def get_sharpe(df: pd.DataFrame, interval: str) -> float:
       return 0.0 # Avoid division by zero if no volatility
   return np.sqrt(annualization_factor) * (np.mean(returns) / np.std(returns, ddof=1))
 
-def get_cagr(df: pd.DataFrame) -> float:
+def get_cagr(df: pd.DataFrame, interval: str) -> float:
   """Calculates the Compound Annual Growth Rate."""
+  annualization_factor = get_annualization_factor(interval)
   pv = df.iloc[0]["total"]
   fv = df.iloc[-1]["total"]
-  years = (df.index[-1] - df.index[0]).days / DAYS_IN_YEAR
+  years = len(df) / annualization_factor
   if years == 0:
-      return 0.0 # No growth if no time has passed
+      return 0.0
   cagr = (fv / pv) ** (1 / years)
   return (cagr - 1) * 100
 
@@ -98,9 +101,9 @@ def get_max_drawdown(df: pd.DataFrame):
       longest_end.strftime('%d %b, %Y')
   )
 
-def get_calmar(df: pd.DataFrame) -> float:
+def get_calmar(df: pd.DataFrame, interval: str) -> float:
   """Calculates the Calmar ratio."""
-  cagr = get_cagr(df)
+  cagr = get_cagr(df, interval)
   max_drawdown, _, _, _, _ = get_max_drawdown(df)
   if max_drawdown == 0:
       return np.inf # or 0.0, depending on convention
@@ -112,7 +115,8 @@ def get_equity_curve(df: pd.DataFrame) -> plotly.graph_objs.Figure:
   fig.update_layout(xaxis_title="Date", yaxis_title="Returns")
   return fig
 
-def rolling_sharpe(df: pd.DataFrame, interval: str, window: int=126) -> plotly.graph_objs.Figure:
+
+def rolling_sharpe(df: pd.DataFrame, interval: str, window: str) -> plotly.graph_objs.Figure:
   match window:
     case "3M":
       window = 63

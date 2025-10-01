@@ -32,9 +32,9 @@ if st.session_state.df is not None:
     with col2:
         st.metric("Sharpe Ratio", f"{millify(utils.get_sharpe(st.session_state.df, st.session_state.arguments["interval"]), precision=3)}")
     with col3:
-        st.metric("CAGR", f"{millify(utils.get_cagr(st.session_state.df), precision=3)}%")
+        st.metric("CAGR", f"{millify(utils.get_cagr(st.session_state.df, st.session_state.arguments["interval"]), precision=3)}%")
     with col4:
-        st.metric("Calmar Ratio", f"{millify(utils.get_calmar(st.session_state.df), precision=3)}")
+        st.metric("Calmar Ratio", f"{millify(utils.get_calmar(st.session_state.df, st.session_state.arguments["interval"]), precision=3)}")
 
     # --- Drawdown Analysis ---
     st.header("Drawdown Analysis")
