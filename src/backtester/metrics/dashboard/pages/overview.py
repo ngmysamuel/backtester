@@ -20,24 +20,25 @@ def load_data():
         st.error("equity_curve.csv not found. Please run a backtest first.")
         return None
 
-df = load_data()
+if "df" not in st.session_state:
+    st.session_state.df = load_data()
 
-if df is not None:
+if st.session_state.df is not None:
     # --- Key Performance Indicators (KPIs) ---
     st.header("Key Performance Indicators")
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.metric("Total Return", f"{millify(utils.get_total_return(df), precision=2)}%")
+        st.metric("Total Return", f"{millify(utils.get_total_return(st.session_state.df), precision=2)}%")
     with col2:
-        st.metric("Sharpe Ratio", f"{millify(utils.get_sharpe(df), precision=3)}")
+        st.metric("Sharpe Ratio", f"{millify(utils.get_sharpe(st.session_state.df), precision=3)}")
     with col3:
-        st.metric("CAGR", f"{millify(utils.get_cagr(df), precision=3)}%")
+        st.metric("CAGR", f"{millify(utils.get_cagr(st.session_state.df), precision=3)}%")
     with col4:
-        st.metric("Calmar Ratio", f"{millify(utils.get_calmar(df), precision=3)}")
+        st.metric("Calmar Ratio", f"{millify(utils.get_calmar(st.session_state.df), precision=3)}")
 
     # --- Drawdown Analysis ---
     st.header("Drawdown Analysis")
-    max_drawdown, max_drawdown_date, longest_streak, longest_start, longest_end = utils.get_max_drawdown(df)
+    max_drawdown, max_drawdown_date, longest_streak, longest_start, longest_end = utils.get_max_drawdown(st.session_state.df)
     
     col5, col6 = st.columns(2)
     with col5:
@@ -50,4 +51,4 @@ if df is not None:
 
     # --- Equity Curve Chart ---
     st.header("Equity Curve")
-    st.plotly_chart(utils.get_equity_curve(df), config={"width":"stretch"})
+    st.plotly_chart(utils.get_equity_curve(st.session_state.df), config={"width":"stretch"})
