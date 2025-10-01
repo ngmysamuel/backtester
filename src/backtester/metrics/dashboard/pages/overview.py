@@ -30,7 +30,7 @@ if st.session_state.df is not None:
     with col1:
         st.metric("Total Return", f"{millify(utils.get_total_return(st.session_state.df), precision=2)}%")
     with col2:
-        st.metric("Sharpe Ratio", f"{millify(utils.get_sharpe(st.session_state.df), precision=3)}")
+        st.metric("Sharpe Ratio", f"{millify(utils.get_sharpe(st.session_state.df, st.session_state.arguments["interval"]), precision=3)}")
     with col3:
         st.metric("CAGR", f"{millify(utils.get_cagr(st.session_state.df), precision=3)}%")
     with col4:

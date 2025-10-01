@@ -1,7 +1,7 @@
 backtester_settings:
   symbol_list: ["MSFT"]
   benchmark: "SPY"
-  interval: "1d" # if using CSV data, this must match it
+  interval: "1d" # 1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
   exchange_closing_time: "16:00" # 24h time format - HH:MM
   initial_capital: 100000.0
   start_date: "14/9/2020 00:00:00"

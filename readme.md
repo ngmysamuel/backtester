@@ -62,11 +62,15 @@ df.to_csv("MSFT.csv")
     3. Note that there are differnces in the values you see in the tearsheet versus what I've calculated and presented via Steamlit
         1. For example, Quantstats starts their calculation from the first date where there is a non-zero return. Refer to _match_dates() in reports.py. For e.g. CAGR is 1.6% if we go by the full time span while Quanstats, relying on a smaller time period, returns a larger CAGR - 1.9%
         2. Another example, Longest Drawdown Duration is present by Quantstats as the number of days from start to end while I present the number of trading intervals
+6. Annulization of Sharpe
+    1. Uses the the interval stated in config.yaml
+        1. If its daily, annualization factor is 252. If its minutely, 98280. See get_annualization_factor() in _util.py
 6. Transaction Cost Modelling
     1. Commisions
     2. Bid-Ask Spread
     3. Slippage
 
+Periods for pandas: https://pandas.pydata.org/docs/reference/api/pandas.Period.asfreq.html
 
 ### Notes
 

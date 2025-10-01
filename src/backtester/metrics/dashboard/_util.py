@@ -3,29 +3,49 @@ import numpy as np
 import plotly.express as px
 import plotly
 
-DAYS_IN_YEAR = 365
+DAYS_IN_YEAR = 365.0
+MINUTES_IN_HOUR = 60.0
+TRD_HOURS_IN_DAY = 6.5
+TRD_DAYS_IN_YEAR = 252.0
 
-def get_annualization_factor(df: pd.DataFrame) -> float:
-    """Calculates the annualization factor based on the data frequency."""
-    if df.empty:
-        return 252.0  # Default to daily if no data
-    years_span = (df.index[-1] - df.index[0]).days / DAYS_IN_YEAR
-    if years_span == 0:
-        return 252.0 # Avoid division by zero for single-day data
-    
-    return len(df) / years_span
+def get_annualization_factor(interval: str) -> float:
+    """
+    Calculates the annualization factor based on the data's frequency,
+    1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
+    """
+    match interval:
+      case "1m":
+        return MINUTES_IN_HOUR * TRD_HOURS_IN_DAY * TRD_DAYS_IN_YEAR
+      case "2m":
+        return (MINUTES_IN_HOUR / 2) * TRD_HOURS_IN_DAY * TRD_DAYS_IN_YEAR
+      case "15m":
+        return (MINUTES_IN_HOUR / 15) * TRD_HOURS_IN_DAY * TRD_DAYS_IN_YEAR
+      case "30m":
+        return (MINUTES_IN_HOUR / 30) * TRD_HOURS_IN_DAY * TRD_DAYS_IN_YEAR
+      case "60m" | "1h":
+        return TRD_HOURS_IN_DAY * TRD_DAYS_IN_YEAR
+      case "90m":
+        return (TRD_HOURS_IN_DAY / 1.5) * TRD_DAYS_IN_YEAR
+      case "1d":
+        return TRD_DAYS_IN_YEAR
+      case "5d":
+        return TRD_DAYS_IN_YEAR / 5
+      case "1mo":
+        return 12
+      case "3mo":
+        return 4
 
 def get_total_return(df: pd.DataFrame) -> float:
   """Calculates the total return from an equity curve."""
   return (df.iloc[-1]["equity_curve"] - 1) * 100
 
-def get_sharpe(df: pd.DataFrame) -> float:
+def get_sharpe(df: pd.DataFrame, interval: str) -> float:
   """Calculates the Sharpe ratio with a dynamic annualization factor."""
-  annualization_factor = get_annualization_factor(df)
+  annualization_factor = get_annualization_factor(interval)
   returns = df["returns"].dropna()
-  if returns.std() == 0:
+  if np.std(returns, ddof=1) == 0:
       return 0.0 # Avoid division by zero if no volatility
-  return np.sqrt(annualization_factor) * np.mean(returns) / np.std(returns, ddof=1)
+  return np.sqrt(annualization_factor) * (np.mean(returns) / np.std(returns, ddof=1))
 
 def get_cagr(df: pd.DataFrame) -> float:
   """Calculates the Compound Annual Growth Rate."""
@@ -90,4 +110,22 @@ def get_equity_curve(df: pd.DataFrame) -> plotly.graph_objs.Figure:
   """Returns the equity curve series from the DataFrame."""
   fig = px.line(df, x=df.index, y="equity_curve")
   fig.update_layout(xaxis_title="Date", yaxis_title="Returns")
+  return fig
+
+def rolling_sharpe(df: pd.DataFrame, interval: str, window: int=126) -> plotly.graph_objs.Figure:
+  match window:
+    case "3M":
+      window = 63
+    case "6M":
+      window = 126
+    case "12M":
+      window = 252
+    case _:
+      window = 126
+  annualization_factor = get_annualization_factor(interval)
+  rolling_sharpe = df["returns"].rolling(window).apply(
+    lambda x: np.sqrt(annualization_factor) * (np.mean(x) / np.std(x, ddof=1)) if np.std(x, ddof=1) != 0 else 0.0
+  )
+  fig = px.line(rolling_sharpe)
+  fig.update_layout(xaxis_title="Date", yaxis_title="Rolling Sharpe", showlegend=False)
   return fig

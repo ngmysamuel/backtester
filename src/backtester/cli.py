@@ -116,10 +116,11 @@ def dashboard():
   """
   Plot the results of the last backtest.
   """
-  typer.echo("Plotting results...")
+  config = load_config
+  interval = config["backtester_settings"]["interval"]
   streamlit_script_path = Path("src/backtester/metrics/dashboard/streamlit_app.py").resolve()
-  typer.echo(streamlit_script_path)
-  sys.argv = ["streamlit", "run", streamlit_script_path]
+  typer.echo(f"Loading {streamlit_script_path}")
+  sys.argv = ["streamlit", "run", streamlit_script_path, f" -- --interval {interval}"] # for more arguments, add ', " -- --what ee"' to the end
   runpy.run_module("streamlit", run_name="__main__")
 
 if __name__ == "__main__":
