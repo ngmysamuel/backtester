@@ -2,16 +2,23 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly
+from millify import millify
 
 DAYS_IN_YEAR = 365.0
 MINUTES_IN_HOUR = 60.0
 TRD_HOURS_IN_DAY = 6.5
 TRD_DAYS_IN_YEAR = 252.0
+STRING_TO_RESAMPLE_WINDOW = {
+  "Weekly": "W",
+  "Monthly": "ME",
+  "Quaterly": "QE",
+  "Yearly": "YE",
+}
 
 def get_annualization_factor(interval: str) -> float:
     """
     Calculates the annualization factor based on the data's frequency,
-    1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
+    1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo (to create enum)
     """
     match interval:
       case "1m":
@@ -133,3 +140,54 @@ def rolling_sharpe(df: pd.DataFrame, interval: str, window: str) -> plotly.graph
   fig = px.line(rolling_sharpe)
   fig.update_layout(xaxis_title="Date", yaxis_title="Rolling Sharpe", showlegend=False)
   return fig
+
+def rolling_volitility(df: pd.DataFrame, interval: str, window: str) -> plotly.graph_objs.Figure:
+  match window:
+    case "3M":
+      window = 63
+    case "6M":
+      window = 126
+    case "12M":
+      window = 252
+    case _:
+      window = 126
+  annualization_factor = get_annualization_factor(interval)
+  rolling_volitility = df["returns"].rolling(window).apply(lambda x: np.sqrt(annualization_factor) * np.std(x, ddof=1))
+  fig = px.line(rolling_volitility)
+  fig.update_layout(xaxis_title="Date", yaxis_title="Rolling Volatility", showlegend=False)
+  return fig
+
+def returns_histogram(df: pd.DataFrame, interval: str, window: str):
+  if interval == "5d":
+    interval = "Weekly"
+  elif interval == "1mo":
+    interval = "Monthly"
+  elif interval == "3mo":
+    interval = "Quaterly"
+
+  if interval != window:
+    window = STRING_TO_RESAMPLE_WINDOW.get(window, "ME")
+    ohlc_data = df["equity_curve"].resample(window).ohlc()
+    ohlc_data["returns"] = ((ohlc_data["close"] - ohlc_data["open"]) / ohlc_data["close"]) * 100
+    fig = px.histogram(ohlc_data, x="returns")
+    kurtosis = ohlc_data["returns"].kurtosis()
+    skewness = ohlc_data["returns"].skew()
+    return fig, kurtosis, skewness
+  else:
+    fig = px.histogram(df, x="returns")
+    kurtosis = df["returns"].kurtosis()
+    skewness = df["returns"].skew()
+    return fig, kurtosis, skewness
+
+def returns_heatmap(df: pd.DataFrame, interval: str, window: str):
+  window = STRING_TO_RESAMPLE_WINDOW.get(window, "ME")
+  ohlc_data = df["equity_curve"].resample(window).ohlc()
+  ohlc_data["returns"] = ((ohlc_data["close"] - ohlc_data["open"]) / ohlc_data["close"]) * 100
+  ohlc_data["returns"] = ohlc_data["returns"].apply(lambda x: float(millify(x, precision=2)))
+  ohlc_data["year"] = ohlc_data.index.year
+  ohlc_data["month"] = ohlc_data.index.month
+  ohlc_data["month_name"] = ohlc_data.index.strftime("%b")
+  data = pd.pivot_table(ohlc_data, values="returns", index="year", columns="month_name")
+  data = data[ohlc_data["month_name"].sort_values(key=lambda x: pd.to_datetime(x,format="%b").dt.month).drop_duplicates()]
+  # return data
+  return px.imshow(data.values, x=data.columns, y=data.index, text_auto=True)
