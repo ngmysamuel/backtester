@@ -117,7 +117,7 @@ def dashboard():
   Plot the results of the last backtest.
   """
   typer.echo("Plotting results...")
-  streamlit_script_path = Path("src/backtester/metrics/dashboard/overview.py").resolve()
+  streamlit_script_path = Path("src/backtester/metrics/dashboard/streamlit_app.py").resolve()
   typer.echo(streamlit_script_path)
   sys.argv = ["streamlit", "run", streamlit_script_path]
   runpy.run_module("streamlit", run_name="__main__")
