@@ -70,7 +70,7 @@ def get_cagr(df: pd.DataFrame, interval: str) -> float:
 def get_max_drawdown(df: pd.DataFrame):
   """
   Calculates the maximum drawdown, its date, and the start, end, and duration
-  of the longest drawdown period using a vectorized pandas approach.
+  of the longest drawdown period.
   """
   # Find max drawdown and the date it happened on
   equity_curve = df[["equity_curve"]].copy()
@@ -190,4 +190,75 @@ def returns_heatmap(df: pd.DataFrame, interval: str, window: str):
   data = pd.pivot_table(ohlc_data, values="returns", index="year", columns="month_name")
   data = data[ohlc_data["month_name"].sort_values(key=lambda x: pd.to_datetime(x,format="%b").dt.month).drop_duplicates()]
   # return data
-  return px.imshow(data.values, x=data.columns, y=data.index, text_auto=True)
+  return px.imshow(data.values, x=data.columns, y=data.index, text_auto=True, color_continuous_scale="brbg", color_continuous_midpoint=0)
+
+def calculate_drawdowns(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Calculates drawdown, high-water mark, and days since peak for an equity curve.
+    """
+    analysis_df = df.copy()
+    analysis_df["hwm"] = analysis_df["equity_curve"].cummax()
+    
+    # The correct drawdown calculation is (current_value - peak_value) / peak_value
+    analysis_df["drawdown_percent"] = (analysis_df["equity_curve"] - analysis_df["hwm"]) / analysis_df["hwm"] * 100
+    
+    # Identify periods when the strategy is "underwater"
+    analysis_df["underwater"] = analysis_df["drawdown_percent"] < 0
+    
+    # Find the start of each drawdown period to calculate duration
+    drawdown_starts = analysis_df[analysis_df["underwater"] & ~analysis_df["underwater"].shift(1, fill_value=False)].index
+    
+    # Map each drawdown period to its start date
+    start_dates = pd.Series(index=analysis_df.index, dtype='datetime64[ns]')
+    for start in drawdown_starts:
+        end = analysis_df.index[analysis_df.index > start]
+        if not any(~analysis_df.loc[end, 'underwater']):
+            end_date = analysis_df.index[-1]
+        else:
+            end_date = analysis_df.loc[end, 'underwater'].idxmin()
+        start_dates.loc[start:end_date] = start
+    
+    analysis_df['drawdown_start_date'] = start_dates.ffill()
+    analysis_df["max_drawdown"] = analysis_df.groupby("drawdown_start_date")["drawdown_percent"].transform("min")
+    analysis_df["max_drawdown"] = analysis_df.apply(lambda x: float(millify(x["max_drawdown"], precision=2)) if x["underwater"] else None, axis=1)
+    analysis_df['days_underwater'] = (analysis_df.index - analysis_df['drawdown_start_date']).dt.days
+    analysis_df["days_underwater"] = analysis_df.apply(lambda x: x["days_underwater"] if x["underwater"] else None, axis=1)
+    
+    return analysis_df
+
+def find_top_drawdowns(df: pd.DataFrame, n: int = 5) -> pd.DataFrame:
+    """Identifies and returns the top N drawdown periods."""
+    drawdown_periods = []
+    in_drawdown = False
+    current_period = {}
+
+    for date, row in df.iterrows():
+        if not in_drawdown and row['underwater']:
+            in_drawdown = True
+            current_period = {
+                'Peak Date': (df['equity_curve'].loc[:date] == row['hwm']).idxmax(),
+                'Peak Value': row['hwm'],
+                'Trough Date': date,
+                'Trough Value': row['equity_curve'],
+                'Max Drawdown %': row['drawdown_percent']
+            }
+        elif in_drawdown:
+            if row['drawdown_percent'] < current_period['Max Drawdown %']:
+                current_period['Trough Date'] = date
+                current_period['Trough Value'] = row['equity_curve']
+                current_period['Max Drawdown %'] = row['drawdown_percent']
+            
+            if not row['underwater']:
+                in_drawdown = False
+                current_period['Recovery Date'] = date
+                current_period['Duration (days)'] = (current_period['Recovery Date'] - current_period['Peak Date']).days
+                drawdown_periods.append(current_period)
+
+    if in_drawdown: # Handle case where backtest ends in a drawdown
+        current_period['Recovery Date'] = "Not Recovered"
+        current_period['Duration (days)'] = (df.index[-1] - current_period['Peak Date']).days
+        drawdown_periods.append(current_period)
+        
+    summary = pd.DataFrame(drawdown_periods).sort_values(by='Max Drawdown %').head(n)
+    summary['Max Drawdown %'] = summary['Max Drawdown %'].map('{:,.2f}%'.format)
+    return summary.reset_index(drop=True)

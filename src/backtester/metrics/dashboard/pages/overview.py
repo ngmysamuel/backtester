@@ -3,9 +3,28 @@ from millify import millify
 import pandas as pd
 from backtester import ROOT_DIR
 import backtester.metrics.dashboard._util as utils
+import os
 
 st.set_page_config(layout="wide")
-st.title('Backtest Performance Dashboard')
+
+@st.cache_resource
+def get_tearsheet():
+    print(os.path.join(ROOT_DIR, "strategy_report.html"))
+    return open(os.path.join(ROOT_DIR, "strategy_report.html"), "r")
+
+tearsheet = get_tearsheet()
+
+colTitle, colDwl = st.columns([0.8, 0.2]) 
+with colTitle:
+    st.title('Backtest Performance Dashboard')
+with colDwl:
+    st.download_button(
+        label="Download Tearsheet",
+        data=tearsheet,
+        file_name="strategy_report.html",
+        mime="text/html",
+        icon=":material/download:",
+    )
 
 # --- Data Loading ---
 @st.cache_data
