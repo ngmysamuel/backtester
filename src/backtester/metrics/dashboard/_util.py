@@ -259,7 +259,16 @@ def find_top_drawdowns(df: pd.DataFrame, n: int = 5) -> pd.DataFrame:
         current_period['Duration (days)'] = (df.index[-1] - current_period['Peak Date']).days
         drawdown_periods.append(current_period)
         
+    if not drawdown_periods:
+        return pd.DataFrame()
+
     summary = pd.DataFrame(drawdown_periods).sort_values(by='Max Drawdown %').head(n)
+    
+    # Format date columns to strings for consistent typing and display
+    for col in ['Peak Date', 'Trough Date', 'Recovery Date']:
+        if col in summary.columns:
+            summary[col] = summary[col].apply(lambda x: x.strftime('%d %b, %Y') if isinstance(x, pd.Timestamp) else x)
+
     summary['Max Drawdown %'] = summary['Max Drawdown %'].map('{:,.2f}%'.format)
     return summary.reset_index(drop=True)
 
@@ -276,11 +285,4 @@ def find_drawdown_period(clicked_date, df):
     period_df = df[df['drawdown_start_date'] == start_date]
     end_date = period_df.index.max()
 
-    # Find recovery date (the first day it's no longer underwater)
-    # recovery_date = period_df.index[not period_df['underwater']].min()
-
-    # Find the actual peak date (high-water mark) before this period started
-    # peak_date = df.loc[:start_date]['equity_curve'].idxmax()
-
-    # return peak_date, recovery_date
     return start_date, end_date

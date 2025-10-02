@@ -4,6 +4,14 @@ from millify import millify
 
 st.set_page_config(layout="wide")
 st.title("Performance Analysis")
+st.info(
+    """
+    This dashboard provides a deeper dive into the strategy's performance characteristics.
+    - **Rolling Sharpe & Volatility**: See how risk-adjusted returns and volatility change over time.
+    - **Returns Distribution**: Analyze the statistical properties of your returns (e.g., skewness, kurtosis).
+    - **Returns Heatmap**: Visualize performance patterns by month and year.
+    """
+)
 
 if "sharpe_window" not in st.session_state:
   st.session_state["sharpe_window"] = "6M"
@@ -65,10 +73,3 @@ col7, col8 = st.columns([0.8, 0.2])
 with col7:
   st.header(f"{st.session_state.heatmap_window} Returns - Heatmap (%)")
   st.plotly_chart(fig)
-# with col8:
-#   heatmap_window = st.selectbox(
-#     "Distribution Windows",
-#     ("Weekly", "Monthly", "Quaterly", "Yearly"),
-#     index=1,
-#     key="heatmap_window"
-#   )
