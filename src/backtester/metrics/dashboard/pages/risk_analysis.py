@@ -11,9 +11,11 @@ st.set_page_config(
 st.title("Risk Analysis")
 st.info(
     """
-    This dashboard provides an overview of the risks associated with the strategy.
-    - Gray areas indicate drawdown periods - these periods are synchronized across all three graphs.
-    - Refer to the bottom for the worst 5 drawdown periods.
+    **Understanding Risk by Understanding Drawdowns.** This dashboard helps you analyze the periods when the strategy was losing money from its peak.
+    
+    - **How to Use**: Click on a point in the Equity Curve during a dip to select and highlight that drawdown period across all charts. Use the "Clear Selection" button to reset.
+    - **Duration vs. Magnitude**: The **Underwater Plot** shows how *long* the strategy stayed below its previous peak. The **Drawdown Plot** shows how *deep* the losses were.
+    - **Worst Events**: The table at the bottom details the top 5 most severe drawdowns, allowing you to quantify the historical worst-case scenarios.
     """
 )
 
