@@ -21,22 +21,39 @@ st.info(
 
 if "selected_period" not in st.session_state:
   st.session_state.selected_period = None
+if "var_method" not in st.session_state:
+  st.session_state.var_method = "Historical"
 
 # Perform calculations
 drawdown_df = utils.calculate_drawdowns(st.session_state.df)
 top_drawdowns = utils.find_top_drawdowns(drawdown_df)
 
+if st.session_state.var_method == "Historical":
+  var_95 = utils.get_historical_var(st.session_state.df, 0.95)
+  var_99 = utils.get_historical_var(st.session_state.df, 0.99)
+else:
+  var_95 = utils.get_parametric_var(st.session_state.df, 0.95)
+  var_99 = utils.get_parametric_var(st.session_state.df, 0.99)
 
-# --- Visualizations ---
-colA, colB = st.columns([0.8, 0.2])
-with colB:
-  st.write("") # Spacer
-  st.write("") # Spacer
-  if st.button("Clear Selection", width="stretch"):
-      st.session_state.selected_period = None
-      st.rerun()
+##### Value at Risk #####
+st.header("Value at Risk")
+col_var1, col_var2, col_var3 = st.columns([0.4,0.4,0.2])
+with col_var1:
+    st.metric("Daily VaR (95%)", f"{var_95:.3f}%")
+    st.caption("There is a 5% chance of losing more than this percentage in a single day.")
+with col_var2:
+    st.metric("Daily VaR (99%)", f"{var_99:.3f}%")
+    st.caption("There is a 1% chance of losing more than this percentage in a single day.")
+with col_var3:
+  st.segmented_control(
+    "Method",
+    options=["Historical","Parametric"],
+    selection_mode="single",
+    key="var_method"
+  )
 
 
+##### Drawdown #####
 #Equity Graph
 fig_equity = go.Figure()
 fig_equity.add_trace(
@@ -117,17 +134,31 @@ if st.session_state.selected_period:
   add_highlight_shape(fig_underwater)
   add_highlight_shape(fig_drawdown)
 
+
+# --- Visualizations ---
+
+
+colA, colB = st.columns([0.8, 0.2])
+with colA:
+  st.header("Drawdown")
+with colB:
+  st.write("") # Spacer
+  st.write("") # Spacer
+  if st.button("Clear Selection", width="stretch"):
+      st.session_state.selected_period = None
+      st.rerun()
+
 # Use the first chart to capture events
 st.plotly_chart(fig_equity, on_select=onselect, key="fig_equity_events", selection_mode="points")
 
 col1, col2 = st.columns(2)
 
 with col1:
-  st.header("Underwater Plot")
+  st.subheader("Underwater Plot")
   st.caption("Duration")
   st.plotly_chart(fig_underwater, config={"width":"stretch"})
 with col2:
-  st.header("Drawdown Plot")
+  st.subheader("Drawdown Plot")
   st.caption("Magnitude")
   # Add annotations for the top drawdown
   for i, row in top_drawdowns.head(1).iterrows(): # Annotate only the worst one to keep it clean

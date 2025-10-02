@@ -3,6 +3,7 @@ import numpy as np
 import plotly.express as px
 import plotly
 from millify import millify
+from scipy.stats import norm
 
 DAYS_IN_YEAR = 365.0
 MINUTES_IN_HOUR = 60.0
@@ -286,3 +287,28 @@ def find_drawdown_period(clicked_date, df):
     end_date = period_df.index.max()
 
     return start_date, end_date
+
+def get_historical_var(df: pd.DataFrame, confidence_level: float = 0.95) -> float:
+    """
+    Calculates the historical Value at Risk (VaR) at a given confidence level.
+    """
+    if 'returns' not in df.columns or df['returns'].dropna().empty:
+        return 0.0
+    
+    # VaR is the quantile of the returns distribution
+    var = df['returns'].quantile(1 - confidence_level)
+    
+    # Return as a positive percentage
+    return abs(var * 100)
+
+def get_parametric_var(df: pd.DataFrame, confidence_level: float = 0.95) -> float:
+    """
+    Calculates the parametric Value at Risk (VaR) at a given confidence level.
+    """
+    if 'returns' not in df.columns or df['returns'].dropna().empty:
+        return 0.0
+    z_score = norm.ppf(1 - confidence_level)
+    mean = df["returns"].mean()
+    sd = df["returns"].std()
+    var = mean - (z_score * sd)
+    return abs(var * 100)
