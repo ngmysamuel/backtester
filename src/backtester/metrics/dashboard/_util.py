@@ -331,16 +331,18 @@ def get_trades(df: pd.DataFrame):
 
   # Clean up: remove leading/trailing whitespace and filter out empty strings
   trades_df['order'] = trades_df['order'].str.strip()
+  trades_df['order'] = trades_df['order'].str.replace(" @ ", " ")
   trades_df = trades_df[trades_df['order'] != '']
 
   # Split the trade string into components: Direction, Quantity, Ticker
-  parts = trades_df['order'].str.split(n=2, expand=True)
+  parts = trades_df['order'].str.split(n=3, expand=True)
   trades_df['Direction'] = parts[0]
   trades_df['Quantity'] = pd.to_numeric(parts[1])
   trades_df['Ticker'] = parts[2]
+  trades_df['Unit Price'] = "$" + parts[3]
 
   # Format the final DataFrame for display
   trades_df = trades_df.reset_index().rename(columns={'timestamp': 'Date'})
   trades_df['Date'] = trades_df['Date'].dt.strftime('%Y-%m-%d')
 
-  return trades_df[['Date', 'Direction', 'Quantity', 'Ticker']]
+  return trades_df[['Date', 'Direction', 'Quantity', 'Ticker', 'Unit Price']]
