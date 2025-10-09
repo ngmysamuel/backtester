@@ -312,3 +312,35 @@ def get_parametric_var(df: pd.DataFrame, confidence_level: float = 0.95) -> floa
     sd = df["returns"].std()
     var = mean - (z_score * sd)
     return abs(var * 100)
+
+def get_trades(df: pd.DataFrame):
+  """
+  Parses the 'order' column of the equity curve DataFrame to create a clean,
+  structured log of all trades.
+  """
+  # Filter for rows that have order information and drop NaNs
+  trades_df = df[df['order'].str.len() > 0][['order']].copy()
+  if trades_df.empty:
+      return pd.DataFrame(columns=['Date', 'Direction', 'Quantity', 'Ticker'])
+
+  # Split the pipe-delimited string into a list of trades
+  trades_df['order'] = trades_df['order'].str.split('|')
+
+  # Create a new row for each trade in the list
+  trades_df = trades_df.explode('order')
+
+  # Clean up: remove leading/trailing whitespace and filter out empty strings
+  trades_df['order'] = trades_df['order'].str.strip()
+  trades_df = trades_df[trades_df['order'] != '']
+
+  # Split the trade string into components: Direction, Quantity, Ticker
+  parts = trades_df['order'].str.split(n=2, expand=True)
+  trades_df['Direction'] = parts[0]
+  trades_df['Quantity'] = pd.to_numeric(parts[1])
+  trades_df['Ticker'] = parts[2]
+
+  # Format the final DataFrame for display
+  trades_df = trades_df.reset_index().rename(columns={'timestamp': 'Date'})
+  trades_df['Date'] = trades_df['Date'].dt.strftime('%Y-%m-%d')
+
+  return trades_df[['Date', 'Direction', 'Quantity', 'Ticker']]

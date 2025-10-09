@@ -6,7 +6,7 @@ st.set_page_config(layout="wide")
 st.title("Performance Analysis")
 st.info(
     """
-    This dashboard provides a deeper dive into the strategy's performance characteristics.
+    Dive deeper into the strategy's performance characteristics.
     - **Rolling Sharpe & Volatility**: See how risk-adjusted returns and volatility change over time.
     - **Returns Distribution**: Analyze the statistical properties of your returns (e.g., skewness, kurtosis).
     - **Returns Heatmap**: Visualize performance patterns by month and year.

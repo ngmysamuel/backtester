@@ -11,7 +11,7 @@ st.set_page_config(
 st.title("Risk Analysis")
 st.info(
     """
-    **Understanding Risk by Understanding Drawdowns.** This dashboard helps you analyze the periods when the strategy was losing money from its peak.
+    Visualize the periods when the strategy was losing money from its peak.
     
     - **How to Use**: Click on a point in the Equity Curve during a dip to select and highlight that drawdown period across all charts. Use the "Clear Selection" button to reset.
     - **Duration vs. Magnitude**: The **Underwater Plot** shows how *long* the strategy stayed below its previous peak. The **Drawdown Plot** shows how *deep* the losses were.

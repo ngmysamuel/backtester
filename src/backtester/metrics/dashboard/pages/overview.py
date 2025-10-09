@@ -9,7 +9,6 @@ st.set_page_config(layout="wide")
 
 @st.cache_resource
 def get_tearsheet():
-    print(os.path.join(ROOT_DIR, "strategy_report.html"))
     return open(os.path.join(ROOT_DIR, "strategy_report.html"), "r")
 
 tearsheet = get_tearsheet()
@@ -24,6 +23,8 @@ with colDwl:
         file_name="strategy_report.html",
         mime="text/html",
         icon=":material/download:",
+        help="Downloads a tearsheet with comprehensive metrics for viewing on the go",
+        type="primary"
     )
 
 # --- Data Loading ---
