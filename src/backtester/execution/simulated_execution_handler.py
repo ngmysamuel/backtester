@@ -40,13 +40,15 @@ class SimulatedExecutionHandler:
         return
       if order.order_type.name == "MKT":
         fill_cost = order.quantity * bar.open
+        unit_cost = bar.open
       elif order.order_type.name == "MOC" and mkt_close:
         fill_cost = order.quantity * bar.close
+        unit_cost = bar.close
       else:
         self.order_queue.append(order)  # put it back and wait for next market event
         continue
       fill_event = FillEvent(
-        current_time, order.ticker, "ARCA", order.quantity, order.direction, fill_cost
+        current_time, order.ticker, "ARCA", order.quantity, order.direction, fill_cost, unit_cost
       )
       self.events.append(fill_event)
 

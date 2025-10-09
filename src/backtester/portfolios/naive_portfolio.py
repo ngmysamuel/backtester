@@ -135,7 +135,7 @@ class NaivePortfolio(Portfolio):
     self.current_holdings["total"] += (self.current_holdings[event.ticker]["value"] - initial_holding - event.commission) # subtract a negative number makes a plus
     self.current_holdings["cash"] += -1 * event.direction.value * event.fill_cost - event.commission # less the actual cost to buy/sell the stock, 
     self.current_holdings["commissions"] += event.commission
-    self.current_holdings["order"] += f" | {event.direction.name} {event.quantity} {event.ticker}"
+    self.current_holdings["order"] += f" | {event.direction.name} {event.quantity} {event.ticker} @ {event.unit_cost:,.2f}"
 
   def end_of_day(self):
     """
