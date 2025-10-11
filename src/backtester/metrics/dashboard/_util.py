@@ -427,6 +427,13 @@ def book_trades(df: pd.DataFrame):
   return return_df
 
 def plot_equity_curve_with_trades(ticker: str, df_trades: pd.DataFrame, df_equity: pd.DataFrame):
+  """
+  Returns a line graph of the equity curve as well as the trades made superimposed over it. 
+  Args
+  1. ticker - a string of the ticker. Can be 'All' to include all ticker trades
+  2. df_trades - dataframe of the closed trades; from the book_trades() method
+  3. df_equity - dataframe with the equity curve
+  """
   df_equity = df_equity[["equity_curve"]]
   y_min, y_max = df_equity["equity_curve"].min(), df_equity["equity_curve"].max()
   fig = px.line(df_equity, x=df_equity.index, y="equity_curve")
@@ -460,6 +467,13 @@ def plot_equity_curve_with_trades(ticker: str, df_trades: pd.DataFrame, df_equit
 
     if show_legend_for_this_trace:
         legend_added[direction] = True
+  
+  fig.update_layout(
+      title_text='Equity Curve with Trades',
+      xaxis_title='Date',
+      yaxis_title='Equity',
+      legend_title='Trade Direction'
+  )
         
   return fig
 

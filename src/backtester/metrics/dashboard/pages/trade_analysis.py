@@ -18,7 +18,7 @@ st.info(
 )
 
 
-st.header("Trades")
+st.header("Trade Log")
 trades_df = utils.get_trades(st.session_state.df)
 
 if "trade_analysis_ticker_trades" not in st.session_state:
@@ -38,13 +38,13 @@ with col1:
     st.plotly_chart(utils.plot_equity_curve_with_trades(st.session_state.trade_analysis_ticker_trades, trades_df, st.session_state.df))
 with col2:
     trade_analysis_ticker_trades = st.selectbox(
-    "Ticker",
+    "Filter by Ticker",
     ["All"] + [*trades_df["Ticker"].unique()],
     index=0,
     key="trade_analysis_ticker_trades"
   )
 
-st.header("Profit and Loss")
+st.header("Closed Trades Profit and Loss")
 pnl = utils.book_trades(trades_df)
 st.dataframe(pnl, hide_index=True, column_config={
       "Quantity":st.column_config.TextColumn("Quantity"),
@@ -59,7 +59,7 @@ with col1:
     st.plotly_chart(utils.plot_stacked_pnl_by_holding_period(st.session_state.trade_analysis_ticker_pnl, pnl))
 with col2:
     trade_analysis_ticker_pnl = st.selectbox(
-    "Ticker",
+    "Filter by Ticker",
     ["All"] + [*trades_df["Ticker"].unique()],
     index=0,
     key="trade_analysis_ticker_pnl"
