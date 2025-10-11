@@ -5,6 +5,7 @@ import plotly
 from millify import millify
 from scipy.stats import norm
 from collections import deque, defaultdict
+import plotly.graph_objects as go
 
 DAYS_IN_YEAR = 365.0
 MINUTES_IN_HOUR = 60.0
@@ -344,34 +345,44 @@ def get_trades(df: pd.DataFrame):
 
   # Format the final DataFrame for display
   trades_df = trades_df.reset_index().rename(columns={'timestamp': 'Date'})
-  trades_df['Date'] = trades_df['Date'].dt.strftime('%Y-%m-%d')
 
   return trades_df[['Date', 'Direction', 'Quantity', 'Ticker', 'Unit Price']]
 
 def book_trades(df: pd.DataFrame):
-  df = get_trades(df)
-  df.columns = ['date', 'direction', 'quantity', 'ticker', 'unit_price']
-  df["unit_price"] = df["unit_price"].str[1:].astype(float)
-  traded_tickers = df["ticker"].unique()
+  """
+  FIFO method to book trades individually. 
+  Args
+  1. df - df has to be output from get_trades(), a method above
+  Returns
+  1. return_df - a df with the pnl arising from every new buy/sell order
+  that has been closed with their corresponding sell/buy
+  """
+  df["Unit Price"] = df["Unit Price"].str[1:].astype(float)
+  df["Date"] = df["Date"].dt.strftime("%Y-%m-%d")
+  traded_tickers = df["Ticker"].unique()
   shorts = {ticker: deque() for ticker in traded_tickers}
   longs = {ticker: deque() for ticker in traded_tickers}
   net_positions = defaultdict(int)
   closed_trades = []
-  for trade in df.itertuples():
-    outstanding_quantity = trade.quantity
-    if trade.direction == "BUY":
-      net_positions[trade.ticker] += trade.quantity
+  for _, trade in df.iterrows():
+    ticker = trade["Ticker"]
+    unit_price = trade["Unit Price"]
+    trade_date = trade["Date"]
+    trade_direction = trade["Direction"]
+    outstanding_quantity = trade["Quantity"]
+    if trade_direction == "BUY":
+      net_positions[ticker] += trade["Quantity"]
       while outstanding_quantity > 0:
-        if shorts[trade.ticker]: # there exists someting in the SHORT deque for that ticker - COVER SHORT
-          earliest_short = shorts[trade.ticker][0]
-          px_diff = earliest_short["price"] - trade.unit_price
+        if shorts[ticker]: # there exists someting in the SHORT deque for that ticker - COVER SHORT
+          earliest_short = shorts[ticker][0]
+          px_diff = earliest_short["price"] - unit_price
           traded_quantity = min(outstanding_quantity, earliest_short["quantity"])
           pnl = px_diff * traded_quantity
           return_pct = (px_diff / earliest_short["price"]) * 100
           closed_trades.append({
-            "ticker": trade.ticker, "entry_date": earliest_short["date"], "exit_date": trade.date, 
-            "type": "BUY", "quantity": traded_quantity, "nett position": net_positions[trade.ticker],
-            "entry_price": earliest_short["price"], "exit_price": trade.unit_price,
+            "ticker": ticker, "entry_date": earliest_short["date"], "exit_date": trade_date, 
+            "type": "BUY", "quantity": traded_quantity, "nett position": net_positions[ticker],
+            "entry_price": earliest_short["price"], "exit_price": unit_price,
              "pnl": pnl, "return_pct": return_pct,
           })
           if earliest_short["quantity"] > outstanding_quantity: # entirely cover BUY
@@ -379,25 +390,25 @@ def book_trades(df: pd.DataFrame):
             outstanding_quantity = 0
           else: # partial cover BUY
             outstanding_quantity -= earliest_short["quantity"]
-            shorts[trade.ticker].popleft()
+            shorts[ticker].popleft()
         else: # not short / no longer short - add to BUY
-          longs[trade.ticker].append({
-            "price": trade.unit_price, "date": trade.date, "quantity": outstanding_quantity
+          longs[ticker].append({
+            "price": unit_price, "date": trade_date, "quantity": outstanding_quantity
           })
           outstanding_quantity = 0
-    elif trade.direction == "SELL":
-      net_positions[trade.ticker] -= trade.quantity
+    elif trade_direction == "SELL":
+      net_positions[ticker] -= trade["Quantity"]
       while outstanding_quantity > 0:
-        if longs[trade.ticker]: # there exists someting in the LONG deque for that ticker - SELL
-          earliest_long = longs[trade.ticker][0]
-          px_diff = trade.unit_price - earliest_long["price"]
+        if longs[ticker]: # there exists someting in the LONG deque for that ticker - SELL
+          earliest_long = longs[ticker][0]
+          px_diff = unit_price - earliest_long["price"]
           traded_quantity = min(outstanding_quantity, earliest_long["quantity"])
           pnl = px_diff * traded_quantity
           return_pct = (px_diff / earliest_long["price"]) * 100
           closed_trades.append({
-            "ticker": trade.ticker, "entry_date": earliest_long["date"], "exit_date": trade.date,
-            "type": "SELL", "quantity": traded_quantity, "nett position": net_positions[trade.ticker],
-            "entry_price": earliest_long["price"], "exit_price": trade.unit_price,
+            "ticker": ticker, "entry_date": earliest_long["date"], "exit_date": trade_date,
+            "type": "SELL", "quantity": traded_quantity, "nett position": net_positions[ticker],
+            "entry_price": earliest_long["price"], "exit_price": unit_price,
             "pnl": pnl, "return_pct": return_pct,
           })
           if earliest_long["quantity"] > outstanding_quantity: # entirely cover SELL
@@ -405,12 +416,99 @@ def book_trades(df: pd.DataFrame):
             outstanding_quantity = 0
           else: # partial cover SELL
             outstanding_quantity -= earliest_long["quantity"]
-            longs[trade.ticker].popleft()
+            longs[ticker].popleft()
         else: # not long / no longer long - add to SHORT
-          shorts[trade.ticker].append({
-            "price": trade.unit_price, "date": trade.date, "quantity": outstanding_quantity
+          shorts[ticker].append({
+            "price": unit_price, "date": trade_date, "quantity": outstanding_quantity
           })
           outstanding_quantity = 0
   return_df = pd.DataFrame(closed_trades)
   return_df.columns = ["Ticker", "Entry Date", "Exit Date", "Direction", "Quantity", "EOD Nett Position", "Entry Price", "Exit Price", "PnL", "Return"]
   return return_df
+
+def plot_equity_curve_with_trades(ticker: str, df_trades: pd.DataFrame, df_equity: pd.DataFrame):
+  df_equity = df_equity[["equity_curve"]]
+  y_min, y_max = df_equity["equity_curve"].min(), df_equity["equity_curve"].max()
+  fig = px.line(df_equity, x=df_equity.index, y="equity_curve")
+
+  if ticker != "All":
+    df_trades = df_trades[df_trades["Ticker"] == ticker]
+
+  # Use flags to add legend items only once
+  legend_added = {'BUY': False, 'SELL': False}
+
+  for _, trade in df_trades.iterrows():
+    direction = trade["Direction"]
+    ticker = trade["Ticker"]
+    trade_color = "#19f505" if direction == "BUY" else "#eb4034"
+    hover_text = f'{trade["Date"].strftime("%Y-%m-%d")}: {direction} {int(trade["Quantity"])} {ticker} @ {trade["Unit Price"]}'
+    
+    show_legend_for_this_trace = not legend_added[direction]
+
+    fig.add_trace(go.Scatter(
+        x=[trade["Date"], trade["Date"]],
+        y=[y_min, y_max],
+        mode='lines',
+        line=dict(color=trade_color, width=2, dash='dot'),
+        name=direction,
+        hoverinfo='text', # Disable hover on the thin visible line
+        hovertext=hover_text,
+        legendgroup=direction.lower(),
+        showlegend=show_legend_for_this_trace,
+        opacity=0.7
+    ))
+
+    if show_legend_for_this_trace:
+        legend_added[direction] = True
+        
+  return fig
+
+
+def plot_stacked_pnl_by_holding_period(ticker: str, df: pd.DataFrame):
+    """
+    Creates a stacked bar chart showing Gross Profit vs. Gross Loss for each bin.
+    """
+    if ticker != "All":
+      df = df[df["Ticker"] == ticker]
+
+    df["Holding Period"] = (pd.to_datetime(df["Exit Date"]) - pd.to_datetime(df["Entry Date"])).dt.days
+    bins = [0, 5, 10, 20, 30, np.inf]
+    labels = ['1-5 Days', '6-10 Days', '11-20 Days', '21-30 Days', '30+ Days']
+    df['period_bin'] = pd.cut(df['Holding Period'], bins=bins, labels=labels, right=False)
+    
+    # Calculate Gross Profit and Gross Loss for each bin
+    gross_profit = df[df['PnL'] > 0].groupby('period_bin', observed=True)['PnL'].sum()
+    gross_loss = df[df['PnL'] < 0].groupby('period_bin', observed=True)['PnL'].sum()
+    
+    # Combine into a single DataFrame for plotting
+    summary = pd.DataFrame({'Gross Profit': gross_profit, 'Gross Loss': gross_loss}).fillna(0)
+    
+    fig = go.Figure()
+    
+    # Add Gross Profit bars (green)
+    fig.add_trace(go.Bar(
+        x=summary.index,
+        y=summary['Gross Profit'],
+        name='Gross Profit',
+        marker_color='#2ca02c',
+        hovertemplate="<b>%{x}</b><br>Gross Profit: $%{y:,.2f}<extra></extra>"
+    ))
+    
+    # Add Gross Loss bars (red)
+    fig.add_trace(go.Bar(
+        x=summary.index,
+        y=summary['Gross Loss'],
+        name='Gross Loss',
+        marker_color='#d62728',
+        hovertemplate="<b>%{x}</b><br>Gross Loss: $%{y:,.2f}<extra></extra>"
+    ))
+    
+    fig.update_layout(
+        barmode='relative', # This stacks positive and negative values from the zero line
+        title_text='Gross Profit vs. Gross Loss by Holding Period',
+        xaxis_title='Holding Period Bin',
+        yaxis_title='P&L ($)',
+        legend_title='Metric'
+    )
+    
+    return fig
