@@ -4,6 +4,7 @@ import plotly.express as px
 import plotly
 from millify import millify
 from scipy.stats import norm
+from collections import deque, defaultdict
 
 DAYS_IN_YEAR = 365.0
 MINUTES_IN_HOUR = 60.0
@@ -346,3 +347,70 @@ def get_trades(df: pd.DataFrame):
   trades_df['Date'] = trades_df['Date'].dt.strftime('%Y-%m-%d')
 
   return trades_df[['Date', 'Direction', 'Quantity', 'Ticker', 'Unit Price']]
+
+def book_trades(df: pd.DataFrame):
+  df = get_trades(df)
+  df.columns = ['date', 'direction', 'quantity', 'ticker', 'unit_price']
+  df["unit_price"] = df["unit_price"].str[1:].astype(float)
+  traded_tickers = df["ticker"].unique()
+  shorts = {ticker: deque() for ticker in traded_tickers}
+  longs = {ticker: deque() for ticker in traded_tickers}
+  net_positions = defaultdict(int)
+  closed_trades = []
+  for trade in df.itertuples():
+    outstanding_quantity = trade.quantity
+    if trade.direction == "BUY":
+      net_positions[trade.ticker] += trade.quantity
+      while outstanding_quantity > 0:
+        if shorts[trade.ticker]: # there exists someting in the SHORT deque for that ticker - COVER SHORT
+          earliest_short = shorts[trade.ticker][0]
+          px_diff = earliest_short["price"] - trade.unit_price
+          traded_quantity = min(outstanding_quantity, earliest_short["quantity"])
+          pnl = px_diff * traded_quantity
+          return_pct = (px_diff / earliest_short["price"]) * 100
+          closed_trades.append({
+            "ticker": trade.ticker, "entry_date": earliest_short["date"], "exit_date": trade.date, 
+            "type": "BUY", "quantity": traded_quantity, "nett position": net_positions[trade.ticker],
+            "entry_price": earliest_short["price"], "exit_price": trade.unit_price,
+             "pnl": pnl, "return_pct": return_pct,
+          })
+          if earliest_short["quantity"] > outstanding_quantity: # entirely cover BUY
+            earliest_short["quantity"] -= outstanding_quantity
+            outstanding_quantity = 0
+          else: # partial cover BUY
+            outstanding_quantity -= earliest_short["quantity"]
+            shorts[trade.ticker].popleft()
+        else: # not short / no longer short - add to BUY
+          longs[trade.ticker].append({
+            "price": trade.unit_price, "date": trade.date, "quantity": outstanding_quantity
+          })
+          outstanding_quantity = 0
+    elif trade.direction == "SELL":
+      net_positions[trade.ticker] -= trade.quantity
+      while outstanding_quantity > 0:
+        if longs[trade.ticker]: # there exists someting in the LONG deque for that ticker - SELL
+          earliest_long = longs[trade.ticker][0]
+          px_diff = trade.unit_price - earliest_long["price"]
+          traded_quantity = min(outstanding_quantity, earliest_long["quantity"])
+          pnl = px_diff * traded_quantity
+          return_pct = (px_diff / earliest_long["price"]) * 100
+          closed_trades.append({
+            "ticker": trade.ticker, "entry_date": earliest_long["date"], "exit_date": trade.date,
+            "type": "SELL", "quantity": traded_quantity, "nett position": net_positions[trade.ticker],
+            "entry_price": earliest_long["price"], "exit_price": trade.unit_price,
+            "pnl": pnl, "return_pct": return_pct,
+          })
+          if earliest_long["quantity"] > outstanding_quantity: # entirely cover SELL
+            earliest_long["quantity"] -= outstanding_quantity
+            outstanding_quantity = 0
+          else: # partial cover SELL
+            outstanding_quantity -= earliest_long["quantity"]
+            longs[trade.ticker].popleft()
+        else: # not long / no longer long - add to SHORT
+          shorts[trade.ticker].append({
+            "price": trade.unit_price, "date": trade.date, "quantity": outstanding_quantity
+          })
+          outstanding_quantity = 0
+  return_df = pd.DataFrame(closed_trades)
+  return_df.columns = ["Ticker", "Entry Date", "Exit Date", "Direction", "Quantity", "EOD Nett Position", "Entry Price", "Exit Price", "PnL", "Return"]
+  return return_df
