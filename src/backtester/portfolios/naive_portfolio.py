@@ -8,7 +8,6 @@ import pandas as pd
 import numpy as np
 import collections
 from backtester.exceptions.negative_cash_exception import NegativeCashException
-import math
 from copy import deepcopy
 
 class NaivePortfolio(Portfolio):
@@ -24,6 +23,7 @@ class NaivePortfolio(Portfolio):
     symbol_list: list[str],
     events: deque,
     start_date: float,
+    interval: str,
     allocation: float = 1,
     borrow_cost: float = 0.01,
     maintenance_margin: float = 0.3,
@@ -40,6 +40,7 @@ class NaivePortfolio(Portfolio):
       symbol_list (list): List of ticker symbols to include in the portfolio.
       events (deque): The event queue to communicate with other components.
       start_date (float): The starting timestamp for the portfolio.
+      interval (str): 
       allocation (float): The percentage of the portfolio that an asset is maximally allowed to take (default is 1).
       borrow_cost (float): The annualized interest rate for borrowing stocks to short sell (default is 0.01, i.e., 1%).
       maintenance_margin (float): The minimum equity percentage required to maintain a short position (default is 0.2, i.e., 20%).
@@ -53,6 +54,8 @@ class NaivePortfolio(Portfolio):
     self.initial_capital = initial_capital
     self.symbol_list = symbol_list
     self.events = events
+    self.start_date = start_date
+    self.interval = interval
     self.allocation = allocation
     self.daily_borrow_rate = borrow_cost / 252 # assuming 252 trading days in a year
     self.maintenance_margin = maintenance_margin
@@ -71,7 +74,7 @@ class NaivePortfolio(Portfolio):
     self.current_holdings["timestamp"] = start_date
     self.current_holdings["borrow_costs"] = 0.0
     self.current_holdings["order"] = ""
-    self.historical_holdings = [self.current_holdings.copy()]
+    self.historical_holdings = []
 
   def on_market(self, event):
     """
@@ -132,7 +135,7 @@ class NaivePortfolio(Portfolio):
     self.current_holdings["total"] += (self.current_holdings[event.ticker]["value"] - initial_holding - event.commission) # subtract a negative number makes a plus
     self.current_holdings["cash"] += -1 * event.direction.value * event.fill_cost - event.commission # less the actual cost to buy/sell the stock, 
     self.current_holdings["commissions"] += event.commission
-    self.current_holdings["order"] += f" | {event.direction.name} {event.quantity} {event.ticker}"
+    self.current_holdings["order"] += f" | {event.direction.name} {event.quantity} {event.ticker} @ {event.unit_cost:,.2f}"
 
   def end_of_day(self):
     """
@@ -168,8 +171,11 @@ class NaivePortfolio(Portfolio):
       if atr:
         self.historical_atr[ticker].append(atr)
 
+
   def liquidate(self):
     self.current_holdings = deepcopy(self.current_holdings)
+    self.current_holdings["timestamp"] = pd.to_datetime(self.current_holdings["timestamp"], unit="s") + pd.Timedelta(self.interval)
+    self.current_holdings["timestamp"] = self.current_holdings["timestamp"].timestamp()
     self.current_holdings["commissions"] = 0.0
     self.current_holdings["borrow_costs"] = 0.0
     self.current_holdings["order"] = ""
@@ -183,6 +189,7 @@ class NaivePortfolio(Portfolio):
       self.current_holdings[ticker]["value"] = 0
       self.current_holdings["margin"][ticker] = 0
     self.current_holdings["total"] = self.current_holdings["cash"]
+
 
   def _calc_atr(self, ticker): # # Use Wilder's Smoothing 
     if len(self.historical_atr[ticker]) < 1: # initialization of average true range uses simple arithmetic mean
@@ -218,3 +225,4 @@ class NaivePortfolio(Portfolio):
     curve["returns"] = curve["total"].pct_change()
     curve["equity_curve"] = (1.0 + curve["returns"]).cumprod()
     self.equity_curve = curve
+

@@ -23,6 +23,7 @@ class CSVDataHandler(DataHandler):
     self.interval = interval
     self.exchange_closing_time = exchange_closing_time
 
+    self.symbol_raw_data = {}
     self.symbol_data = {}
     self.latest_symbol_data = {}
     self.continue_backtest = True
@@ -44,9 +45,10 @@ class CSVDataHandler(DataHandler):
         header=0,
         parse_dates=True,
         usecols=lambda x: x.lower() in ["open", "close", "high", "low", "volume", "date"],
-        converters={"Date": lambda x: pd.to_datetime(x)}
+        converters={"Date": lambda x: pd.to_datetime(x).tz_localize(None)}
       )
 
+      self.symbol_raw_data[s] = df
       self.symbol_data[s] = df
       self.latest_symbol_data[s] = []
 

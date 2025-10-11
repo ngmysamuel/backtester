@@ -10,7 +10,7 @@ class FillEvent(ABC):
   """
 
   def __init__(
-    self, timestamp, ticker, exchange, quantity, direction, fill_cost, commission=None
+    self, timestamp, ticker, exchange, quantity, direction, fill_cost, unit_cost, commission=None
   ):
     """
     Initialises the FillEvent object. Sets the ticker, exchange,
@@ -28,6 +28,7 @@ class FillEvent(ABC):
     quantity - The filled quantity.
     direction - The direction of fill ('BUY' or 'SELL')
     fill_cost - The holdings value in dollars.
+    unit_cost - The price of a single stock that was bought/sold
     commission - An optional commission sent from IB.
     """
 
@@ -38,6 +39,7 @@ class FillEvent(ABC):
     self.quantity = quantity
     self.direction = direction
     self.fill_cost = fill_cost
+    self.unit_cost = unit_cost
 
     # Calculate commission
     if commission is None:

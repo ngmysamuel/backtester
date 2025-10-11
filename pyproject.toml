@@ -11,6 +11,11 @@ typer = "^0.17.4"
 pandas = "^2.3.2"
 yfinance = "^0.2.65"
 pyyaml = "^6.0.2"
+quantstats = "^0.0.77"
+ipython = "^9.5.0"
+streamlit = "^1.50.0"
+millify = "^0.1.1"
+plotly = "^6.3.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.4.2"

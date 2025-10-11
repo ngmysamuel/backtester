@@ -16,6 +16,11 @@ poetry run backtester run
 poetry run pytest
 ```
 
+### Dashboard
+```
+poetry run backtester dashboard
+```
+
 ### Pulling CSV data
 ```
 import yfinance as yf
@@ -49,7 +54,24 @@ df.to_csv("MSFT.csv")
             1. https://www.macroption.com/atr-calculation/#exponential-moving-average-ema-method
             2. https://www.macroption.com/atr-excel-wilder/
         2. initialization is handled with a simple average of the true range over the number of periods
+5. Metrics
+    1. Quantstats
+        1. https://github.com/ranaroussi/quantstats/blob/main/quantstats/reports.py
+        2. https://github.com/ranaroussi/quantstats/blob/main/quantstats/stats.py
+    2. Streamlit
+    3. Note that there are differnces in the values you see in the tearsheet versus what I've calculated and presented via Steamlit
+        1. For example, Quantstats starts their calculation from the first date where there is a non-zero return. Refer to _match_dates() in reports.py. For e.g. CAGR is 1.6% if we go by the full time span while Quanstats, relying on a smaller time period, returns a larger CAGR - 1.9%
+        2. Another example, Longest Drawdown Duration is present by Quantstats as the number of days from start to end while I present the number of trading intervals
+6. Annulization of Sharpe
+    1. The factor depends on what kind of time period we are calculating Sharpe over which in turn depends on the data interval we are using. If the data interval is daily, the Sharpe Ratio is daily. To get the sharpe ratio for the year, we need to "increase" the ratio to a year's basis. There are 252 trading days in a year which means the annualization factor is 252.
+    2. Uses the the interval stated in config.yaml
+    3. If its daily, annualization factor is 252. If its minutely, 98280. See get_annualization_factor() in _util.py
+6. Transaction Cost Modelling
+    1. Commisions
+    2. Bid-Ask Spread
+    3. Slippage
 
+Periods for pandas: https://pandas.pydata.org/docs/reference/api/pandas.Period.asfreq.html
 
 ### Notes
 
@@ -64,3 +86,7 @@ When a company pays a dividend, its stock price typically drops by the dividend 
 If a strategy depends on detecting sudden price drops (e.g., a "buy the dip" strategy), using adjusted prices would remove these drops from the historical data, causing the backtest to miss valid trading signals. 
 3. Using next-bar data  
 A strategy that buys a stock if the closing price is higher than the opening price. On Monday morning, the backtest looks at Monday's historical data, sees that the closing price was indeed higher than the opening price, and records a profitable trade. 
+
+#### Numpy and Pandas
+1. Standard Deviation
+    1. Numpy assumes population level s.d. (ddof = 0) while pandas assumes sample (ddof = 1)

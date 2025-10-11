@@ -9,6 +9,10 @@ from backtester.portfolios.naive_portfolio import NaivePortfolio
 import pandas as pd
 from backtester.execution.simulated_execution_handler import SimulatedExecutionHandler
 from backtester.exceptions.negative_cash_exception import NegativeCashException
+import quantstats as qs
+from pathlib import Path
+import sys
+import runpy
 
 app = typer.Typer()
 
@@ -52,19 +56,19 @@ def run(data_dir: str,
   typer.echo(f"Symbols: {symbol_list}")
 
   initial_capital = config["backtester_settings"]["initial_capital"]
-  start_timestamp = pd.to_datetime(config["backtester_settings"]["start_date"]).timestamp()
+  start_timestamp = pd.to_datetime(config["backtester_settings"]["start_date"], dayfirst=True).timestamp()
   interval = config["backtester_settings"]["interval"]
   exchange_closing_time = config["backtester_settings"]["exchange_closing_time"]
+  benchmark_ticker = config["backtester_settings"]["benchmark"]
   typer.echo(f"Initial Capital: {initial_capital}")
   
-
   StrategyClass = load_class(config["strategies"][strategy]["name"])
   additional_params = config["strategies"][strategy].get("additional_parameters", {})
 
   event_queue = collections.deque()
   data_handler = CSVDataHandler(event_queue, data_dir, symbol_list, interval, exchange_closing_time)
   strategy_instance = StrategyClass(event_queue, data_handler, **additional_params)
-  portfolio = NaivePortfolio(data_handler,initial_capital,symbol_list,event_queue,start_timestamp)
+  portfolio = NaivePortfolio(data_handler,initial_capital,symbol_list,event_queue,start_timestamp, interval)
   execution_handler = SimulatedExecutionHandler(event_queue, data_handler)
   
   mkt_close = False
@@ -96,19 +100,28 @@ def run(data_dir: str,
       portfolio.end_of_day() # deduct borrow costs and calculate margin
       mkt_close = False
 
-  portfolio.liquidate()
+  # portfolio.liquidate()
   portfolio.create_equity_curve()
   portfolio.equity_curve.to_csv("equity_curve.csv")
 
+  benchmark_data_handler = CSVDataHandler(event_queue, data_dir, [benchmark_ticker], interval, exchange_closing_time)
+  benchmark_data = benchmark_data_handler.symbol_raw_data["SPY"]
+  benchmark_returns = benchmark_data["close"].pct_change()
+  benchmark_returns.name = benchmark_ticker
+  qs.reports.html(portfolio.equity_curve["returns"], benchmark=benchmark_returns, output='strategy_report.html', title=strategy, match_dates=False)
+
 
 @app.command()
-def plot_results():
+def dashboard():
   """
   Plot the results of the last backtest.
   """
-  typer.echo("Plotting results...")
-  # --- TO BE IMPLEMENTED ---
-
+  config = load_config()
+  interval = config["backtester_settings"]["interval"]
+  streamlit_script_path = Path("src/backtester/metrics/dashboard/streamlit_app.py").resolve()
+  typer.echo(f"Loading {streamlit_script_path}")
+  sys.argv = ["streamlit", "run", streamlit_script_path, "--global.disableWidgetStateDuplicationWarning", "true", f" -- --interval {interval}"] # for more arguments, add ', " -- --what ee"' to the end
+  runpy.run_module("streamlit", run_name="__main__")
 
 if __name__ == "__main__":
   app()
