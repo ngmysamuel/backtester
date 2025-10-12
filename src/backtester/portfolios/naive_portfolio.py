@@ -71,9 +71,8 @@ class NaivePortfolio(Portfolio):
     self.position_size = {sym: 100 for sym in self.symbol_list}  # to be derived
     self.historical_atr = {sym: [] for sym in self.symbol_list}
 
-    self.value_updated = set()
-
     self.current_holdings = {sym: {"position": 0, "value": 0.0} for sym in self.symbol_list}
+    self.current_holdings["margin"] = collections.defaultdict(int)
     self.current_holdings["cash"] = initial_capital
     self.current_holdings["total"] = initial_capital
     self.current_holdings["commissions"] = 0.0
@@ -135,16 +134,19 @@ class NaivePortfolio(Portfolio):
     """
     Updates the portfolio's positions and holdings based on a FillEvent.
     """
-    bar = self.data_handler.get_latest_bars(event.ticker)[0]
     initial_holding = self.current_holdings[event.ticker]["value"]
+    
+    # Update position and cash
     self.current_holdings[event.ticker]["position"] += event.direction.value * event.quantity
-    self.current_holdings[event.ticker]["value"] = self.current_holdings[event.ticker]["position"] * bar.close # use closing price to evaluate portfolio value
-    cash_delta = -1 * event.direction.value * event.fill_cost - event.commission # less the actual cost to buy/sell the stock, 
-    self.current_holdings["total"] += (self.current_holdings[event.ticker]["value"] - initial_holding + cash_delta) # subtract a negative number makes a plus
+    cash_delta = -1 * event.direction.value * event.fill_cost - event.commission
     self.current_holdings["cash"] += cash_delta
     self.current_holdings["commissions"] += event.commission
+
+    # Update portfolio value based on fill, not latest close
+    self.current_holdings[event.ticker]["value"] = self.current_holdings[event.ticker]["position"] * event.unit_cost
+    self.current_holdings["total"] += (self.current_holdings[event.ticker]["value"] - initial_holding + cash_delta)
+    
     self.current_holdings["order"] += f" | {event.direction.name} {event.quantity} {event.ticker} @ {event.unit_cost:,.2f}"
-    self.value_updated.add(event.ticker)
 
   def end_of_day(self):
     """
@@ -181,19 +183,19 @@ class NaivePortfolio(Portfolio):
       atr = self._calc_atr(ticker)
       if atr:
         self.historical_atr[ticker].append(atr)
-      if ticker not in self.value_updated:
-        bar = self.data_handler.get_latest_bars(ticker)[0]
-        initial_holding = self.current_holdings[ticker]["value"]
-        self.current_holdings[ticker]["value"] = self.current_holdings[ticker]["position"] * bar.close # use closing price to evaluate portfolio value
-        self.current_holdings["total"] += (self.current_holdings[ticker]["value"] - initial_holding) # subtract a negative number makes a plus
-    self.value_updated.clear()
+
+      # Mark-to-market valuation at the end of the interval
+      bar = self.data_handler.get_latest_bars(ticker)[0]
+      initial_holding = self.current_holdings[ticker]["value"]
+      self.current_holdings[ticker]["value"] = self.current_holdings[ticker]["position"] * bar.close
+      self.current_holdings["total"] += (self.current_holdings[ticker]["value"] - initial_holding)
 
 
   def create_equity_curve(self):
     curve = pd.DataFrame(self.historical_holdings)
     curve["timestamp"] = pd.to_datetime(curve["timestamp"], unit="s")
     curve.set_index("timestamp", inplace=True)
-    curve["returns"] = curve["total"].pct_change()
+    curve["returns"] = curve["total"].pct_change().fillna(0.0)
     curve["equity_curve"] = (1.0 + curve["returns"]).cumprod()
     self.equity_curve = curve
 
@@ -267,6 +269,7 @@ class NaivePortfolio(Portfolio):
       latest_bar = self.data_handler.get_latest_bars(ticker)[0]
       if self.current_holdings[ticker]["position"] < 0: # nett SHORT position
         self.current_holdings["cash"] += self.margin_holdings[ticker] # release any margin being held
+        self.margin_holdings[ticker] = 0
       self.current_holdings["cash"] += self.current_holdings[ticker]["position"] * latest_bar.close
       self.current_holdings[ticker]["position"] = 0
       self.current_holdings[ticker]["value"] = 0
