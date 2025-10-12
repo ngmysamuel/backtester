@@ -19,13 +19,19 @@ class FakeDataHandler:
         self._bars = bars_map
 
     def get_latest_bars(self, ticker, n=1):
-        return self._bars.get(ticker, [])
+        return [self._bars.get(ticker, []).popleft()] # assumes that we always only get 1 bar at a time for our tests
 
 @pytest.fixture
 def mock_data_handler():
     bars = {
-        "MSFT": [SimpleNamespace(Index=pd.to_datetime("2023-01-01 10:00:00"), open=100, close=105)],
-        "AAPL": [SimpleNamespace(Index=pd.to_datetime("2023-01-01 10:00:00"), open=150, close=155)],
+        "MSFT": deque([
+            SimpleNamespace(Index=pd.to_datetime("2023-01-01 10:00:00"), open=100, close=105),
+            SimpleNamespace(Index=pd.to_datetime("2023-01-02 10:00:00"), open=105, close=115)
+            ]),
+        "AAPL": deque([
+            SimpleNamespace(Index=pd.to_datetime("2023-01-01 10:00:00"), open=150, close=155),
+            SimpleNamespace(Index=pd.to_datetime("2023-01-02 10:00:00"), open=155, close=156)
+        ]),
     }
     return FakeDataHandler(bars)
 
@@ -52,7 +58,7 @@ def test_initialization(portfolio):
     assert portfolio.current_holdings["cash"] == 100000.0
     assert portfolio.current_holdings["total"] == 100000.0
     assert portfolio.current_holdings["MSFT"]["position"] == 0
-    assert len(portfolio.historical_holdings) == 1
+    assert len(portfolio.historical_holdings) == 0
 
 def test_calc_atr_insufficient_data(portfolio):
     """Tests that _calc_atr returns None if there is not enough data."""
@@ -123,7 +129,7 @@ def test_on_market(portfolio):
 
     portfolio.on_market(market_event)
 
-    assert len(portfolio.historical_holdings) == 2
+    assert len(portfolio.historical_holdings) == 1
     assert portfolio.current_holdings["timestamp"] == market_event.timestamp
     # Check that state is carried over, but event-specific fields are reset
     assert portfolio.current_holdings["cash"] == initial_holdings["cash"]
@@ -188,9 +194,8 @@ def test_on_fill_buy(portfolio):
     portfolio.on_fill(fill)
     assert portfolio.current_holdings["MSFT"]["position"] == 100
     assert portfolio.current_holdings["MSFT"]["value"] == 10500 # 100 * 105 (close price)
-    assert portfolio.current_holdings["cash"] == 100000 - 10000 - 5.0
-    assert portfolio.current_holdings["total"] == 100000 + (10500 - 0 - 5.0)
-    assert portfolio.current_holdings["commissions"] == 5.0
+    assert portfolio.current_holdings["cash"] == 100000 - 10000 - fill.commission
+    assert portfolio.current_holdings["total"] == 100000 + (10500 - 0 - fill.commission)
 
 def test_on_fill_sell_to_close(portfolio):
     """Tests updating holdings after a SELL fill to close a long position."""
@@ -205,9 +210,8 @@ def test_on_fill_sell_to_close(portfolio):
 
     assert portfolio.current_holdings["MSFT"]["position"] == 0
     assert portfolio.current_holdings["MSFT"]["value"] == 0 # 0 * 105
-    assert portfolio.current_holdings["cash"] == 90000 + 11000 - 5.0
-    assert portfolio.current_holdings["total"] == 100500 + (0 - 10500 - 5.0)
-    assert portfolio.current_holdings["commissions"] == 5.0
+    assert portfolio.current_holdings["cash"] == 90000 + 11000 - fill.commission
+    assert portfolio.current_holdings["total"] == 100500 + (0 - 10500 - fill.commission)
 
 def test_end_of_day_short_position(portfolio):
     """Tests margin and borrow cost calculation for a short position."""
@@ -276,22 +280,65 @@ def test_end_of_day_long_position_releases_margin(portfolio):
 
 def test_on_fill_multiple_tickers(portfolio):
     """Tests updating holdings after fills for multiple tickers."""
+    opening_msft_price = 100
+    closing_msft_price = 105
+    quantity_msft = 100
+
     # First fill: BUY MSFT
-    fill_msft = FillEvent(123, "MSFT", "ARCA", 100, DirectionType.BUY, 10000, 5.0)
+    fill_msft = FillEvent(123, "MSFT", "ARCA", quantity_msft, DirectionType.BUY, quantity_msft*opening_msft_price, opening_msft_price)
     portfolio.on_fill(fill_msft)
 
-    assert portfolio.current_holdings["MSFT"]["position"] == 100
-    assert portfolio.current_holdings["cash"] == 90000 - 5.0
-    assert portfolio.current_holdings["total"] == 100000 + (10500 - 0 - 5.0)
+    assert portfolio.current_holdings["MSFT"]["position"] == quantity_msft
+    assert portfolio.current_holdings["cash"] == 100000 - quantity_msft*opening_msft_price - fill_msft.commission
+    assert portfolio.current_holdings["total"] == portfolio.current_holdings["cash"] + quantity_msft*closing_msft_price
+    assert portfolio.current_holdings["order"] == f" | BUY {quantity_msft} MSFT @ {opening_msft_price}.00"
+
+    cash_after_msft = portfolio.current_holdings["cash"]
+
+    opening_aapl_price = 150
+    closing_aapl_price = 155
+    quantity_aapl = 50
 
     # Second fill: BUY AAPL
-    fill_aapl = FillEvent(124, "AAPL", "ARCA", 50, DirectionType.BUY, 7500, 5.0)
+    fill_aapl = FillEvent(124, "AAPL", "ARCA", quantity_aapl, DirectionType.BUY, quantity_aapl*opening_aapl_price, opening_aapl_price)
     portfolio.on_fill(fill_aapl)
 
-    assert portfolio.current_holdings["AAPL"]["position"] == 50
-    assert portfolio.current_holdings["cash"] == 90000 - 5.0 - 7500 - 5.0
-    # total = initial_total + (msft_value - msft_commission) + (aapl_value - aapl_commission)
-    assert portfolio.current_holdings["total"] == 100000 + (10500 - 5.0) + (50 * 155 - 5.0)
+    assert portfolio.current_holdings["AAPL"]["position"] == quantity_aapl
+    assert portfolio.current_holdings["cash"] == cash_after_msft - quantity_aapl*opening_aapl_price - fill_aapl.commission
+    assert portfolio.current_holdings["total"] == portfolio.current_holdings["cash"] + (quantity_msft*closing_msft_price) + (quantity_aapl*closing_aapl_price)
+    assert portfolio.current_holdings["order"] == f" | BUY {quantity_msft} MSFT @ {opening_msft_price}.00 | BUY {quantity_aapl} AAPL @ {opening_aapl_price}.00"
+
+def test_on_fill_with_existing_holdings(portfolio):
+    """Tests updating holdings after fills for multiple tickers."""
+    """Tests updating holdings after fills for multiple tickers."""
+    opening_msft_price = 100
+    closing_msft_price = 105
+    quantity_msft = 100
+
+    # First fill: BUY MSFT
+    fill_msft = FillEvent(123, "MSFT", "ARCA", quantity_msft, DirectionType.BUY, quantity_msft*opening_msft_price, opening_msft_price)
+    portfolio.on_fill(fill_msft)
+
+    assert portfolio.current_holdings["MSFT"]["position"] == quantity_msft
+    assert portfolio.current_holdings["cash"] == 100000 - quantity_msft*opening_msft_price - fill_msft.commission
+    assert portfolio.current_holdings["total"] == portfolio.current_holdings["cash"] + quantity_msft*closing_msft_price
+    assert portfolio.current_holdings["order"] == f" | BUY {quantity_msft} MSFT @ {opening_msft_price}.00"
+
+    cash_after_msft = portfolio.current_holdings["cash"]
+    posiiton_after_msft = portfolio.current_holdings["MSFT"]["position"]
+
+    opening_msft_price = 105
+    closing_msft_price = 115
+    quantity_msft = 50
+
+    # Second fill: BUY MSFT
+    fill_msft = FillEvent(124, "MSFT", "ARCA", quantity_msft, DirectionType.BUY, quantity_msft*opening_msft_price, opening_msft_price)
+    portfolio.on_fill(fill_msft)
+
+    assert portfolio.current_holdings["MSFT"]["position"] == posiiton_after_msft + quantity_msft
+    assert portfolio.current_holdings["cash"] == cash_after_msft - quantity_msft*opening_msft_price - fill_msft.commission
+    assert portfolio.current_holdings["total"] == portfolio.current_holdings["cash"] + portfolio.current_holdings["MSFT"]["position"]*closing_msft_price
+    assert portfolio.current_holdings["order"] == f" | BUY {quantity_msft} MSFT @ {opening_msft_price}.00"
 
 def test_liquidate(portfolio):
     """Tests that all positions are closed and assets are converted to cash."""

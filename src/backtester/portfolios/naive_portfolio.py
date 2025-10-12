@@ -40,7 +40,7 @@ class NaivePortfolio(Portfolio):
       symbol_list (list): List of ticker symbols to include in the portfolio.
       events (deque): The event queue to communicate with other components.
       start_date (float): The starting timestamp for the portfolio.
-      interval (str): 
+      interval (str):  one of the following - 1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
       allocation (float): The percentage of the portfolio that an asset is maximally allowed to take (default is 1).
       borrow_cost (float): The annualized interest rate for borrowing stocks to short sell (default is 0.01, i.e., 1%).
       maintenance_margin (float): The minimum equity percentage required to maintain a short position (default is 0.2, i.e., 20%).
@@ -50,6 +50,10 @@ class NaivePortfolio(Portfolio):
       margin_holdings: tracks the margin held for each symbol when shorting
       current_holdings: polarity of values indicate a short (<0) or long (>0) position
     """
+    self.MINUTES_IN_HOUR = 60.0
+    self.TRD_HOURS_IN_DAY = 6.5
+    self.TRD_DAYS_IN_YEAR = 252.0
+
     self.data_handler = data_handler
     self.initial_capital = initial_capital
     self.symbol_list = symbol_list
@@ -57,7 +61,7 @@ class NaivePortfolio(Portfolio):
     self.start_date = start_date
     self.interval = interval
     self.allocation = allocation
-    self.daily_borrow_rate = borrow_cost / 252 # assuming 252 trading days in a year
+    self.daily_borrow_rate = borrow_cost / self._get_annualization_factor(interval) # assuming 252 trading days in a year
     self.maintenance_margin = maintenance_margin
     self.risk_per_trade = risk_per_trade
     self.atr_period = atr_period
@@ -66,6 +70,8 @@ class NaivePortfolio(Portfolio):
     self.margin_holdings = collections.defaultdict(int)
     self.position_size = {sym: 100 for sym in self.symbol_list}  # to be derived
     self.historical_atr = {sym: [] for sym in self.symbol_list}
+
+    self.value_updated = set()
 
     self.current_holdings = {sym: {"position": 0, "value": 0.0} for sym in self.symbol_list}
     self.current_holdings["cash"] = initial_capital
@@ -78,8 +84,9 @@ class NaivePortfolio(Portfolio):
 
   def on_market(self, event):
     """
-    Updates the portfolio's positions and holdings based on the latest market data.
     This method is called whenever a new market event is received.
+    Sets up the new phase of current_holdings by creating a new map object and placing the previous 
+    'current_holdings' into historical_holdings
     """
     self.current_holdings = deepcopy(self.current_holdings)
     self.current_holdings["commissions"] = 0.0
@@ -132,14 +139,17 @@ class NaivePortfolio(Portfolio):
     initial_holding = self.current_holdings[event.ticker]["value"]
     self.current_holdings[event.ticker]["position"] += event.direction.value * event.quantity
     self.current_holdings[event.ticker]["value"] = self.current_holdings[event.ticker]["position"] * bar.close # use closing price to evaluate portfolio value
-    self.current_holdings["total"] += (self.current_holdings[event.ticker]["value"] - initial_holding - event.commission) # subtract a negative number makes a plus
-    self.current_holdings["cash"] += -1 * event.direction.value * event.fill_cost - event.commission # less the actual cost to buy/sell the stock, 
+    cash_delta = -1 * event.direction.value * event.fill_cost - event.commission # less the actual cost to buy/sell the stock, 
+    self.current_holdings["total"] += (self.current_holdings[event.ticker]["value"] - initial_holding + cash_delta) # subtract a negative number makes a plus
+    self.current_holdings["cash"] += cash_delta
     self.current_holdings["commissions"] += event.commission
     self.current_holdings["order"] += f" | {event.direction.name} {event.quantity} {event.ticker} @ {event.unit_cost:,.2f}"
+    self.value_updated.add(event.ticker)
 
   def end_of_day(self):
     """
     The end of the trading day - perform mark to market activities like margin calculation and borrow costs
+    Also, updates the value of currently held positions
     """
     self.current_holdings["total"] = 0 # recalculate
     for ticker in self.symbol_list:
@@ -165,30 +175,57 @@ class NaivePortfolio(Portfolio):
   def end_of_interval(self):
     """
     The end of a trading interval e.g. 5mins, 1day - perform tasks that can only take place only take place at the END of the current interval
+    Also, updates the value of currently held positions
     """
     for ticker in self.symbol_list:
       atr = self._calc_atr(ticker)
       if atr:
         self.historical_atr[ticker].append(atr)
+      if ticker not in self.value_updated:
+        bar = self.data_handler.get_latest_bars(ticker)[0]
+        initial_holding = self.current_holdings[ticker]["value"]
+        self.current_holdings[ticker]["value"] = self.current_holdings[ticker]["position"] * bar.close # use closing price to evaluate portfolio value
+        self.current_holdings["total"] += (self.current_holdings[ticker]["value"] - initial_holding) # subtract a negative number makes a plus
+    self.value_updated.clear()
 
 
-  def liquidate(self):
-    self.current_holdings = deepcopy(self.current_holdings)
-    self.current_holdings["timestamp"] = pd.to_datetime(self.current_holdings["timestamp"], unit="s") + pd.Timedelta(self.interval)
-    self.current_holdings["timestamp"] = self.current_holdings["timestamp"].timestamp()
-    self.current_holdings["commissions"] = 0.0
-    self.current_holdings["borrow_costs"] = 0.0
-    self.current_holdings["order"] = ""
-    self.historical_holdings.append(self.current_holdings)
-    for ticker in self.symbol_list:
-      latest_bar = self.data_handler.get_latest_bars(ticker)[0]
-      if self.current_holdings[ticker]["position"] < 0: # nett SHORT position
-        self.current_holdings["cash"] += self.margin_holdings[ticker] # release any margin being held
-      self.current_holdings["cash"] += self.current_holdings[ticker]["position"] * latest_bar.close
-      self.current_holdings[ticker]["position"] = 0
-      self.current_holdings[ticker]["value"] = 0
-      self.current_holdings["margin"][ticker] = 0
-    self.current_holdings["total"] = self.current_holdings["cash"]
+  def create_equity_curve(self):
+    curve = pd.DataFrame(self.historical_holdings)
+    curve["timestamp"] = pd.to_datetime(curve["timestamp"], unit="s")
+    curve.set_index("timestamp", inplace=True)
+    curve["returns"] = curve["total"].pct_change()
+    curve["equity_curve"] = (1.0 + curve["returns"]).cumprod()
+    self.equity_curve = curve
+
+
+  def _get_annualization_factor(self, interval: str) -> float:
+    """
+    Calculates the annualization factor based on the data's frequency,
+    1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo (to create enum)
+    """
+    match interval:
+      case "1m":
+        return self.MINUTES_IN_HOUR * self.TRD_HOURS_IN_DAY * self.TRD_DAYS_IN_YEAR
+      case "2m":
+        return (self.MINUTES_IN_HOUR / 2) * self.TRD_HOURS_IN_DAY * self.TRD_DAYS_IN_YEAR
+      case "15m":
+        return (self.MINUTES_IN_HOUR / 15) * self.TRD_HOURS_IN_DAY * self.TRD_DAYS_IN_YEAR
+      case "30m":
+        return (self.MINUTES_IN_HOUR / 30) * self.TRD_HOURS_IN_DAY * self.TRD_DAYS_IN_YEAR
+      case "60m" | "1h":
+        return self.TRD_HOURS_IN_DAY * self.TRD_DAYS_IN_YEAR
+      case "90m":
+        return (self.TRD_HOURS_IN_DAY / 1.5) * self.TRD_DAYS_IN_YEAR
+      case "1d":
+        return self.TRD_DAYS_IN_YEAR
+      case "5d":
+        return self.TRD_DAYS_IN_YEAR / 5
+      case "1mo":
+        return 12
+      case "3mo":
+        return 4
+      case _:
+        raise ValueError(f"{interval} is not supported")
 
 
   def _calc_atr(self, ticker): # # Use Wilder's Smoothing 
@@ -218,11 +255,20 @@ class NaivePortfolio(Portfolio):
     return atr 
 
 
-  def create_equity_curve(self):
-    curve = pd.DataFrame(self.historical_holdings)
-    curve["timestamp"] = pd.to_datetime(curve["timestamp"], unit="s")
-    curve.set_index("timestamp", inplace=True)
-    curve["returns"] = curve["total"].pct_change()
-    curve["equity_curve"] = (1.0 + curve["returns"]).cumprod()
-    self.equity_curve = curve
-
+  def liquidate(self):
+    self.current_holdings = deepcopy(self.current_holdings)
+    self.current_holdings["timestamp"] = pd.to_datetime(self.current_holdings["timestamp"], unit="s") + pd.Timedelta(self.interval)
+    self.current_holdings["timestamp"] = self.current_holdings["timestamp"].timestamp()
+    self.current_holdings["commissions"] = 0.0
+    self.current_holdings["borrow_costs"] = 0.0
+    self.current_holdings["order"] = ""
+    self.historical_holdings.append(self.current_holdings)
+    for ticker in self.symbol_list:
+      latest_bar = self.data_handler.get_latest_bars(ticker)[0]
+      if self.current_holdings[ticker]["position"] < 0: # nett SHORT position
+        self.current_holdings["cash"] += self.margin_holdings[ticker] # release any margin being held
+      self.current_holdings["cash"] += self.current_holdings[ticker]["position"] * latest_bar.close
+      self.current_holdings[ticker]["position"] = 0
+      self.current_holdings[ticker]["value"] = 0
+      self.current_holdings["margin"][ticker] = 0
+    self.current_holdings["total"] = self.current_holdings["cash"]
