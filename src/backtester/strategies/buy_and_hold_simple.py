@@ -23,7 +23,7 @@ class BuyAndHoldSimple(Strategy):
 
       # No market data available for this ticker at the moment; skip signal generation.
       if not ohlcv_data:
-        return
+        continue
 
       if not self.bought[ticker]:
         self.bought[ticker] = True
