@@ -11,9 +11,11 @@ class MovingAverageCrossover:
     self.long_window = long_window
 
     # tmp while position sizing is not implemented
-    self.history = {sym: 0 for sym in self.symbol_list}  # to track position history
+    self.current_positions = {sym: 0 for sym in self.symbol_list}  # to track position history
 
   def generate_signals(self, event):
+    if event.type != "MARKET":
+        return
     timestamp = event.timestamp
     for ticker in self.symbol_list:
       data = self.data_handler.get_latest_bars(ticker, n=self.long_window+1)
@@ -27,9 +29,9 @@ class MovingAverageCrossover:
         long_avg += bar.close
       short_avg /= self.short_window
       long_avg /= self.long_window
-      if short_avg < long_avg and self.history[ticker] >= 0: # GO SHORT
+      if short_avg < long_avg and self.current_positions[ticker] >= 0: # GO SHORT
         self.events.append(SignalEvent(timestamp, ticker, SignalType.SHORT))
-        self.history[ticker] = -1
-      elif short_avg > long_avg and self.history[ticker] <= 0: # GO LONG
+        self.current_positions[ticker] = -1
+      elif short_avg > long_avg and self.current_positions[ticker] <= 0: # GO LONG
         self.events.append(SignalEvent(timestamp, ticker, SignalType.LONG))
-        self.history[ticker] = 1
+        self.current_positions[ticker] = 1

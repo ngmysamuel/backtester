@@ -140,11 +140,9 @@ def rolling_sharpe(df: pd.DataFrame, interval: str, window: str) -> plotly.graph
   rolling_sharpe = df["returns"].rolling(window).apply(
     lambda x: np.sqrt(annualization_factor) * (np.mean(x) / np.std(x, ddof=1)) if np.std(x, ddof=1) != 0 else 0.0
   )
-  fig = px.line(rolling_sharpe)
-  fig.update_layout(xaxis_title="Date", yaxis_title="Rolling Sharpe", showlegend=False)
-  return fig
+  return rolling_sharpe
 
-def rolling_volitility(df: pd.DataFrame, interval: str, window: str) -> plotly.graph_objs.Figure:
+def rolling_volatility(df: pd.DataFrame, interval: str, window: str) -> plotly.graph_objs.Figure:
   match window:
     case "3M":
       window = 63
@@ -155,10 +153,8 @@ def rolling_volitility(df: pd.DataFrame, interval: str, window: str) -> plotly.g
     case _:
       window = 126
   annualization_factor = get_annualization_factor(interval)
-  rolling_volitility = df["returns"].rolling(window).apply(lambda x: np.sqrt(annualization_factor) * np.std(x, ddof=1))
-  fig = px.line(rolling_volitility)
-  fig.update_layout(xaxis_title="Date", yaxis_title="Rolling Volatility", showlegend=False)
-  return fig
+  rolling_volatility = df["returns"].rolling(window).apply(lambda x: np.sqrt(annualization_factor) * np.std(x, ddof=1))
+  return rolling_volatility
 
 def returns_histogram(df: pd.DataFrame, interval: str, window: str):
   if interval == "5d":
@@ -171,29 +167,26 @@ def returns_histogram(df: pd.DataFrame, interval: str, window: str):
   if interval != window:
     window = STRING_TO_RESAMPLE_WINDOW.get(window, "ME")
     ohlc_data = df["equity_curve"].resample(window).ohlc()
-    ohlc_data["returns"] = ((ohlc_data["close"] - ohlc_data["open"]) / ohlc_data["close"]) * 100
-    fig = px.histogram(ohlc_data, x="returns")
+    ohlc_data["returns"] = ((ohlc_data["close"] - ohlc_data["open"]) / ohlc_data["open"]) * 100
     kurtosis = ohlc_data["returns"].kurtosis()
     skewness = ohlc_data["returns"].skew()
-    return fig, kurtosis, skewness
+    return ohlc_data, kurtosis, skewness
   else:
-    fig = px.histogram(df, x="returns")
     kurtosis = df["returns"].kurtosis()
     skewness = df["returns"].skew()
-    return fig, kurtosis, skewness
+    return df, kurtosis, skewness
 
 def returns_heatmap(df: pd.DataFrame, interval: str, window: str):
   window = STRING_TO_RESAMPLE_WINDOW.get(window, "ME")
   ohlc_data = df["equity_curve"].resample(window).ohlc()
-  ohlc_data["returns"] = ((ohlc_data["close"] - ohlc_data["open"]) / ohlc_data["close"]) * 100
+  ohlc_data["returns"] = ((ohlc_data["close"] - ohlc_data["open"]) / ohlc_data["open"]) * 100
   ohlc_data["returns"] = ohlc_data["returns"].apply(lambda x: float(millify(x, precision=2)))
   ohlc_data["year"] = ohlc_data.index.year
   ohlc_data["month"] = ohlc_data.index.month
   ohlc_data["month_name"] = ohlc_data.index.strftime("%b")
   data = pd.pivot_table(ohlc_data, values="returns", index="year", columns="month_name")
   data = data[ohlc_data["month_name"].sort_values(key=lambda x: pd.to_datetime(x,format="%b").dt.month).drop_duplicates()]
-  # return data
-  return px.imshow(data.values, x=data.columns, y=data.index, text_auto=True, color_continuous_scale="brbg", color_continuous_midpoint=0)
+  return data
 
 def calculate_drawdowns(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -312,7 +305,7 @@ def get_parametric_var(df: pd.DataFrame, confidence_level: float = 0.95) -> floa
     z_score = norm.ppf(1 - confidence_level)
     mean = df["returns"].mean()
     sd = df["returns"].std()
-    var = mean - (z_score * sd)
+    var = mean + (z_score * sd)
     return abs(var * 100)
 
 def get_trades(df: pd.DataFrame):
@@ -320,10 +313,12 @@ def get_trades(df: pd.DataFrame):
   Parses the 'order' column of the equity curve DataFrame to create a clean,
   structured log of all trades.
   """
+  if 'order' not in df.columns:
+      return pd.DataFrame(columns=['Date', 'Direction', 'Quantity', 'Ticker', 'Unit Price'])
   # Filter for rows that have order information and drop NaNs
   trades_df = df[df['order'].str.len() > 0][['order']].copy()
   if trades_df.empty:
-      return pd.DataFrame(columns=['Date', 'Direction', 'Quantity', 'Ticker'])
+      return pd.DataFrame(columns=['Date', 'Direction', 'Quantity', 'Ticker', 'Unit Price'])
 
   # Split the pipe-delimited string into a list of trades
   trades_df['order'] = trades_df['order'].str.split('|')
@@ -357,8 +352,9 @@ def book_trades(df: pd.DataFrame):
   1. return_df - a df with the pnl arising from every new buy/sell order
   that has been closed with their corresponding sell/buy
   """
+  df = df.copy()
   df["Unit Price"] = df["Unit Price"].str[1:].astype(float)
-  df["Date"] = df["Date"].dt.strftime("%Y-%m-%d")
+  df["Date"] = pd.to_datetime(df["Date"]).dt.strftime("%Y-%m-%d")
   traded_tickers = df["Ticker"].unique()
   shorts = {ticker: deque() for ticker in traded_tickers}
   longs = {ticker: deque() for ticker in traded_tickers}
@@ -422,9 +418,11 @@ def book_trades(df: pd.DataFrame):
             "price": unit_price, "date": trade_date, "quantity": outstanding_quantity
           })
           outstanding_quantity = 0
-  return_df = pd.DataFrame(closed_trades)
-  return_df.columns = ["Ticker", "Entry Date", "Exit Date", "Direction", "Quantity", "EOD Nett Position", "Entry Price", "Exit Price", "PnL", "Return"]
-  return return_df
+  if closed_trades:
+    return_df = pd.DataFrame(closed_trades)
+    return_df.columns = ["Ticker", "Entry Date", "Exit Date", "Direction", "Quantity", "EOD Nett Position", "Entry Price", "Exit Price", "PnL", "Return"]
+    return return_df
+  return pd.DataFrame()
 
 def plot_equity_curve_with_trades(ticker: str, df_trades: pd.DataFrame, df_equity: pd.DataFrame):
   """
