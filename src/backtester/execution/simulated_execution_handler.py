@@ -1,6 +1,7 @@
 from collections import deque
 from backtester.events.fill_event import FillEvent
-
+import pandas as pd
+from backtester.enums.direction_type import DirectionType
 
 class SimulatedExecutionHandler:
   """
@@ -8,15 +9,17 @@ class SimulatedExecutionHandler:
   they are received, assuming that all orders are filled at the next market
   open price. This class handles both Market and Market-On-Close orders.
   """
-  def __init__(self, events, data_handler):
+  def __init__(self, events, data_handler, slippage_model):
     """
     Initializes the SimulatedExecutionHandler
     args:
         events: the Event Queue
         data_handler: the DataHandler object with current market data
+        slippage_model: the model that simulates slippage
     """
     self.events = events
     self.data_handler = data_handler
+    self.slippage_model = slippage_model
     self.order_queue = deque()
     self.mkt_close = False
 
@@ -38,17 +41,23 @@ class SimulatedExecutionHandler:
       if order.timestamp >= current_time:
         self.order_queue.appendleft(order)  # put it back and wait for next market event
         return
-      if order.order_type.name == "MKT":
-        fill_cost = order.quantity * bar.open
-        unit_cost = bar.open
-      elif order.order_type.name == "MOC" and mkt_close:
+      slippage = 0.0
+      if order.order_type.name == "MOC" and mkt_close:
         fill_cost = order.quantity * bar.close
         unit_cost = bar.close
       else:
-        self.order_queue.append(order)  # put it back and wait for next market event
-        continue
+        if order.order_type.name == "MKT": # limit, stop-loss orders
+          slippage = self.slippage_model.calculate_slippage(order.ticker, pd.to_datetime(order.timestamp, unit="s"), order.quantity)
+          if order.direction == DirectionType.BUY:
+            unit_cost = bar.open * (1 + slippage)
+          else:
+            unit_cost = bar.open * (1 - slippage)
+          fill_cost = order.quantity * unit_cost
+        else:
+          self.order_queue.append(order)  # put it back and wait for next market event
+          continue
       fill_event = FillEvent(
-        current_time, order.ticker, "ARCA", order.quantity, order.direction, fill_cost, unit_cost
+        current_time, order.ticker, "", order.quantity, order.direction, fill_cost, unit_cost, slippage
       )
       self.events.append(fill_event)
 

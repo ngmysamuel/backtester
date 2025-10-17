@@ -16,6 +16,7 @@ ipython = "^9.5.0"
 streamlit = "^1.50.0"
 millify = "^0.1.1"
 plotly = "^6.3.0"
+bidask = "^2.1.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.4.2"

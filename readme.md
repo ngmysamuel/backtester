@@ -68,8 +68,11 @@ df.to_csv("MSFT.csv")
     3. If its daily, annualization factor is 252. If its minutely, 98280. See get_annualization_factor() in _util.py
 6. Transaction Cost Modelling
     1. Commisions
-    2. Bid-Ask Spread
-    3. Slippage
+    2. Slippage
+        1. Bid-Ask Spread
+        2. 
+    3. Links
+        1. Educational: https://www.quantstart.com/articles/Successful-Backtesting-of-Algorithmic-Trading-Strategies-Part-II/
 
 Periods for pandas: https://pandas.pydata.org/docs/reference/api/pandas.Period.asfreq.html
 

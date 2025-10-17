@@ -28,7 +28,7 @@ class NaivePortfolio(Portfolio):
     borrow_cost: float = 0.01,
     maintenance_margin: float = 0.3,
     risk_per_trade: float = 0.01,
-    atr_period: int = 14,
+    atr_window: int = 14,
     atr_multiplier: int = 2
   ):
     """
@@ -64,7 +64,7 @@ class NaivePortfolio(Portfolio):
     self.daily_borrow_rate = borrow_cost / self._get_annualization_factor(interval) # assuming 252 trading days in a year
     self.maintenance_margin = maintenance_margin
     self.risk_per_trade = risk_per_trade
-    self.atr_period = atr_period
+    self.atr_window = atr_window
     self.atr_multiplier = atr_multiplier
 
     self.margin_holdings = collections.defaultdict(int)
@@ -92,6 +92,7 @@ class NaivePortfolio(Portfolio):
     self.current_holdings["timestamp"] = event.timestamp
     self.current_holdings["borrow_costs"] = 0.0
     self.current_holdings["order"] = ""
+    self.current_holdings["slippage"] = ""
     self.historical_holdings.append(self.current_holdings)
 
     if self.current_holdings["cash"] < 0:
@@ -146,7 +147,9 @@ class NaivePortfolio(Portfolio):
     self.current_holdings[event.ticker]["value"] = self.current_holdings[event.ticker]["position"] * event.unit_cost
     self.current_holdings["total"] += (self.current_holdings[event.ticker]["value"] - initial_holding + cash_delta)
     
-    self.current_holdings["order"] += f" | {event.direction.name} {event.quantity} {event.ticker} @ {event.unit_cost:,.2f}"
+    self.current_holdings["order"] += f"{event.direction.name} {event.quantity} {event.ticker} @ {event.unit_cost:,.2f} | "
+
+    self.current_holdings["slippage"] += f"{event.slippage} | "
 
   def end_of_day(self):
     """
@@ -232,8 +235,8 @@ class NaivePortfolio(Portfolio):
 
   def _calc_atr(self, ticker): # # Use Wilder's Smoothing 
     if len(self.historical_atr[ticker]) < 1: # initialization of average true range uses simple arithmetic mean
-      bar_data = self.data_handler.get_latest_bars(ticker, self.atr_period + 1)
-      if len(bar_data) < self.atr_period + 1:
+      bar_data = self.data_handler.get_latest_bars(ticker, self.atr_window + 1)
+      if len(bar_data) < self.atr_window + 1:
         return
 
       bar_data = pd.DataFrame(bar_data)
@@ -252,7 +255,7 @@ class NaivePortfolio(Portfolio):
       bar_data["l-prev"] = (bar_data["low"] - bar_data["close"].shift(periods=1)).abs()
 
       tr = np.nanmax(bar_data[["h-l","h-prev","l-prev"]], axis=1)[-1]
-      atr = 1/self.atr_period * tr + (1- 1/self.atr_period) * self.historical_atr[ticker][-1]
+      atr = 1/self.atr_window * tr + (1- 1/self.atr_window) * self.historical_atr[ticker][-1]
 
     return atr 
 

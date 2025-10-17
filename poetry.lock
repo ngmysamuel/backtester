@@ -81,6 +81,21 @@ html5lib = ["html5lib"]
 lxml = ["lxml"]
 
 [[package]]
+name = "bidask"
+version = "2.1.0"
+description = "Efficient Estimation of Bid-Ask Spreads from Open, High, Low, and Close Prices"
+optional = false
+python-versions = "<4.0,>=3.6"
+files = [
+    {file = "bidask-2.1.0-py3-none-any.whl", hash = "sha256:8cbd4e27a53800f041ebaa343656984552ad00f6c4407359a2230c9fbf81a5c3"},
+    {file = "bidask-2.1.0.tar.gz", hash = "sha256:eb4c89a1381f4f1299aa36b1c60d845bc325e4fc2fbde6a0703bf6b48b47f600"},
+]
+
+[package.dependencies]
+numpy = "*"
+pandas = "*"
+
+[[package]]
 name = "blinker"
 version = "1.9.0"
 description = "Fast, simple object-to-object and broadcast signaling"
@@ -2569,4 +2584,4 @@ repair = ["scipy (>=1.6.3)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "f5aa12a19eb97a73e31b9de7b379b78b9304c8577f03bcbecbe3ff7cb162003f"
+content-hash = "00a659f605b875377626da820b18ea693a0bc327b91b4271582aadbc1a407f02"

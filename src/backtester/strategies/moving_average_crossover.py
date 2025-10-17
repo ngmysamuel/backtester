@@ -10,7 +10,6 @@ class MovingAverageCrossover:
     self.short_window = short_window
     self.long_window = long_window
 
-    # tmp while position sizing is not implemented
     self.current_positions = {sym: 0 for sym in self.symbol_list}  # to track position history
 
   def generate_signals(self, event):

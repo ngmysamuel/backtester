@@ -9,6 +9,23 @@ backtester_settings:
   borrow_cost: 0.01 # interest on short sold stock - 1%
   maintenance_margin: 0.3 # margin to hold on short positions - 30%
   risk_per_trade: 0.01 # percentage of total portfolio value willing to risk in a single trade
+  atr_window: 14 # number of days used when calculating average true range
+
+slippage:
+  multi_factor_slippage:
+    name: backtester.util.slippage.multi_factor_slippage.MultiFactorSlippage
+    additional_parameters:
+      short_window: 5
+      med_window: 21
+      long_window: 63
+      power_law_exponent: 0.6 # this will be used to indicate a diminishing return i.e. k in x**k. The 3/5 power law by Almgren et al. https://www.cis.upenn.edu/~mkearns/finread/costestim.pdf
+      upper_lim_vol_surge: 5
+      bidask_window: 21 # number of days used when calculating bidask spread. https://doi.org/10.1016/j.jfineco.2024.103916
+      volatility_cost_factor: 0.2
+      market_impact_factor: 0.1
+      momentum_cost_factor: 0.05
+      liquidity_cost_factor: 0.1
+      liquidity_cost_exponent: 0.3
 
 strategies:
   buy_and_hold_simple:
