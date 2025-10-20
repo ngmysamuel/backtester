@@ -214,3 +214,6 @@ __marimo__/
 
 # Scratch files
 scratch.py
+
+# Reports
+*.html
