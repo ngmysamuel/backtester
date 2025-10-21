@@ -121,7 +121,7 @@ class MultiFactorSlippage(Slippage):
 
   def calculate_slippage(self, ticker, trade_date, trade_size):
     """
-    Slippage = (Spread Cost) + (Amplified Market Impact) + (Momentum Cost/Liquidity Cost) + (Random Noise)
+    Slippage = (Spread Cost) + (Amplified Market Impact) + (Momentum Cost*Liquidity Cost) + (Random Noise)
     """
 
     characteristics = self.feature_df_dict[ticker].loc[trade_date]

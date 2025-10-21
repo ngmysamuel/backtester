@@ -69,9 +69,12 @@ df.to_csv("MSFT.csv")
 7. Transaction Cost Modelling
     1. Commisions
     2. Slippage Modelling
+        1. Principles
+            - a chaotic market means higher slippage
+            - going with the market momentum means higher slippage
+            - an illiquid instrument means higher slippage
         1. Volatility Metrics
             - Rolling annulized standard deviation based on the close price across several window sizes
-            - Price acceleration
         2. Bid Ask Spread
             - Based on Ardia et al. (2024), an efficient estimator (EDGE) described in https://doi.org/10.1016/j.jfineco.2024.103916
             - Does not assume continuously observed prices, unlike previous estimators, resulting in a more accurate spread without the downward bias
@@ -84,9 +87,14 @@ df.to_csv("MSFT.csv")
         4. Composite Metrics
             - Amihud Illiquidity - a look at the product's inherent illiquidity. Price movement per dollar traded
             - Turnover (Coeff of Variance) - standardised metric to compare volatility across products (e.g. capitalization)
-            - Volatility Cose
+            - Price acceleration - quantifies market sentiment, if it increases it means that a stampede is forming. Trading either with or against it is dangerous. 
+            - Volatility Cost - a cost amplifier for the other factors
+            - Momentum Cost - the cost incurred when other traders are trying to make the same move as you 
+            - Liquidity Cost - distinguishes between different types of assets e.g. blue chips vs unknown penny stocks
         5. Combining the above
-            - 
+            - Participation rate - ratio of the current trade to the volume on that day
+            - Market Impact - quanitifies the adverse price movement caused directly by the pressure of our own order. Scales along a concave relation (empircallly set to the 3/5 power relationship); doubling trade size does not double cost, it would be less than that. Normalized by the average volume in the medium term with a dampener provided by a negative exponential of the coefficient of variation
+            - Slippage - (Spread Cost) + (Market Impact) + (Momentum Cost*Liquidity Cost) + (Random Noise)
     3. Links
         - Educational: https://www.quantstart.com/articles/Successful-Backtesting-of-Algorithmic-Trading-Strategies-Part-II/
         - Understanding Almgren et al.: https://quant.stackexchange.com/a/55897
