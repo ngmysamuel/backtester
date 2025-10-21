@@ -39,6 +39,7 @@ def load_class(path_to_class: str):
 @app.command()
 def run(data_dir: str,
         strategy: Optional[str] = "buy_and_hold_simple",
+        slippage: Optional[str] = "multi_factor_slippage",
         exception_contd: Optional[int] = 0
       ):
   """
@@ -46,30 +47,42 @@ def run(data_dir: str,
   args:
       data_dir (str): Directory containing CSV data files.
       strategy (str): the strategy to backtest; this name should match those found in config.yaml.
+      slippage (str): the model used to calculate slippage
   """
   typer.echo(f"Data directory: {data_dir}")
-  typer.echo(f"Running backtest for strategy: {strategy}")
+  typer.echo(f"Running backtest for strategy: {strategy} with slippage modelling by: {slippage}")
 
   config = load_config()  # load data from yaml config file
 
-  symbol_list = config["backtester_settings"]["symbol_list"]
+  backtester_settings = config["backtester_settings"]
+
+  symbol_list = backtester_settings["symbol_list"]
   typer.echo(f"Symbols: {symbol_list}")
 
-  initial_capital = config["backtester_settings"]["initial_capital"]
-  start_timestamp = pd.to_datetime(config["backtester_settings"]["start_date"], dayfirst=True).timestamp()
-  interval = config["backtester_settings"]["interval"]
-  exchange_closing_time = config["backtester_settings"]["exchange_closing_time"]
-  benchmark_ticker = config["backtester_settings"]["benchmark"]
+  initial_capital = backtester_settings["initial_capital"]
+  start_timestamp = pd.to_datetime(backtester_settings["start_date"], dayfirst=True).timestamp()
+  interval = backtester_settings["interval"]
+  exchange_closing_time = backtester_settings["exchange_closing_time"]
+  benchmark_ticker = backtester_settings["benchmark"]
+  atr_window = backtester_settings["atr_window"]
   typer.echo(f"Initial Capital: {initial_capital}")
-  
-  StrategyClass = load_class(config["strategies"][strategy]["name"])
-  additional_params = config["strategies"][strategy].get("additional_parameters", {})
 
   event_queue = collections.deque()
+
   data_handler = CSVDataHandler(event_queue, data_dir, symbol_list, interval, exchange_closing_time)
+
+  SlippageClass = load_class(config["slippage"][slippage]["name"])
+  slippage_settings = config["slippage"][slippage]["additional_parameters"]
+  slippage_model = SlippageClass(data_handler.symbol_raw_data, slippage_settings)
+  slippage_model.generate_features()
+
+  StrategyClass = load_class(config["strategies"][strategy]["name"])
+  additional_params = config["strategies"][strategy].get("additional_parameters", {})
   strategy_instance = StrategyClass(event_queue, data_handler, **additional_params)
-  portfolio = NaivePortfolio(data_handler,initial_capital,symbol_list,event_queue,start_timestamp, interval)
-  execution_handler = SimulatedExecutionHandler(event_queue, data_handler)
+
+  portfolio = NaivePortfolio(data_handler,initial_capital,symbol_list,event_queue,start_timestamp, interval, atr_window=atr_window)
+
+  execution_handler = SimulatedExecutionHandler(event_queue, data_handler, slippage_model)
   
   mkt_close = False
 

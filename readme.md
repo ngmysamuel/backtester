@@ -29,6 +29,12 @@ df = dat.history(period='5y') # period must be one of: 1d, 5d, 1mo, 3mo, 6mo, 1y
 df.to_csv("MSFT.csv")
 ```
 
+### Important Caveats
+1. Slippage Model 
+    - The multi factor slippage model only supports daily data
+    - If you have data of other intervals, you must update the parameters used by it in config.yaml
+    - If you do not wish the hassle, use the NoSlippage model
+
 ### Implementation Details
 1. Portfolio
     1. Value of positions are calculated using the closing price of each interval. 
@@ -66,14 +72,53 @@ df.to_csv("MSFT.csv")
     1. The factor depends on what kind of time period we are calculating Sharpe over which in turn depends on the data interval we are using. If the data interval is daily, the Sharpe Ratio is daily. To get the sharpe ratio for the year, we need to "increase" the ratio to a year's basis. There are 252 trading days in a year which means the annualization factor is 252.
     2. Uses the the interval stated in config.yaml
     3. If its daily, annualization factor is 252. If its minutely, 98280. See get_annualization_factor() in _util.py
-6. Transaction Cost Modelling
+7. Transaction Cost Modelling
     1. Commisions
-    2. Bid-Ask Spread
-    3. Slippage
+    2. Slippage Modelling
+        1. Principles
+            - a chaotic market means higher slippage
+            - going with the market momentum means higher slippage
+            - an illiquid instrument means higher slippage
+        1. Volatility Metrics
+            - Rolling annulized standard deviation based on the close price across several window sizes
+        2. Bid Ask Spread
+            - Based on Ardia et al. (2024), an efficient estimator (EDGE) described in https://doi.org/10.1016/j.jfineco.2024.103916
+            - Does not assume continuously observed prices, unlike previous estimators, resulting in a more accurate spread without the downward bias
+            - By making use of various combinations of OHLC prices (across time, if high equals open, etc), 4 estimators can be derived which the paper calls Discrete Generalized Estimators. These 4 estimators work best in different market conditions; some being more accurate in volatile situations for example. The paper blends them together, weighting them accordingly to achieve a final estimator that has the smallest estimation variance under any scenario
+            - EDGE, as a result, is a robust and more accurate estimator which can be applied to a wide range of frequencies (albeit it is mentioned that higher frequency data is better) 
+        3. Volume Metrics
+            - Moving average of volume over several window sizes 
+            - Ratio of today's volume vs the average
+            - Volume Surge - indicator of outliers in volume, clipped to a max of 5
+        4. Composite Metrics
+            - Amihud Illiquidity - a look at the product's inherent illiquidity. Price movement per dollar traded
+            - Turnover (Coeff of Variance) - standardised metric to compare volatility across products (e.g. capitalization)
+            - Price acceleration - quantifies market sentiment, if it increases it means that a stampede is forming. Trading either with or against it is dangerous. 
+            - Volatility Cost - a cost amplifier for the other factors
+            - Momentum Cost - the cost incurred when other traders are trying to make the same move as you 
+            - Liquidity Cost - distinguishes between different types of assets e.g. blue chips vs unknown penny stocks
+        5. Combining the above
+            - Participation rate - ratio of the current trade to the volume on that day
+            - Market Impact - quanitifies the adverse price movement caused directly by the pressure of our own order. Scales along a concave relation (empircallly set to the 3/5 power relationship); doubling trade size does not double cost, it would be less than that. Normalized by the average volume in the medium term with a dampener provided by a negative exponential of the coefficient of variation
+            - Randome Noise - modelled with a normal distribution; no model is perfect
+            - Slippage - (Spread Cost) + (Market Impact) + (Momentum Cost*Liquidity Cost) + (Random Noise)
+    3. Links
+        - Educational: https://www.quantstart.com/articles/Successful-Backtesting-of-Algorithmic-Trading-Strategies-Part-II/
+        - Understanding Almgren et al.: https://quant.stackexchange.com/a/55897
+        - Almgren et al.: https://www.cis.upenn.edu/~mkearns/finread/costestim.pdf
+        - An approach: https://www.stephendiehl.com/posts/slippage/
+        - Heavily adapted from: https://github.com/QuantJourneyOrg/qj_public_code/blob/main/slippage-analysis.py
+        - Explanations: https://quantjourney.substack.com/p/slippage-a-comprehensive-analysis
 
-Periods for pandas: https://pandas.pydata.org/docs/reference/api/pandas.Period.asfreq.html
+### To Do
+- Slippage model  - supporting other time periods automatically 
+    - switches variables to use when the trading interval changes. The slippage model only supports daily data now e.g. 252 trading periods in a year. The trading interval would be the variable in config.yaml
+    - Intraday data support
+- 
 
 ### Notes
+
+Periods for pandas: https://pandas.pydata.org/docs/reference/api/pandas.Period.asfreq.html
 
 An event driven backtester is a pure chronological construct unlike a vectorized backtester which has the prices at all time periods already.
 
