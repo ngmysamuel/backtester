@@ -29,6 +29,12 @@ df = dat.history(period='5y') # period must be one of: 1d, 5d, 1mo, 3mo, 6mo, 1y
 df.to_csv("MSFT.csv")
 ```
 
+### Important Caveats
+1. Slippage Model 
+    - The multi factor slippage model only supports daily data
+    - If you have data of other intervals, you must update the parameters used by it in config.yaml
+    - If you do not wish the hassle, use the NoSlippage model
+
 ### Implementation Details
 1. Portfolio
     1. Value of positions are calculated using the closing price of each interval. 
@@ -94,6 +100,7 @@ df.to_csv("MSFT.csv")
         5. Combining the above
             - Participation rate - ratio of the current trade to the volume on that day
             - Market Impact - quanitifies the adverse price movement caused directly by the pressure of our own order. Scales along a concave relation (empircallly set to the 3/5 power relationship); doubling trade size does not double cost, it would be less than that. Normalized by the average volume in the medium term with a dampener provided by a negative exponential of the coefficient of variation
+            - Randome Noise - modelled with a normal distribution; no model is perfect
             - Slippage - (Spread Cost) + (Market Impact) + (Momentum Cost*Liquidity Cost) + (Random Noise)
     3. Links
         - Educational: https://www.quantstart.com/articles/Successful-Backtesting-of-Algorithmic-Trading-Strategies-Part-II/
@@ -103,9 +110,15 @@ df.to_csv("MSFT.csv")
         - Heavily adapted from: https://github.com/QuantJourneyOrg/qj_public_code/blob/main/slippage-analysis.py
         - Explanations: https://quantjourney.substack.com/p/slippage-a-comprehensive-analysis
 
-Periods for pandas: https://pandas.pydata.org/docs/reference/api/pandas.Period.asfreq.html
+### To Do
+- Slippage model  - supporting other time periods automatically 
+    - switches variables to use when the trading interval changes. The slippage model only supports daily data now e.g. 252 trading periods in a year. The trading interval would be the variable in config.yaml
+    - Intraday data support
+- 
 
 ### Notes
+
+Periods for pandas: https://pandas.pydata.org/docs/reference/api/pandas.Period.asfreq.html
 
 An event driven backtester is a pure chronological construct unlike a vectorized backtester which has the prices at all time periods already.
 

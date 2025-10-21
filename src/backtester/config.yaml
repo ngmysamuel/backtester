@@ -12,20 +12,24 @@ backtester_settings:
   atr_window: 14 # number of days used when calculating average true range
 
 slippage:
+  no_slippage:
+    name: backtester.util.slippage.no_slippage.NoSlippage
   multi_factor_slippage:
     name: backtester.util.slippage.multi_factor_slippage.MultiFactorSlippage
     additional_parameters:
+      periods_in_year: 252
       short_window: 5
       med_window: 21
       long_window: 63
       power_law_exponent: 0.6 # this will be used to indicate a diminishing return i.e. k in x**k. The 3/5 power law by Almgren et al. https://www.cis.upenn.edu/~mkearns/finread/costestim.pdf
-      upper_lim_vol_surge: 5
+      upper_lim_vol_surge: 5 # upper limit on volume surge - prevent excessive impact on model
       bidask_window: 21 # number of days used when calculating bidask spread. https://doi.org/10.1016/j.jfineco.2024.103916
       volatility_cost_factor: 0.2
       market_impact_factor: 0.1
       momentum_cost_factor: 0.05
       liquidity_cost_factor: 0.1
       liquidity_cost_exponent: 0.3
+      random_noise: 0.0005
 
 strategies:
   buy_and_hold_simple:

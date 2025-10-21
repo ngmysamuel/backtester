@@ -5,10 +5,10 @@ from backtester.util.slippage.slippage import Slippage
 class MultiFactorSlippage(Slippage):
 
   def __init__(self, df_dict, config):
-    self.TRD_DAYS_IN_YEAR = 252
     self.feature_df_dict = {}
     for key, val in df_dict.items():
       self.feature_df_dict[key] = val.copy()
+    self.PERIODS_IN_YEAR = config["periods_in_year"]
     self.short_window = config["short_window"]
     self.med_window = config["med_window"]
     self.long_window = config["long_window"]
@@ -20,6 +20,7 @@ class MultiFactorSlippage(Slippage):
     self.momentum_cost_factor = config["momentum_cost_factor"]
     self.liquidity_cost_factor = config["liquidity_cost_factor"]
     self.liquidity_cost_exponent = config["liquidity_cost_exponent"]
+    self.random_noise = config["random_noise"]
 
 
   def generate_features(self):
@@ -34,9 +35,9 @@ class MultiFactorSlippage(Slippage):
       feature_df["returns"] = feature_df["close"].pct_change()
 
       # Volatility with different timeframes
-      feature_df["vol_short"] = feature_df["returns"].rolling(self.short_window).std() * np.sqrt(self.TRD_DAYS_IN_YEAR)
-      feature_df["vol_med"] = feature_df["returns"].rolling(self.med_window).std() * np.sqrt(self.TRD_DAYS_IN_YEAR)
-      feature_df["vol_long"] = feature_df["returns"].rolling(self.long_window).std() * np.sqrt(self.TRD_DAYS_IN_YEAR)
+      feature_df["vol_short"] = feature_df["returns"].rolling(self.short_window).std() * np.sqrt(self.PERIODS_IN_YEAR)
+      feature_df["vol_med"] = feature_df["returns"].rolling(self.med_window).std() * np.sqrt(self.PERIODS_IN_YEAR)
+      feature_df["vol_long"] = feature_df["returns"].rolling(self.long_window).std() * np.sqrt(self.PERIODS_IN_YEAR)
 
       price_cols = [
         "returns", "vol_short", "vol_med", "vol_long"
@@ -122,6 +123,7 @@ class MultiFactorSlippage(Slippage):
   def calculate_slippage(self, ticker, trade_date, trade_size):
     """
     Slippage = (Spread Cost) + (Amplified Market Impact) + (Momentum Cost*Liquidity Cost) + (Random Noise)
+    The default values in cofig.yaml supports daily data. You must update it if using any other period data.
     """
 
     characteristics = self.feature_df_dict[ticker].loc[trade_date]
@@ -140,7 +142,7 @@ class MultiFactorSlippage(Slippage):
     )
 
     # 3. Random market noise (increased variance)
-    noise = np.random.normal(0, 0.0005)
+    noise = np.random.normal(0, self.random_noise)
 
     # 4. Combine components with non-linear interactions
     slippage = (
