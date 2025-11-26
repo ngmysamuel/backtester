@@ -1,7 +1,7 @@
 # Backtester
 
-<h3 style="text-align:center;"> ⚠ Work in progress ⚠</h3>
-<p style="text-align:center;"> You might notice some formatting issues / messiness in the meantime.</p>
+<h3 align="center"> ⚠ Work in progress ⚠</h3>
+<p align="center"> You might notice some formatting issues / messiness in the meantime.</p>
 
 ### Dependencies
 1. Poetry
