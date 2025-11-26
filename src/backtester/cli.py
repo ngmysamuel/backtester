@@ -72,8 +72,8 @@ def run(data_dir: str,
   data_handler = CSVDataHandler(event_queue, data_dir, symbol_list, interval, exchange_closing_time)
 
   SlippageClass = load_class(config["slippage"][slippage]["name"])
-  slippage_settings = config["slippage"][slippage]["additional_parameters"]
-  slippage_model = SlippageClass(data_handler.symbol_raw_data, slippage_settings)
+  slippage_settings = config["slippage"][slippage]["additional_parameters"] # TODO: handle NoSlippage model not having addition_parameters
+  slippage_model = SlippageClass(data_handler.symbol_raw_data, slippage_settings) # TODO: handle NoSlippage model initialization
   slippage_model.generate_features()
 
   StrategyClass = load_class(config["strategies"][strategy]["name"])

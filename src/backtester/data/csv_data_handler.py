@@ -9,13 +9,15 @@ class CSVDataHandler(DataHandler):
   historical data for each symbol from CSV files.
   """
 
-  def __init__(self, event_queue: list, csv_dir: str, symbol_list: str, interval: int, exchange_closing_time: str):
+  def __init__(self, event_queue: list, csv_dir: str, symbol_list: str, interval: str, exchange_closing_time: str):
     """
     Initializes the CSVDataHandler
     args:
         event_queue: the Event Queue
         csv_dir: absolute directory path folder containing all the CSV files
         symbol_list: a list of symbol strings
+        interval: e.g. 5m means OHLC data for 5 minutes
+        exchange_closing_time: 24h time format - HH:MM
     """
     self.event_queue = event_queue
     self.csv_dir = csv_dir

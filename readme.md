@@ -1,22 +1,32 @@
 # Backtester
 
+<h3 align="center"> ⚠ Work in progress ⚠</h3>
+<p align="center"> You might notice some formatting issues / messiness / lack of documentation in the meantime.</p>
+
 ### Dependencies
 1. Poetry
 
 ### Run
+Trigger a backtest - note the parameters to the final command. The data_dir contains the CSVs of the OHLC data of the tickers you specified in config.yaml. Also, see config.yaml for what strategies are already available. 
 ```
 git clone https://github.com/ngmysamuel/backtester.git
 cd backtester
 poetry install
-poetry run backtester run
+poetry run backtester run path\to\data_dir\ --strategy moving_average --exception-contd 1
 ```
 
 ### Test
+Run the testcases
 ```
 poetry run pytest
 ```
+For a specific file
+```
+poetry run pytest tests\execution\test_simulated_execution_handler.py
+```
 
 ### Dashboard
+Run this to view and interact with the data generated from a backtest
 ```
 poetry run backtester dashboard
 ```
@@ -34,6 +44,7 @@ df.to_csv("MSFT.csv")
     - The multi factor slippage model only supports daily data
     - If you have data of other intervals, you must update the parameters used by it in config.yaml
     - If you do not wish the hassle, use the NoSlippage model
+    - Note backtester_settings.interval config as well
 
 ### Implementation Details
 1. Portfolio
@@ -114,7 +125,7 @@ df.to_csv("MSFT.csv")
 - Slippage model  - supporting other time periods automatically 
     - switches variables to use when the trading interval changes. The slippage model only supports daily data now e.g. 252 trading periods in a year. The trading interval would be the variable in config.yaml
     - Intraday data support
-- 
+- Move Position Sizing into its own module with ATR as just an implementation of position sizing
 
 ### Notes
 
