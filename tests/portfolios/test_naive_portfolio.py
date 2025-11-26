@@ -50,7 +50,8 @@ def portfolio(mock_data_handler):
         symbol_list=["MSFT", "AAPL"],
         events=events,
         start_date=pd.to_datetime("2023-01-01").timestamp(),
-        interval="1d"
+        interval="1d",
+        atr_window=5
     )
 
 # --- Test Cases ---
@@ -296,7 +297,7 @@ def test_on_fill_multiple_tickers(portfolio):
     assert portfolio.current_holdings["MSFT"]["position"] == quantity_msft
     assert portfolio.current_holdings["cash"] == 100000 - quantity_msft*opening_msft_price - fill_msft.commission
     assert portfolio.current_holdings["total"] == 100000 - fill_msft.commission
-    assert portfolio.current_holdings["order"] == f" | BUY {quantity_msft} MSFT @ {opening_msft_price}.00"
+    assert portfolio.current_holdings["order"] == f"BUY {quantity_msft} MSFT @ {opening_msft_price}.00 | "
 
     cash_after_msft = portfolio.current_holdings["cash"]
 
@@ -311,7 +312,7 @@ def test_on_fill_multiple_tickers(portfolio):
     assert portfolio.current_holdings["AAPL"]["position"] == quantity_aapl
     assert portfolio.current_holdings["cash"] == cash_after_msft - quantity_aapl*opening_aapl_price - fill_aapl.commission
     assert portfolio.current_holdings["total"] == 100000 - fill_msft.commission - fill_aapl.commission
-    assert portfolio.current_holdings["order"] == f" | BUY {quantity_msft} MSFT @ {opening_msft_price}.00 | BUY {quantity_aapl} AAPL @ {opening_aapl_price}.00"
+    assert portfolio.current_holdings["order"] == f"BUY {quantity_msft} MSFT @ {opening_msft_price}.00 | BUY {quantity_aapl} AAPL @ {opening_aapl_price}.00 | "
 
     portfolio.end_of_interval()
 
@@ -332,7 +333,7 @@ def test_on_fill_with_existing_holdings(portfolio):
     assert portfolio.current_holdings["MSFT"]["position"] == quantity_msft
     assert portfolio.current_holdings["cash"] == 100000 - quantity_msft*opening_msft_price - fill_msft.commission
     assert portfolio.current_holdings["total"] == 100000 - fill_msft.commission
-    assert portfolio.current_holdings["order"] == f" | BUY {quantity_msft} MSFT @ {opening_msft_price}.00"
+    assert portfolio.current_holdings["order"] == f"BUY {quantity_msft} MSFT @ {opening_msft_price}.00 | "
 
     portfolio.end_of_interval()
 
@@ -357,7 +358,7 @@ def test_on_fill_with_existing_holdings(portfolio):
     assert portfolio.current_holdings["MSFT"]["position"] == posiiton_after_first_fill + quantity_msft
     assert portfolio.current_holdings["cash"] == cash_after_first_fill - quantity_msft*opening_msft_price - fill_msft.commission
     assert portfolio.current_holdings["total"] == total_after_first_fill - fill_msft.commission
-    assert portfolio.current_holdings["order"] == f" | BUY {quantity_msft} MSFT @ {opening_msft_price}.00"
+    assert portfolio.current_holdings["order"] == f"BUY {quantity_msft} MSFT @ {opening_msft_price}.00 | "
 
     portfolio.end_of_interval()
 

@@ -79,6 +79,7 @@ class NaivePortfolio(Portfolio):
     self.current_holdings["timestamp"] = start_date
     self.current_holdings["borrow_costs"] = 0.0
     self.current_holdings["order"] = ""
+    self.current_holdings["slippage"] = ""
     self.historical_holdings = []
 
   def on_market(self, event):
