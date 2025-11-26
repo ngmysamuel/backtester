@@ -1,18 +1,18 @@
 # Backtester
 
 <h3 align="center"> ⚠ Work in progress ⚠</h3>
-<p align="center"> You might notice some formatting issues / messiness in the meantime.</p>
+<p align="center"> You might notice some formatting issues / messiness / lack of documentation in the meantime.</p>
 
 ### Dependencies
 1. Poetry
 
 ### Run
-Trigger a backtest
+Trigger a backtest - note the parameters to the final command. The data_dir contains the CSVs of the OHLC data of the tickers you specified in config.yaml. Also, see config.yaml for what strategies are already available. 
 ```
 git clone https://github.com/ngmysamuel/backtester.git
 cd backtester
 poetry install
-poetry run backtester run
+poetry run backtester run path\to\data_dir\ --strategy moving_average --exception-contd 1
 ```
 
 ### Test
@@ -20,9 +20,13 @@ Run the testcases
 ```
 poetry run pytest
 ```
+For a specific file
+```
+poetry run pytest tests\execution\test_simulated_execution_handler.py
+```
 
 ### Dashboard
-Run this to view and interact with the data genreated from a backtest
+Run this to view and interact with the data generated from a backtest
 ```
 poetry run backtester dashboard
 ```
