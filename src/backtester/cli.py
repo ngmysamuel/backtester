@@ -48,7 +48,7 @@ def run(data_dir: Optional["str"],
         position_calc: Optional[str] = "atr",
         slippage: Optional[str] = "multi_factor_slippage",
         strategy: Optional[str] = "buy_and_hold_simple",
-        exception_contd: Optional[int] = 0
+        exception_contd: Optional[int] = 1
       ):
   """
   Run the backtester with a given strategy and date range.
