@@ -11,6 +11,10 @@ backtester_settings:
   risk_per_trade: 0.01 # percentage of total portfolio value willing to risk in a single trade
   atr_window: 14 # number of days used when calculating average true range
 
+data_handler:
+  yf: backtester.data.yf_data_handler.YFDataHandler
+  csv: backtester.data.csv_data_handler.CSVDataHandler
+
 slippage:
   no_slippage:
     name: backtester.util.slippage.no_slippage.NoSlippage

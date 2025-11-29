@@ -1,26 +1,14 @@
 from backtester.data.data_handler import DataHandler
+import yfinance as yf
 import pandas as pd
-import os
 from backtester.events.market_event import MarketEvent
 
-class CSVDataHandler(DataHandler):
-  """
-  CSVDataHandler is a concrete implementation of DataHandler that reads
-  historical data for each symbol from CSV files.
-  """
 
-  def __init__(self, event_queue: list, csv_dir: str, symbol_list: str, interval: str, exchange_closing_time: str):
-    """
-    Initializes the CSVDataHandler
-    args:
-        event_queue: the Event Queue
-        csv_dir: absolute directory path folder containing all the CSV files
-        symbol_list: a list of symbol strings
-        interval: e.g. 5m means OHLC data for 5 minutes
-        exchange_closing_time: 24h time format - HH:MM
-    """
+class YFDataHandler(DataHandler):
+  def __init__(self, event_queue: list, start_date: str, end_date: str, symbol_list: str, interval: str, exchange_closing_time: str):
     self.event_queue = event_queue
-    self.csv_dir = csv_dir
+    self.start_date = start_date
+    self.end_date = end_date
     self.symbol_list = symbol_list
     self.interval = interval
     self.exchange_closing_time = exchange_closing_time
@@ -30,31 +18,18 @@ class CSVDataHandler(DataHandler):
     self.latest_symbol_data = {}
     self.continue_backtest = True
 
-    self._load_from_csv()
+    self._download_from_yf()
 
-  def _load_from_csv(self):
-    """
-    Opens the CSV files from the data directory, converting them into
-    pandas DataFrames within a symbol dictionary. Assumes the format
-    of the CSV files: date, open, high, low, close, volume
-    """
+
+  def _download_from_yf(self):
     combined_index = None
-
     for symbol in self.symbol_list:
-      # Load the CSV file
-      df = pd.read_csv(
-        os.path.join(self.csv_dir, f"{symbol}.csv"),
-        header=0,
-        parse_dates=True,
-        usecols=lambda x: x.lower() in ["open", "close", "high", "low", "volume", "date"],
-        converters={"Date": lambda x: pd.to_datetime(x).tz_localize(None)}
-      )
-
+      df = yf.download(symbol, start=self.start_date, end=self.end_date, interval=self.interval, multi_level_index=False)
+      df = df[["Open","High","Low","Close","Volume"]]
       self.symbol_raw_data[symbol] = df
       self.symbol_data[symbol] = df
       self.latest_symbol_data[symbol] = []
 
-      df.set_index("Date", inplace=True)
       df.sort_index(inplace=True) # ensure data is sorted
       df.columns = [col.lower() for col in df.columns]
 
@@ -63,11 +38,11 @@ class CSVDataHandler(DataHandler):
       else:
         combined_index = combined_index.union(df.index) # include any dates not in the previous files
 
-    # Reindex the dataframes to the same index
     for symbol in self.symbol_list:
       self.symbol_data[symbol] = (
         self.symbol_data[symbol].reindex(index=combined_index, method="pad").itertuples()
       )
+
 
   def _get_new_bar(self, symbol: str):
     """
@@ -76,6 +51,7 @@ class CSVDataHandler(DataHandler):
     """
     for b in self.symbol_data[symbol]:
       yield b
+
 
   def update_bars(self):
     """

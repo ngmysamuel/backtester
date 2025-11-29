@@ -1,18 +1,20 @@
-import typer
-from typing import Optional
-from backtester.data.csv_data_handler import CSVDataHandler
 import collections
-import yaml
-import importlib.resources
 import importlib
-from backtester.portfolios.naive_portfolio import NaivePortfolio
-import pandas as pd
-from backtester.execution.simulated_execution_handler import SimulatedExecutionHandler
-from backtester.exceptions.negative_cash_exception import NegativeCashException
-import quantstats as qs
-from pathlib import Path
-import sys
+import importlib.resources
 import runpy
+import sys
+from pathlib import Path
+from typing import Optional
+
+import pandas as pd
+import quantstats as qs
+import typer
+import yaml
+
+from backtester.data.csv_data_handler import CSVDataHandler
+from backtester.exceptions.negative_cash_exception import NegativeCashException
+from backtester.execution.simulated_execution_handler import SimulatedExecutionHandler
+from backtester.portfolios.naive_portfolio import NaivePortfolio
 
 app = typer.Typer()
 
@@ -38,6 +40,7 @@ def load_class(path_to_class: str):
 
 @app.command()
 def run(data_dir: str,
+        data_source: Optional[str] = "csv",
         strategy: Optional[str] = "buy_and_hold_simple",
         slippage: Optional[str] = "multi_factor_slippage",
         exception_contd: Optional[int] = 0
@@ -49,7 +52,7 @@ def run(data_dir: str,
       strategy (str): the strategy to backtest; this name should match those found in config.yaml.
       slippage (str): the model used to calculate slippage
   """
-  typer.echo(f"Data directory: {data_dir}")
+  typer.echo(f"Data directory: {data_dir}, handled by: {data_source}")
   typer.echo(f"Running backtest for strategy: {strategy} with slippage modelling by: {slippage}")
 
   config = load_config()  # load data from yaml config file
@@ -61,6 +64,7 @@ def run(data_dir: str,
 
   initial_capital = backtester_settings["initial_capital"]
   start_timestamp = pd.to_datetime(backtester_settings["start_date"], dayfirst=True).timestamp()
+  end_timestamp = pd.to_datetime(backtester_settings["end_date"], dayfirst=True).timestamp()
   interval = backtester_settings["interval"]
   exchange_closing_time = backtester_settings["exchange_closing_time"]
   benchmark_ticker = backtester_settings["benchmark"]
@@ -69,7 +73,15 @@ def run(data_dir: str,
 
   event_queue = collections.deque()
 
-  data_handler = CSVDataHandler(event_queue, data_dir, symbol_list, interval, exchange_closing_time)
+  DataHandlerClass = load_class(config["data_handler"][data_source])
+  if data_source == "yf":
+    start_datetime = pd.to_datetime(start_timestamp, unit='s')
+    start_date = start_datetime.strftime("%Y-%m-%d")
+    end_datetime = pd.to_datetime(end_timestamp, unit='s')
+    end_date = end_datetime.strftime("%Y-%m-%d")
+    data_handler = DataHandlerClass(event_queue, start_date, end_date, symbol_list, interval, exchange_closing_time)
+  else:
+    data_handler = DataHandlerClass(event_queue, data_dir, symbol_list, interval, exchange_closing_time)
 
   SlippageClass = load_class(config["slippage"][slippage]["name"])
   slippage_settings = config["slippage"][slippage]["additional_parameters"] # TODO: handle NoSlippage model not having addition_parameters
