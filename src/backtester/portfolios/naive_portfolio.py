@@ -11,6 +11,8 @@ from backtester.enums.order_type import OrderType
 from backtester.events.order_event import OrderEvent
 from backtester.exceptions.negative_cash_exception import NegativeCashException
 from backtester.portfolios.portfolio import Portfolio
+from backtester.util.position_sizer.position_sizer import PositionSizer
+from backtester.util.position_sizer.atr_position_sizer import ATRPositionSizer
 
 
 class NaivePortfolio(Portfolio):
@@ -27,12 +29,13 @@ class NaivePortfolio(Portfolio):
     events: deque,
     start_date: float,
     interval: str,
+    position_sizer: PositionSizer,
     allocation: float = 1,
     borrow_cost: float = 0.01,
     maintenance_margin: float = 0.3,
     risk_per_trade: float = 0.01,
-    atr_window: int = 14,
-    atr_multiplier: int = 2
+    # atr_window: int = 14,
+    # atr_multiplier: int = 2
   ):
     """
     Initializes the NaivePortfolio with initial capital, a list of symbols, an event queue, and allocation percentage.
@@ -67,12 +70,13 @@ class NaivePortfolio(Portfolio):
     self.daily_borrow_rate = borrow_cost / self._get_annualization_factor(interval) # assuming 252 trading days in a year
     self.maintenance_margin = maintenance_margin
     self.risk_per_trade = risk_per_trade
-    self.atr_window = atr_window
-    self.atr_multiplier = atr_multiplier
+    self.position_sizer = position_sizer
+    # self.atr_window = atr_window
+    # self.atr_multiplier = atr_multiplier
 
     self.margin_holdings = collections.defaultdict(int)
-    self.position_size = {sym: 100 for sym in self.symbol_list}  # to be derived
-    self.historical_atr = {sym: [] for sym in self.symbol_list}
+    self.position_dict = {sym: 100 for sym in self.symbol_list}  # to be derived
+    # self.historical_atr = {sym: [] for sym in self.symbol_list}
 
     self.current_holdings = {sym: {"position": 0, "value": 0.0} for sym in self.symbol_list}
     self.current_holdings["margin"] = collections.defaultdict(int)
@@ -109,14 +113,19 @@ class NaivePortfolio(Portfolio):
     order_type = OrderType.MKT
     cur_quantity = self.current_holdings[ticker]["position"]
 
-    atr_list = self.historical_atr[ticker]
-    if len(atr_list) > 0: # check for ATR > 0 to prevent ZeroDivisionError, else, reuse previous position size
-      atr = self.historical_atr[ticker][-1]
-      if atr:
-        capital_to_risk = min(self.current_holdings["cash"], self.risk_per_trade * self.current_holdings["total"])
-        self.position_size[ticker] = capital_to_risk // (atr * self.atr_multiplier)
+    # atr_list = self.historical_atr[ticker]
+    # if len(atr_list) > 0: # check for ATR > 0 to prevent ZeroDivisionError, else, reuse previous position size
+    #   atr = self.historical_atr[ticker][-1]
+    #   if atr:
+    #     capital_to_risk = min(self.current_holdings["cash"], self.risk_per_trade * self.current_holdings["total"])
+    #     self.position_size[ticker] = capital_to_risk // (atr * self.atr_multiplier)
 
-    to_be_quantity = self.position_size[ticker] * event.strength
+    self.position_dict[ticker] = self.position_sizer.get_position_size(self, ticker)
+    to_be_quantity = self.position_dict[ticker]
+    if to_be_quantity is None:
+        return
+        
+    to_be_quantity *= event.strength
  
     if event.signal_type.value == -1: # SHORT
       if cur_quantity > 0: # currently LONG, need to exit first
@@ -187,9 +196,11 @@ class NaivePortfolio(Portfolio):
     Also, updates the value of currently held positions
     """
     for ticker in self.symbol_list:
-      atr = self._calc_atr(ticker)
-      if atr:
-        self.historical_atr[ticker].append(atr)
+      # atr = self._calc_atr(ticker)
+      # if atr:
+      #   self.historical_atr[ticker].append(atr)
+      if isinstance(self.position_sizer, ATRPositionSizer):
+        self.position_sizer.update_historical_atr(self, ticker)
 
       # Mark-to-market valuation at the end of the interval
       bar = self.data_handler.get_latest_bars(ticker)[0]
@@ -237,31 +248,31 @@ class NaivePortfolio(Portfolio):
         raise ValueError(f"{interval} is not supported")
 
 
-  def _calc_atr(self, ticker): # # Use Wilder's Smoothing 
-    if len(self.historical_atr[ticker]) < 1: # initialization of average true range uses simple arithmetic mean
-      bar_data = self.data_handler.get_latest_bars(ticker, self.atr_window + 1)
-      if len(bar_data) < self.atr_window + 1:
-        return
+  # def _calc_atr(self, ticker): # # Use Wilder's Smoothing 
+  #   if len(self.historical_atr[ticker]) < 1: # initialization of average true range uses simple arithmetic mean
+  #     bar_data = self.data_handler.get_latest_bars(ticker, self.atr_window + 1)
+  #     if len(bar_data) < self.atr_window + 1:
+  #       return
 
-      bar_data = pd.DataFrame(bar_data)
-      bar_data["h-l"] = bar_data["high"] - bar_data["low"]
-      bar_data["h-prev"] = (bar_data["high"] - bar_data["close"].shift(periods=1)).abs()
-      bar_data["l-prev"] = (bar_data["low"] - bar_data["close"].shift(periods=1)).abs()
+  #     bar_data = pd.DataFrame(bar_data)
+  #     bar_data["h-l"] = bar_data["high"] - bar_data["low"]
+  #     bar_data["h-prev"] = (bar_data["high"] - bar_data["close"].shift(periods=1)).abs()
+  #     bar_data["l-prev"] = (bar_data["low"] - bar_data["close"].shift(periods=1)).abs()
       
-      tr = np.nanmax(bar_data[["h-l","h-prev","l-prev"]], axis=1)
+  #     tr = np.nanmax(bar_data[["h-l","h-prev","l-prev"]], axis=1)
       
-      atr = tr.mean()
-    else:
-      bar_data = self.data_handler.get_latest_bars(ticker, 2)
-      bar_data = pd.DataFrame(bar_data)
-      bar_data["h-l"] = bar_data["high"] - bar_data["low"]
-      bar_data["h-prev"] = (bar_data["high"] - bar_data["close"].shift(periods=1)).abs()
-      bar_data["l-prev"] = (bar_data["low"] - bar_data["close"].shift(periods=1)).abs()
+  #     atr = tr.mean()
+  #   else:
+  #     bar_data = self.data_handler.get_latest_bars(ticker, 2)
+  #     bar_data = pd.DataFrame(bar_data)
+  #     bar_data["h-l"] = bar_data["high"] - bar_data["low"]
+  #     bar_data["h-prev"] = (bar_data["high"] - bar_data["close"].shift(periods=1)).abs()
+  #     bar_data["l-prev"] = (bar_data["low"] - bar_data["close"].shift(periods=1)).abs()
 
-      tr = np.nanmax(bar_data[["h-l","h-prev","l-prev"]], axis=1)[-1]
-      atr = 1/self.atr_window * tr + (1- 1/self.atr_window) * self.historical_atr[ticker][-1]
+  #     tr = np.nanmax(bar_data[["h-l","h-prev","l-prev"]], axis=1)[-1]
+  #     atr = 1/self.atr_window * tr + (1- 1/self.atr_window) * self.historical_atr[ticker][-1]
 
-    return atr 
+  #   return atr 
 
 
   def liquidate(self):

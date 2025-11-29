@@ -13,6 +13,7 @@ from backtester.events.market_event import MarketEvent
 from backtester.events.signal_event import SignalEvent
 from backtester.exceptions.negative_cash_exception import NegativeCashException
 from backtester.portfolios.naive_portfolio import NaivePortfolio
+from backtester.util.position_sizer.no_position_sizer import NoPositionSizer
 
 # --- Mocks and Fixtures ---
 
@@ -45,6 +46,7 @@ def mock_data_handler():
 def portfolio(mock_data_handler):
     """Returns a NaivePortfolio instance with default settings."""
     events = deque()
+    position_sizer = NoPositionSizer({"initial_position_size": 100})
     return NaivePortfolio(
         data_handler=mock_data_handler,
         initial_capital=100000.0,
@@ -52,7 +54,7 @@ def portfolio(mock_data_handler):
         events=events,
         start_date=pd.to_datetime("2023-01-01").timestamp(),
         interval="1d",
-        atr_window=5
+        position_sizer=position_sizer,
     )
 
 # --- Test Cases ---
@@ -61,70 +63,11 @@ def test_initialization(portfolio):
     """Tests that the portfolio is initialized with correct values."""
     assert portfolio.initial_capital == 100000.0
     assert portfolio.symbol_list == ["MSFT", "AAPL"]
-    assert portfolio.position_size == {"MSFT": 100, "AAPL": 100}
+    assert portfolio.position_dict == {"MSFT": 100, "AAPL": 100}
     assert portfolio.current_holdings["cash"] == 100000.0
     assert portfolio.current_holdings["total"] == 100000.0
     assert portfolio.current_holdings["MSFT"]["position"] == 0
     assert len(portfolio.historical_holdings) == 0
-
-def test_calc_atr_insufficient_data(portfolio):
-    """Tests that _calc_atr returns None if there is not enough data."""
-    assert portfolio._calc_atr("MSFT") is None
-
-def test_calc_atr_correct_calculation(portfolio, mock_data_handler):
-    """Tests that the ATR is calculated correctly based on mock data."""
-    portfolio.atr_period = 5
-    bars = [
-        {"high":10, "low":8, "close":9},
-        {"high":11, "low":9, "close":10},
-        {"high":12, "low":10, "close": 11},
-        {"high":13, "low":11, "close": 12},
-        {"high":14, "low":12, "close": 13},
-        {"high":15, "low":13, "close": 14},
-    ]
-    mock_data_handler._bars["MSFT"] = bars
-    
-    # With Wilder's smoothing, the calculation is different from a simple mean.
-    # For a 5-period ATR, alpha = 1/5 = 0.2
-    # TRs = [2, 2, 2, 2, 2, 2] (based on the data)
-    # Smoothed ATR will converge towards 2.
-    assert portfolio._calc_atr("MSFT") == pytest.approx(2.0)
-
-def test_on_signal_updates_position_size_with_atr(portfolio, mock_data_handler):
-    """Tests that on_signal correctly updates position_size based on ATR."""
-    portfolio.atr_period = 5
-    bars = [SimpleNamespace(high=10, low=8, close=9)] * 6
-    mock_data_handler._bars["MSFT"] = bars
-    
-    # Simulate that the historical ATR has been calculated on previous bars
-    portfolio.historical_atr["MSFT"] = [2.0]
-    
-    # capital_to_risk = 0.01 * 100000 = 1000
-    # position_size = 1000 // (2.0 * 2) = 250
-    signal = SignalEvent(123, "MSFT", SignalType.LONG)
-    
-    portfolio.on_signal(signal)
-    
-    assert portfolio.position_size["MSFT"] == 250
-
-def test_on_signal_handles_zero_atr(portfolio, mock_data_handler):
-    """Tests that a ZeroDivisionError is avoided if ATR is 0."""
-    portfolio.atr_period = 5
-    bars = [SimpleNamespace(high=10, low=10, close=10)] * 6
-    mock_data_handler._bars["MSFT"] = bars
-    
-    # Simulate historical ATR of 0
-    portfolio.historical_atr["MSFT"] = [0.0]
-    
-    signal = SignalEvent(123, "MSFT", SignalType.LONG)
-
-    try:
-        portfolio.on_signal(signal)
-    except ZeroDivisionError:
-        pytest.fail("on_signal raised a ZeroDivisionError due to zero ATR.")
-    
-    # If ATR is 0, position size should remain unchanged from its initial value.
-    assert portfolio.position_size["MSFT"] == 100
 
 
 def test_on_market(portfolio):
@@ -400,3 +343,23 @@ def test_create_equity_curve(portfolio):
     assert "returns" in curve.columns
     assert "equity_curve" in curve.columns
     assert curve["equity_curve"].iloc[-1] < curve["equity_curve"].iloc[-2]
+
+def test_on_signal_with_position_sizer(portfolio):
+    """Tests that on_signal generates an order when the position sizer returns a size."""
+    portfolio.position_sizer.get_position_size = lambda portfolio, ticker: 250
+    signal = SignalEvent(123, "MSFT", SignalType.LONG)
+    
+    portfolio.on_signal(signal)
+    
+    assert len(portfolio.events) == 1
+    order = portfolio.events.pop()
+    assert order.quantity == 250
+
+def test_on_signal_with_no_position_size(portfolio):
+    """Tests that on_signal does nothing if the position sizer returns None."""
+    portfolio.position_sizer.get_position_size = lambda portfolio, ticker: None
+    signal = SignalEvent(123, "MSFT", SignalType.LONG)
+    
+    portfolio.on_signal(signal)
+    
+    assert len(portfolio.events) == 0

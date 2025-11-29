@@ -9,13 +9,24 @@ backtester_settings:
   borrow_cost: 0.01 # interest on short sold stock - 1%
   maintenance_margin: 0.3 # margin to hold on short positions - 30%
   risk_per_trade: 0.01 # percentage of total portfolio value willing to risk in a single trade
-  atr_window: 14 # number of days used when calculating average true range
 
 data_handler:
   yf: 
     name: backtester.data.yf_data_handler.YFDataHandler
   csv:
     name: backtester.data.csv_data_handler.CSVDataHandler
+
+position_sizer:
+  atr:
+    name: backtester.util.position_sizer.atr_position_sizer.ATRPositionSizer
+    additional_parameters:
+      atr_window: 14 # number of days used when calculating average true range
+      atr_multiplier: 2
+      initial_position_size: 100
+  no_position_sizer:
+    name: backtester.util.position_sizer.no_position_sizer.NoPositionSizer
+    additional_parameters:
+      initial_position_size: 100
 
 slippage:
   no_slippage:

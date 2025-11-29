@@ -45,8 +45,9 @@ def load_class(path_to_class: str):
 @app.command()
 def run(data_dir: str,
         data_source: Optional[str] = "csv",
-        strategy: Optional[str] = "buy_and_hold_simple",
+        position_calc: Optional[str] = "atr",
         slippage: Optional[str] = "multi_factor_slippage",
+        strategy: Optional[str] = "buy_and_hold_simple",
         exception_contd: Optional[int] = 0
       ):
   """
@@ -69,15 +70,15 @@ def run(data_dir: str,
   interval = backtester_settings["interval"]
   exchange_closing_time = backtester_settings["exchange_closing_time"]
   benchmark_ticker = backtester_settings["benchmark"]
-  atr_window = backtester_settings["atr_window"]
 
   typer_tbl = Table(title="Parameter List", box=box.SQUARE_DOUBLE_HEAD,show_lines=True)
   typer_tbl.add_column("Parameter", style="cyan")
   typer_tbl.add_column("Value")
   typer_tbl.add_row("Data Directory", data_dir)
   typer_tbl.add_row("Data Handler", data_source)
-  typer_tbl.add_row("Strategy", strategy)
+  typer_tbl.add_row("Position Sizer", position_calc)
   typer_tbl.add_row("Slippage", slippage)
+  typer_tbl.add_row("Strategy", strategy)
   typer_tbl.add_row("Symbols", ", ".join(symbol_list))
   typer_tbl.add_row("Initial Capital", str(initial_capital))
   console.print(typer_tbl)
@@ -94,6 +95,10 @@ def run(data_dir: str,
   else:
     data_handler = DataHandlerClass(event_queue, data_dir, symbol_list, interval, exchange_closing_time)
 
+  PositionSizerClass = load_class(config["position_sizer"][position_calc]["name"])
+  position_sizer_settings = config["position_sizer"][position_calc].get("additional_parameters", None)
+  position_sizer = PositionSizerClass(position_sizer_settings, symbol_list)
+
   SlippageClass = load_class(config["slippage"][slippage]["name"])
   slippage_settings = config["slippage"][slippage].get("additional_parameters", None)
   slippage_model = SlippageClass(data_handler.symbol_raw_data, slippage_settings)
@@ -103,7 +108,7 @@ def run(data_dir: str,
   additional_params = config["strategies"][strategy].get("additional_parameters", {})
   strategy_instance = StrategyClass(event_queue, data_handler, **additional_params)
 
-  portfolio = NaivePortfolio(data_handler,initial_capital,symbol_list,event_queue,start_timestamp, interval, atr_window=atr_window)
+  portfolio = NaivePortfolio(data_handler,initial_capital,symbol_list,event_queue,start_timestamp, interval, position_sizer)
 
   execution_handler = SimulatedExecutionHandler(event_queue, data_handler, slippage_model)
   
