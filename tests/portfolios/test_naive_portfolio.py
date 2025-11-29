@@ -1,17 +1,18 @@
 from collections import deque
-from types import SimpleNamespace
-import pytest
-import pandas as pd
 from copy import deepcopy
+from types import SimpleNamespace
 
-from backtester.portfolios.naive_portfolio import NaivePortfolio
-from backtester.events.event import Event
-from backtester.events.signal_event import SignalEvent
-from backtester.events.market_event import MarketEvent
-from backtester.events.fill_event import FillEvent
-from backtester.enums.signal_type import SignalType
+import pandas as pd
+import pytest
+
 from backtester.enums.direction_type import DirectionType
+from backtester.enums.signal_type import SignalType
+from backtester.events.event import Event
+from backtester.events.fill_event import FillEvent
+from backtester.events.market_event import MarketEvent
+from backtester.events.signal_event import SignalEvent
 from backtester.exceptions.negative_cash_exception import NegativeCashException
+from backtester.portfolios.naive_portfolio import NaivePortfolio
 
 # --- Mocks and Fixtures ---
 

@@ -1,7 +1,10 @@
-from backtester.data.data_handler import DataHandler
-import pandas as pd
 import os
+
+import pandas as pd
+
+from backtester.data.data_handler import DataHandler
 from backtester.events.market_event import MarketEvent
+
 
 class CSVDataHandler(DataHandler):
   """
@@ -62,8 +65,6 @@ class CSVDataHandler(DataHandler):
         combined_index = df.index
       else:
         combined_index = combined_index.union(df.index) # include any dates not in the previous files
-
-      self.symbol_data[symbol].to_csv("csv.csv")
 
     # Reindex the dataframes to the same index
     for symbol in self.symbol_list:

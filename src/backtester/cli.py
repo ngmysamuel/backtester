@@ -10,14 +10,16 @@ import pandas as pd
 import quantstats as qs
 import typer
 import yaml
+from rich import box
+from rich.console import Console
+from rich.table import Table
 
 from backtester.data.csv_data_handler import CSVDataHandler
 from backtester.exceptions.negative_cash_exception import NegativeCashException
 from backtester.execution.simulated_execution_handler import SimulatedExecutionHandler
 from backtester.portfolios.naive_portfolio import NaivePortfolio
 
-from rich import print as print_console
-
+console = Console()
 app = typer.Typer()
 
 def load_config():
@@ -54,15 +56,12 @@ def run(data_dir: str,
       strategy (str): the strategy to backtest; this name should match those found in config.yaml.
       slippage (str): the model used to calculate slippage
   """
-  print_console(f"Data directory: [underline]{data_dir}[/underline], handled by: [underline]{data_source}[/underline]")
-  print_console(f"Running backtest for strategy: [underline]{strategy}[/underline] with slippage modelling by: [underline]{slippage}[/underline]")
 
   config = load_config()  # load data from yaml config file
 
   backtester_settings = config["backtester_settings"]
 
   symbol_list = backtester_settings["symbol_list"]
-  print_console(f"Symbols: {symbol_list}")
 
   initial_capital = backtester_settings["initial_capital"]
   start_timestamp = pd.to_datetime(backtester_settings["start_date"], dayfirst=True).timestamp()
@@ -71,7 +70,17 @@ def run(data_dir: str,
   exchange_closing_time = backtester_settings["exchange_closing_time"]
   benchmark_ticker = backtester_settings["benchmark"]
   atr_window = backtester_settings["atr_window"]
-  print_console(f"Initial Capital: [underline]{initial_capital}[/underline]")
+
+  typer_tbl = Table(title="Parameter List", box=box.SQUARE_DOUBLE_HEAD,show_lines=True)
+  typer_tbl.add_column("Parameter", style="cyan")
+  typer_tbl.add_column("Value")
+  typer_tbl.add_row("Data Directory", data_dir)
+  typer_tbl.add_row("Data Handler", data_source)
+  typer_tbl.add_row("Strategy", strategy)
+  typer_tbl.add_row("Slippage", slippage)
+  typer_tbl.add_row("Symbols", ", ".join(symbol_list))
+  typer_tbl.add_row("Initial Capital", str(initial_capital))
+  console.print(typer_tbl)
 
   event_queue = collections.deque()
 
@@ -146,7 +155,7 @@ def dashboard():
   config = load_config()
   interval = config["backtester_settings"]["interval"]
   streamlit_script_path = Path("src/backtester/metrics/dashboard/streamlit_app.py").resolve()
-  typer.echo(f"Loading [underline]{streamlit_script_path}[/underline]")
+  console.print(f"Loading [underline]{streamlit_script_path}[/underline]")
   sys.argv = ["streamlit", "run", streamlit_script_path, "--global.disableWidgetStateDuplicationWarning", "true", f" -- --interval {interval}"] # for more arguments, add ', " -- --what ee"' to the end
   runpy.run_module("streamlit", run_name="__main__")
 

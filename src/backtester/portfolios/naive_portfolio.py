@@ -1,14 +1,17 @@
-from backtester.portfolios.portfolio import Portfolio
+import collections
 from collections import deque
+from copy import deepcopy
+
+import numpy as np
+import pandas as pd
+
 from backtester.data.data_handler import DataHandler
 from backtester.enums.direction_type import DirectionType
 from backtester.enums.order_type import OrderType
 from backtester.events.order_event import OrderEvent
-import pandas as pd
-import numpy as np
-import collections
 from backtester.exceptions.negative_cash_exception import NegativeCashException
-from copy import deepcopy
+from backtester.portfolios.portfolio import Portfolio
+
 
 class NaivePortfolio(Portfolio):
   """

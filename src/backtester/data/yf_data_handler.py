@@ -1,6 +1,7 @@
-from backtester.data.data_handler import DataHandler
-import yfinance as yf
 import pandas as pd
+import yfinance as yf
+
+from backtester.data.data_handler import DataHandler
 from backtester.events.market_event import MarketEvent
 
 
@@ -38,8 +39,6 @@ class YFDataHandler(DataHandler):
         combined_index = df.index
       else:
         combined_index = combined_index.union(df.index) # include any dates not in the previous files
-
-      self.symbol_data[symbol].to_csv("yf.csv")
 
     for symbol in self.symbol_list:
       self.symbol_data[symbol] = (

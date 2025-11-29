@@ -1,6 +1,8 @@
-import numpy as np
 import bidask
+import numpy as np
+
 from backtester.util.slippage.slippage import Slippage
+
 
 class MultiFactorSlippage(Slippage):
 
