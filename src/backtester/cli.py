@@ -43,7 +43,7 @@ def load_class(path_to_class: str):
     return getattr(m, class_name)
 
 @app.command()
-def run(data_dir: str,
+def run(data_dir: Optional["str"],
         data_source: Optional[str] = "csv",
         position_calc: Optional[str] = "atr",
         slippage: Optional[str] = "multi_factor_slippage",

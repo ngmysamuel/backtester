@@ -2,7 +2,6 @@ import collections
 from collections import deque
 from copy import deepcopy
 
-import numpy as np
 import pandas as pd
 
 from backtester.data.data_handler import DataHandler
@@ -11,8 +10,8 @@ from backtester.enums.order_type import OrderType
 from backtester.events.order_event import OrderEvent
 from backtester.exceptions.negative_cash_exception import NegativeCashException
 from backtester.portfolios.portfolio import Portfolio
-from backtester.util.position_sizer.position_sizer import PositionSizer
 from backtester.util.position_sizer.atr_position_sizer import ATRPositionSizer
+from backtester.util.position_sizer.position_sizer import PositionSizer
 
 
 class NaivePortfolio(Portfolio):
