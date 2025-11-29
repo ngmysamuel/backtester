@@ -3,7 +3,7 @@
 <h3 align="center"> ⚠ Work in progress ⚠</h3>
 <p align="center"> You might notice some formatting issues / lack of documentation in the meantime.</p>
 
-### Dependencies
+### Prerequisites
 1. Poetry
 
 ### Run
