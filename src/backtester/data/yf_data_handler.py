@@ -26,6 +26,7 @@ class YFDataHandler(DataHandler):
     for symbol in self.symbol_list:
       df = yf.download(symbol, start=self.start_date, end=self.end_date, interval=self.interval, multi_level_index=False)
       df = df[["Open","High","Low","Close","Volume"]]
+
       self.symbol_raw_data[symbol] = df
       self.symbol_data[symbol] = df
       self.latest_symbol_data[symbol] = []
@@ -37,6 +38,8 @@ class YFDataHandler(DataHandler):
         combined_index = df.index
       else:
         combined_index = combined_index.union(df.index) # include any dates not in the previous files
+
+      self.symbol_data[symbol].to_csv("yf.csv")
 
     for symbol in self.symbol_list:
       self.symbol_data[symbol] = (

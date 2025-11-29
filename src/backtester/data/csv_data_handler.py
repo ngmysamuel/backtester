@@ -63,6 +63,8 @@ class CSVDataHandler(DataHandler):
       else:
         combined_index = combined_index.union(df.index) # include any dates not in the previous files
 
+      self.symbol_data[symbol].to_csv("csv.csv")
+
     # Reindex the dataframes to the same index
     for symbol in self.symbol_list:
       self.symbol_data[symbol] = (

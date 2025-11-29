@@ -13,7 +13,7 @@ class Slippage(ABC):
     pass
 
   @abstractmethod
-  def calculate_slippage(self, trade_date, trade_size):
+  def calculate_slippage(self, ticker, trade_date, trade_size):
     """
     Calculates the slippage for a particular trade based on the specifics of that trading day
     """

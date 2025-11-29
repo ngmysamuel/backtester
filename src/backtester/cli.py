@@ -75,7 +75,7 @@ def run(data_dir: str,
 
   event_queue = collections.deque()
 
-  DataHandlerClass = load_class(config["data_handler"][data_source])
+  DataHandlerClass = load_class(config["data_handler"][data_source]["name"])
   if data_source == "yf":
     start_datetime = pd.to_datetime(start_timestamp, unit='s')
     start_date = start_datetime.strftime("%Y-%m-%d")
@@ -86,8 +86,8 @@ def run(data_dir: str,
     data_handler = DataHandlerClass(event_queue, data_dir, symbol_list, interval, exchange_closing_time)
 
   SlippageClass = load_class(config["slippage"][slippage]["name"])
-  slippage_settings = config["slippage"][slippage]["additional_parameters"] # TODO: handle NoSlippage model not having addition_parameters
-  slippage_model = SlippageClass(data_handler.symbol_raw_data, slippage_settings) # TODO: handle NoSlippage model initialization
+  slippage_settings = config["slippage"][slippage].get("additional_parameters", None)
+  slippage_model = SlippageClass(data_handler.symbol_raw_data, slippage_settings)
   slippage_model.generate_features()
 
   StrategyClass = load_class(config["strategies"][strategy]["name"])

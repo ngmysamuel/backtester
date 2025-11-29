@@ -12,8 +12,10 @@ backtester_settings:
   atr_window: 14 # number of days used when calculating average true range
 
 data_handler:
-  yf: backtester.data.yf_data_handler.YFDataHandler
-  csv: backtester.data.csv_data_handler.CSVDataHandler
+  yf: 
+    name: backtester.data.yf_data_handler.YFDataHandler
+  csv:
+    name: backtester.data.csv_data_handler.CSVDataHandler
 
 slippage:
   no_slippage:
