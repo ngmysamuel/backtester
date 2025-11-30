@@ -1,18 +1,46 @@
 # Backtester
 
 <h3 align="center"> ⚠ Work in progress ⚠</h3>
-<p align="center"> You might notice some formatting issues / messiness / lack of documentation in the meantime.</p>
+<p align="center"> You might notice some formatting issues / lack of documentation in the meantime.</p>
 
-### Dependencies
+### Prerequisites
 1. Poetry
 
 ### Run
-Trigger a backtest - note the parameters to the final command. The data_dir contains the CSVs of the OHLC data of the tickers you specified in config.yaml. Also, see config.yaml for what strategies are already available. 
+Trigger a backtest
 ```
 git clone https://github.com/ngmysamuel/backtester.git
 cd backtester
 poetry install
-poetry run backtester run path\to\data_dir\ --strategy moving_average --exception-contd 1
+poetry run backtester run --data-dir path\to\data_dir\ --strategy moving_average --exception-contd 1
+```
+There are 6 parameters
+1. data-dir
+    - The path to the directory where the CSVs of OHLC data of the tickers you specified in config.yaml
+    - Necessary if data-source is csv
+    - Default is None
+2. data-source
+    - Available options are in config.yaml under "data_handler"
+    - Default is "csv"
+3. position_calc
+    - Method used to calculate the position size of each trade
+    - Available options are in config.yaml under "position_sizer"
+    - Default is "atr"
+4. slippage
+    - Available options are in config.yaml under "slippage"
+    - Default is "multi_factor_slippage"
+5. strategy
+    - Available options are in config.yaml under "strategies"
+    - Default is "buy_and_hold_simple"
+6. exception-contd
+    - either 1 or 0
+    - indicates whether to continue the backtest if portfolio cash balance drops below 0
+    - Default is 1
+
+### Dashboard
+Run this to view and interact with the data generated from a backtest. You must have ran a backtest at least once.
+```
+poetry run backtester dashboard
 ```
 
 ### Test
@@ -25,13 +53,8 @@ For a specific file
 poetry run pytest tests\execution\test_simulated_execution_handler.py
 ```
 
-### Dashboard
-Run this to view and interact with the data generated from a backtest
-```
-poetry run backtester dashboard
-```
-
 ### Pulling CSV data
+Identical to using data-source = "yf"
 ```
 import yfinance as yf
 dat = yf.Ticker("MSFT")
@@ -59,8 +82,8 @@ df.to_csv("MSFT.csv")
 3. Simulated Execution
     1. Market Orders are filled at open i.e. at the opening price of the next interval from the order placed. Market On Close are filled at close when the current interval of market data is the last slice of the day.
     2. All orders are filled entirely i.e. no partial filling
-4. Position Sizing
-    1. Implemented in the portfolio module with attributes defined in config.yaml
+4. Position Sizing (ATR)
+    1. Implemented as part of the position sizer module with attributes defined in config.yaml
     2. Calculated at the end of the interval, before new bars are added
     3. position_size = capital_to_risk // (atr * atr_multiplier) where
     4. position_size = number of stocks to buy
@@ -125,7 +148,11 @@ df.to_csv("MSFT.csv")
 - Slippage model  - supporting other time periods automatically 
     - switches variables to use when the trading interval changes. The slippage model only supports daily data now e.g. 252 trading periods in a year. The trading interval would be the variable in config.yaml
     - Intraday data support
-- Move Position Sizing into its own module with ATR as just an implementation of position sizing
+- Polish the entry point of application, cli.py
+- Test cases for multi factor slippage modelling
+- Add explanation for how create own implementation of various items e.g. position sizer, slippage model, etc
+- Logger
+- Other order types e.g. Limit order
 
 ### Notes
 

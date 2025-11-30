@@ -1,12 +1,13 @@
 from collections import deque
 from types import SimpleNamespace
-import pytest
-import pandas as pd
 
-from backtester.execution.simulated_execution_handler import SimulatedExecutionHandler
-from backtester.events.fill_event import FillEvent
-from backtester.enums.order_type import OrderType
+import pandas as pd
+import pytest
+
 from backtester.enums.direction_type import DirectionType
+from backtester.enums.order_type import OrderType
+from backtester.events.fill_event import FillEvent
+from backtester.execution.simulated_execution_handler import SimulatedExecutionHandler
 
 # --- Mocks and Fixtures ---
 

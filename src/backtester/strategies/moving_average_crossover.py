@@ -1,5 +1,6 @@
-from backtester.events.signal_event import SignalEvent
 from backtester.enums.signal_type import SignalType
+from backtester.events.signal_event import SignalEvent
+
 
 class MovingAverageCrossover:
   def __init__(self, events, data_handler, short_window=40, long_window=100):

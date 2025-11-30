@@ -1,7 +1,10 @@
 from collections import deque
-from backtester.events.fill_event import FillEvent
+
 import pandas as pd
+
 from backtester.enums.direction_type import DirectionType
+from backtester.events.fill_event import FillEvent
+
 
 class SimulatedExecutionHandler:
   """

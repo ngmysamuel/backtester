@@ -1,19 +1,25 @@
-import typer
-from typing import Optional
-from backtester.data.csv_data_handler import CSVDataHandler
 import collections
-import yaml
-import importlib.resources
 import importlib
-from backtester.portfolios.naive_portfolio import NaivePortfolio
-import pandas as pd
-from backtester.execution.simulated_execution_handler import SimulatedExecutionHandler
-from backtester.exceptions.negative_cash_exception import NegativeCashException
-import quantstats as qs
-from pathlib import Path
-import sys
+import importlib.resources
 import runpy
+import sys
+from pathlib import Path
+from typing import Optional
 
+import pandas as pd
+import quantstats as qs
+import typer
+import yaml
+from rich import box
+from rich.console import Console
+from rich.table import Table
+
+from backtester.data.csv_data_handler import CSVDataHandler
+from backtester.exceptions.negative_cash_exception import NegativeCashException
+from backtester.execution.simulated_execution_handler import SimulatedExecutionHandler
+from backtester.portfolios.naive_portfolio import NaivePortfolio
+
+console = Console()
 app = typer.Typer()
 
 def load_config():
@@ -37,50 +43,75 @@ def load_class(path_to_class: str):
     return getattr(m, class_name)
 
 @app.command()
-def run(data_dir: str,
-        strategy: Optional[str] = "buy_and_hold_simple",
+def run(data_dir: Optional["str"],
+        data_source: Optional[str] = "csv",
+        position_calc: Optional[str] = "atr",
         slippage: Optional[str] = "multi_factor_slippage",
-        exception_contd: Optional[int] = 0
+        strategy: Optional[str] = "buy_and_hold_simple",
+        exception_contd: Optional[int] = 1
       ):
   """
   Run the backtester with a given strategy and date range.
   args:
-      data_dir (str): Directory containing CSV data files.
-      strategy (str): the strategy to backtest; this name should match those found in config.yaml.
+      data_dir: Directory containing CSV data files.
+      data_source: Where the OHLC data comes from
+      position_calc: the method to caculcate position size
       slippage (str): the model used to calculate slippage
+      strategy: the strategy to backtest; this name should match those found in config.yaml.
+      exception_contd: 1 or 0
   """
-  typer.echo(f"Data directory: {data_dir}")
-  typer.echo(f"Running backtest for strategy: {strategy} with slippage modelling by: {slippage}")
 
   config = load_config()  # load data from yaml config file
 
   backtester_settings = config["backtester_settings"]
 
   symbol_list = backtester_settings["symbol_list"]
-  typer.echo(f"Symbols: {symbol_list}")
 
   initial_capital = backtester_settings["initial_capital"]
   start_timestamp = pd.to_datetime(backtester_settings["start_date"], dayfirst=True).timestamp()
+  end_timestamp = pd.to_datetime(backtester_settings["end_date"], dayfirst=True).timestamp()
   interval = backtester_settings["interval"]
   exchange_closing_time = backtester_settings["exchange_closing_time"]
   benchmark_ticker = backtester_settings["benchmark"]
-  atr_window = backtester_settings["atr_window"]
-  typer.echo(f"Initial Capital: {initial_capital}")
+
+  typer_tbl = Table(title="Parameter List", box=box.SQUARE_DOUBLE_HEAD,show_lines=True)
+  typer_tbl.add_column("Parameter", style="cyan")
+  typer_tbl.add_column("Value")
+  typer_tbl.add_row("Data Directory", data_dir)
+  typer_tbl.add_row("Data Handler", data_source)
+  typer_tbl.add_row("Position Sizer", position_calc)
+  typer_tbl.add_row("Slippage", slippage)
+  typer_tbl.add_row("Strategy", strategy)
+  typer_tbl.add_row("Symbols", ", ".join(symbol_list))
+  typer_tbl.add_row("Initial Capital", str(initial_capital))
+  console.print(typer_tbl)
 
   event_queue = collections.deque()
 
-  data_handler = CSVDataHandler(event_queue, data_dir, symbol_list, interval, exchange_closing_time)
+  DataHandlerClass = load_class(config["data_handler"][data_source]["name"])
+  start_datetime = pd.to_datetime(start_timestamp, unit='s')
+  end_datetime = pd.to_datetime(end_timestamp, unit='s')
+  if data_source == "yf":
+    data_handler = DataHandlerClass(event_queue, start_datetime, end_datetime, symbol_list, interval, exchange_closing_time)
+    benchmark_data_handler = DataHandlerClass(event_queue, start_datetime, end_datetime, [benchmark_ticker], interval, exchange_closing_time)
+  else:
+    data_handler = DataHandlerClass(event_queue, data_dir, start_datetime, end_datetime, symbol_list, interval, exchange_closing_time)
+    benchmark_data_handler = DataHandlerClass(event_queue, data_dir, start_datetime, end_datetime, [benchmark_ticker], interval, exchange_closing_time)
+
+  PositionSizerClass = load_class(config["position_sizer"][position_calc]["name"])
+  position_sizer_settings = config["position_sizer"][position_calc].get("additional_parameters", None)
+  position_sizer = PositionSizerClass(position_sizer_settings, symbol_list)
 
   SlippageClass = load_class(config["slippage"][slippage]["name"])
-  slippage_settings = config["slippage"][slippage]["additional_parameters"] # TODO: handle NoSlippage model not having addition_parameters
-  slippage_model = SlippageClass(data_handler.symbol_raw_data, slippage_settings) # TODO: handle NoSlippage model initialization
+  slippage_settings = config["slippage"][slippage].get("additional_parameters", None)
+  slippage_model = SlippageClass(data_handler.symbol_raw_data, slippage_settings)
   slippage_model.generate_features()
 
   StrategyClass = load_class(config["strategies"][strategy]["name"])
   additional_params = config["strategies"][strategy].get("additional_parameters", {})
   strategy_instance = StrategyClass(event_queue, data_handler, **additional_params)
 
-  portfolio = NaivePortfolio(data_handler,initial_capital,symbol_list,event_queue,start_timestamp, interval, atr_window=atr_window)
+  portfolio = NaivePortfolio(data_handler,initial_capital,symbol_list,event_queue,start_timestamp, interval, position_sizer)
 
   execution_handler = SimulatedExecutionHandler(event_queue, data_handler, slippage_model)
   
@@ -117,8 +148,7 @@ def run(data_dir: str,
   portfolio.create_equity_curve()
   portfolio.equity_curve.to_csv("equity_curve.csv")
 
-  benchmark_data_handler = CSVDataHandler(event_queue, data_dir, [benchmark_ticker], interval, exchange_closing_time)
-  benchmark_data = benchmark_data_handler.symbol_raw_data["SPY"]
+  benchmark_data = benchmark_data_handler.symbol_raw_data[benchmark_ticker]
   benchmark_returns = benchmark_data["close"].pct_change()
   benchmark_returns.name = benchmark_ticker
   qs.reports.html(portfolio.equity_curve["returns"], benchmark=benchmark_returns, output='strategy_report.html', title=strategy, match_dates=False)
@@ -132,7 +162,7 @@ def dashboard():
   config = load_config()
   interval = config["backtester_settings"]["interval"]
   streamlit_script_path = Path("src/backtester/metrics/dashboard/streamlit_app.py").resolve()
-  typer.echo(f"Loading {streamlit_script_path}")
+  console.print(f"Loading [underline]{streamlit_script_path}[/underline]")
   sys.argv = ["streamlit", "run", streamlit_script_path, "--global.disableWidgetStateDuplicationWarning", "true", f" -- --interval {interval}"] # for more arguments, add ', " -- --what ee"' to the end
   runpy.run_module("streamlit", run_name="__main__")
 
