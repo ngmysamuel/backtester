@@ -30,3 +30,4 @@ backtester = "backtester.cli:app"
 
 [tool.ruff]
 indent-width = 2
+line-length = 320

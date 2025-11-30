@@ -153,6 +153,8 @@ df.to_csv("MSFT.csv")
 - Add explanation for how create own implementation of various items e.g. position sizer, slippage model, etc
 - Logger
 - Other order types e.g. Limit order
+- Modelling probability of fill for limit orders
+- Live data
 
 ### Notes
 
