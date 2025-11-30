@@ -151,6 +151,8 @@ df.to_csv("MSFT.csv")
 - Polish the entry point of application, cli.py
 - Test cases for multi factor slippage modelling
 - Add explanation for how create own implementation of various items e.g. position sizer, slippage model, etc
+- Logger
+- Other order types e.g. Limit order
 
 ### Notes
 

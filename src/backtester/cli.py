@@ -53,9 +53,12 @@ def run(data_dir: Optional["str"],
   """
   Run the backtester with a given strategy and date range.
   args:
-      data_dir (str): Directory containing CSV data files.
-      strategy (str): the strategy to backtest; this name should match those found in config.yaml.
+      data_dir: Directory containing CSV data files.
+      data_source: Where the OHLC data comes from
+      position_calc: the method to caculcate position size
       slippage (str): the model used to calculate slippage
+      strategy: the strategy to backtest; this name should match those found in config.yaml.
+      exception_contd: 1 or 0
   """
 
   config = load_config()  # load data from yaml config file
@@ -86,14 +89,14 @@ def run(data_dir: Optional["str"],
   event_queue = collections.deque()
 
   DataHandlerClass = load_class(config["data_handler"][data_source]["name"])
+  start_datetime = pd.to_datetime(start_timestamp, unit='s')
+  end_datetime = pd.to_datetime(end_timestamp, unit='s')
   if data_source == "yf":
-    start_datetime = pd.to_datetime(start_timestamp, unit='s')
-    start_date = start_datetime.strftime("%Y-%m-%d")
-    end_datetime = pd.to_datetime(end_timestamp, unit='s')
-    end_date = end_datetime.strftime("%Y-%m-%d")
-    data_handler = DataHandlerClass(event_queue, start_date, end_date, symbol_list, interval, exchange_closing_time)
+    data_handler = DataHandlerClass(event_queue, start_datetime, end_datetime, symbol_list, interval, exchange_closing_time)
+    benchmark_data_handler = DataHandlerClass(event_queue, start_datetime, end_datetime, [benchmark_ticker], interval, exchange_closing_time)
   else:
-    data_handler = DataHandlerClass(event_queue, data_dir, symbol_list, interval, exchange_closing_time)
+    data_handler = DataHandlerClass(event_queue, data_dir, start_datetime, end_datetime, symbol_list, interval, exchange_closing_time)
+    benchmark_data_handler = DataHandlerClass(event_queue, data_dir, start_datetime, end_datetime, [benchmark_ticker], interval, exchange_closing_time)
 
   PositionSizerClass = load_class(config["position_sizer"][position_calc]["name"])
   position_sizer_settings = config["position_sizer"][position_calc].get("additional_parameters", None)
@@ -145,8 +148,7 @@ def run(data_dir: Optional["str"],
   portfolio.create_equity_curve()
   portfolio.equity_curve.to_csv("equity_curve.csv")
 
-  benchmark_data_handler = CSVDataHandler(event_queue, data_dir, [benchmark_ticker], interval, exchange_closing_time)
-  benchmark_data = benchmark_data_handler.symbol_raw_data["SPY"]
+  benchmark_data = benchmark_data_handler.symbol_raw_data[benchmark_ticker]
   benchmark_returns = benchmark_data["close"].pct_change()
   benchmark_returns.name = benchmark_ticker
   qs.reports.html(portfolio.equity_curve["returns"], benchmark=benchmark_returns, output='strategy_report.html', title=strategy, match_dates=False)

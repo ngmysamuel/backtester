@@ -1,8 +1,9 @@
-from collections import deque
 from unittest.mock import MagicMock
+
 import pytest
 
 from backtester.util.position_sizer.atr_position_sizer import ATRPositionSizer
+
 
 class FakeDataHandler:
     def __init__(self, bars_map):

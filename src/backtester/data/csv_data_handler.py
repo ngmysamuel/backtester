@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+from typing import Union
 
 import pandas as pd
 
@@ -12,7 +14,7 @@ class CSVDataHandler(DataHandler):
   historical data for each symbol from CSV files.
   """
 
-  def __init__(self, event_queue: list, csv_dir: str, symbol_list: str, interval: str, exchange_closing_time: str):
+  def __init__(self, event_queue: list, csv_dir: str, start_date: Union[pd.Timestamp, datetime], end_date: Union[pd.Timestamp, datetime],  symbol_list: str, interval: str, exchange_closing_time: str):
     """
     Initializes the CSVDataHandler
     args:
@@ -24,6 +26,8 @@ class CSVDataHandler(DataHandler):
     """
     self.event_queue = event_queue
     self.csv_dir = csv_dir
+    self.start_date = start_date
+    self.end_date = end_date
     self.symbol_list = symbol_list
     self.interval = interval
     self.exchange_closing_time = exchange_closing_time
@@ -53,13 +57,15 @@ class CSVDataHandler(DataHandler):
         converters={"Date": lambda x: pd.to_datetime(x).tz_localize(None)}
       )
 
-      self.symbol_raw_data[symbol] = df
-      self.symbol_data[symbol] = df
-      self.latest_symbol_data[symbol] = []
-
       df.set_index("Date", inplace=True)
       df.sort_index(inplace=True) # ensure data is sorted
       df.columns = [col.lower() for col in df.columns]
+
+      df = df.loc[self.start_date : self.end_date]
+
+      self.symbol_raw_data[symbol] = df
+      self.symbol_data[symbol] = df
+      self.latest_symbol_data[symbol] = []
 
       if combined_index is None:
         combined_index = df.index
