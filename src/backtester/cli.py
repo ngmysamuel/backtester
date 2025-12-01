@@ -14,9 +14,11 @@ from rich import box
 from rich.console import Console
 from rich.table import Table
 
+from backtester.data.yf_data_handler import YFDataHandler
 from backtester.exceptions.negative_cash_exception import NegativeCashException
 from backtester.execution.simulated_execution_handler import SimulatedExecutionHandler
 from backtester.portfolios.naive_portfolio import NaivePortfolio
+from backtester.util.util import str_to_seconds
 
 console = Console()
 app = typer.Typer()
@@ -67,6 +69,7 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
   start_timestamp = pd.to_datetime(backtester_settings["start_date"], dayfirst=True).timestamp()
   end_timestamp = pd.to_datetime(backtester_settings["end_date"], dayfirst=True).timestamp()
   interval = backtester_settings["interval"]
+  period = backtester_settings["period"]
   exchange_closing_time = backtester_settings["exchange_closing_time"]
   benchmark_ticker = backtester_settings["benchmark"]
 
@@ -82,17 +85,17 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
   typer_tbl.add_row("Initial Capital", str(initial_capital))
   console.print(typer_tbl)
 
-  event_queue = collections.deque()
+  event_queue = collections.deque() # to update to Queue.queue
 
   DataHandlerClass = load_class(config["data_handler"][data_source]["name"])
   start_datetime = pd.to_datetime(start_timestamp, unit="s")
   end_datetime = pd.to_datetime(end_timestamp, unit="s")
   if data_source == "yf":
-    data_handler = DataHandlerClass(event_queue, start_datetime, end_datetime, symbol_list, interval, exchange_closing_time)
-    benchmark_data_handler = DataHandlerClass(event_queue, start_datetime, end_datetime, [benchmark_ticker], interval, exchange_closing_time)
+    data_handler = DataHandlerClass(event_queue, start_datetime, end_datetime, symbol_list + [benchmark_ticker], interval, exchange_closing_time)
+  elif data_source == "live":
+    data_handler = DataHandlerClass(event_queue, symbol_list + [benchmark_ticker], interval, period, exchange_closing_time)
   else:
-    data_handler = DataHandlerClass(event_queue, data_dir, start_datetime, end_datetime, symbol_list, interval, exchange_closing_time)
-    benchmark_data_handler = DataHandlerClass(event_queue, data_dir, start_datetime, end_datetime, [benchmark_ticker], interval, exchange_closing_time)
+    data_handler = DataHandlerClass(event_queue, data_dir, start_datetime, end_datetime, symbol_list + [benchmark_ticker], interval, exchange_closing_time)
 
   PositionSizerClass = load_class(config["position_sizer"][position_calc]["name"])
   position_sizer_settings = config["position_sizer"][position_calc].get("additional_parameters", None)
@@ -112,6 +115,8 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
   execution_handler = SimulatedExecutionHandler(event_queue, data_handler, slippage_model)
 
   mkt_close = False
+  current_time_interval = None
+  interval_seconds = str_to_seconds(interval)
 
   while data_handler.continue_backtest:
     data_handler.update_bars()
@@ -119,6 +124,11 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
     while event_queue:
       event = event_queue.popleft()
       if event.type == "MARKET":
+        if current_time_interval is None:
+          current_time_interval = event.timestamp
+        if event.timestamp >= current_time_interval + interval_seconds: # the marketEvent timestamp is always the timestamp of the interval start 
+          portfolio.end_of_interval()
+          current_time_interval = event.timestamp
         mkt_close = event.is_eod
         try:
           portfolio.on_market(event)  # update portfolio valuation
@@ -130,12 +140,13 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
         execution_handler.on_market(event, mkt_close)  # check if any orders can be filled, if so, it will update the portfolio via a FILL event
         strategy_instance.generate_signals(event)  # generate signals based on market event
       elif event.type == "SIGNAL":
-        portfolio.on_signal(event)
+        if event.ticker != benchmark_ticker: # we skip any isignals generated for the benchmark
+          portfolio.on_signal(event)
       elif event.type == "ORDER":
         execution_handler.on_order(event)
       elif event.type == "FILL":
         portfolio.on_fill(event)
-    portfolio.end_of_interval()
+    # portfolio.end_of_interval()
     if mkt_close:
       portfolio.end_of_day()  # deduct borrow costs and calculate margin
       mkt_close = False
@@ -144,7 +155,7 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
   portfolio.create_equity_curve()
   portfolio.equity_curve.to_csv("equity_curve.csv")
 
-  benchmark_data = benchmark_data_handler.symbol_raw_data[benchmark_ticker]
+  benchmark_data = data_handler.symbol_raw_data[benchmark_ticker]
   benchmark_returns = benchmark_data["close"].pct_change()
   benchmark_returns.name = benchmark_ticker
   qs.reports.html(portfolio.equity_curve["returns"], benchmark=benchmark_returns, output="strategy_report.html", title=strategy, match_dates=False)

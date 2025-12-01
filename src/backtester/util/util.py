@@ -1,0 +1,12 @@
+def str_to_seconds(interval):
+  match interval:
+    case "1m":
+      return 60
+    case "2m":
+      return 120
+    case "5m":
+      return 500
+    case "15m":
+      return 900
+    case "1d":
+      return 86400

@@ -7,6 +7,7 @@ import time
 import pandas as pd
 from backtester.events.market_event import MarketEvent
 from collections import namedtuple
+from backtester.util.util import str_to_seconds
 
 
 class LiveDataHandler(DataHandler):
@@ -28,10 +29,12 @@ class LiveDataHandler(DataHandler):
       keep track of the current interval start time in the "while event_queue" loop as well?
   """
 
-  def __init__(self, symbol_list: list, interval: str = "1m", period: str = "5m"):
-    self.interval = self._str_to_seconds(interval)
-    self.period = self._str_to_seconds(period)
+  def __init__(self, event_queue: list, symbol_list: list, interval: str, period: str, exchange_closing_time: str):
+    self.event_queue = event_queue
+    self.interval = str_to_seconds(interval)
+    self.period = str_to_seconds(period)
     self.symbol_list = symbol_list
+    self.exchange_closing_time = exchange_closing_time
 
     self.message_queue = Queue.queue()
     self.BarTuple = namedtuple("Bar", ["Index", "open", "high", "low", "close"])
@@ -41,23 +44,31 @@ class LiveDataHandler(DataHandler):
 
     message_listener = threading.Thread(target=self._start_listening, args=(symbol_list,))
     aggregator = threading.Thread(target=self._start_aggregating, args=(symbol_list,))
-    self.start_time = datetime.now().timestamp()
+    self.beginning_time = datetime.now().timestamp()
+    self.start_time = self.beginning_time
     self.end_time = self.start_time + self.interval - 1
     self.final_time = self.start_time + self.period
     message_listener.start()
     aggregator.start()
 
   def _start_aggregating(self):
+    """
+    Aggregates all messages from the websocket into a single bar
+    """
     current_time = self.start_time
+    next_time = self.start_time + self.interval # to negate drift
     while current_time < self.final_time:
-      time.sleep(self.interval)
+      sleep_time = next_time - datetime.now().timestamp()
+      if sleep_time > 0:
+        time.sleep(self.interval)
+      next_time += self.interval
       while not self.message_queue.empty():
         message = self.message_queue.get(block=False)
         ticker = message["id"]
         price = message["price"]
         current_time = message["time"]
         if current_time > self.end_time:  # we are in a new interval alr, push out whatever is present
-          self.update_bars()
+          self._finalize_and_push_bars()
         if not self.bar_dict[ticker]:  # we are starting a new interval, reset bar_dict
           self.start_time = self.end_time + 1
           self.end_time = self.start_time + self.interval - 1
@@ -68,7 +79,9 @@ class LiveDataHandler(DataHandler):
           bar["low"] = max(bar["low"], price)
           bar["close"] = price
 
-  def update_bars(self):
+    self.symbol_raw_data = {key: pd.DataFrame(val) for key, val in self.symbol_raw_data.values()}
+
+  def _finalize_and_push_bars(self):
     """
     Pushes the latest bar to the latest_symbol_data structure for all
     symbols in the symbol list. This will also generate a MarketEvent.
@@ -76,9 +89,9 @@ class LiveDataHandler(DataHandler):
     for symbol in self.symbol_list:
       bar = self.bar_dict[symbol]
       if not bar:
-        if len(self.latest_symbol_data[symbol]) > 0:
+        if len(self.latest_symbol_data[symbol]) > 0:  # if we have previous data and only this interval has no movement, use previous data
           bar = self.latest_symbol_data[symbol][-1]
-        else:
+        else:  # if no previous data, then this interval will have no data as well
           bar = None
 
       if bar is not None:
@@ -88,6 +101,13 @@ class LiveDataHandler(DataHandler):
         self.event_queue.append(MarketEvent(bar.Index.timestamp(), mkt_close))
 
       self.bar_dict[symbol] = {}  # reset for the next interval
+
+  def update_bars(self):
+    """
+    In live trading, the background thread handles bar generation.
+    This method is a stub to satisfy the DataHandler interface.
+    """
+    pass
 
   def get_latest_bars(self, symbol: str, n: int = 1):
     """
@@ -105,14 +125,3 @@ class LiveDataHandler(DataHandler):
     {'id': 'AAPL', 'price': 239.8471, 'time': '1758116301000', 'exchange': 'NMS', 'quote_type': 8, 'market_hours': 1, 'change_percent': 0.7126236, 'day_volume': '3618459', 'change': 1.697113, 'price_hint': '2'}
     """
     self.message_queue.put(message)
-
-  def _str_to_seconds(self, interval):
-    match interval:
-      case "1m":
-        return 60
-      case "2m":
-        return 120
-      case "5m":
-        return 500
-      case "15m":
-        return 900
