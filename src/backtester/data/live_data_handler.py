@@ -36,14 +36,17 @@ class LiveDataHandler(DataHandler):
     self.symbol_list = symbol_list
     self.exchange_closing_time = exchange_closing_time
 
-    self.message_queue = Queue.queue()
+    self.message_queue = Queue()
     self.BarTuple = namedtuple("Bar", ["Index", "open", "high", "low", "close"])
     self.bar_dict = {ticker: {} for ticker in symbol_list}
     self.symbol_raw_data = {ticker: [] for ticker in symbol_list}
     self.latest_symbol_data = {ticker: [] for ticker in symbol_list}
+    self.continue_backtest = True
 
     message_listener = threading.Thread(target=self._start_listening, args=(symbol_list,))
-    aggregator = threading.Thread(target=self._start_aggregating, args=(symbol_list,))
+    message_listener.daemon = True
+    aggregator = threading.Thread(target=self._start_aggregating)
+    aggregator.daemon = True
     self.beginning_time = datetime.now().timestamp()
     self.start_time = self.beginning_time
     self.end_time = self.start_time + self.interval - 1
@@ -66,26 +69,28 @@ class LiveDataHandler(DataHandler):
         message = self.message_queue.get(block=False)
         ticker = message["id"]
         price = message["price"]
-        current_time = message["time"]
+        current_time = float(message["time"])
         if current_time > self.end_time:  # we are in a new interval alr, push out whatever is present
           self._finalize_and_push_bars()
         if not self.bar_dict[ticker]:  # we are starting a new interval, reset bar_dict
           self.start_time = self.end_time + 1
           self.end_time = self.start_time + self.interval - 1
-          self.bar_dict[ticker] = {"Index": pd.to_datetime(self.start_time, unit="s"), "open": price, "high": price, "low": price, "close": price}
+          self.bar_dict[ticker] = {"Index": pd.to_datetime(self.start_time, unit="s").tz_localize(None), "open": price, "high": price, "low": price, "close": price}
         else:  # we are still in the same interval, continue updating high, low, and close prices
           bar = self.bar_dict[ticker]
           bar["high"] = max(bar["high"], price)
           bar["low"] = max(bar["low"], price)
           bar["close"] = price
 
-    self.symbol_raw_data = {key: pd.DataFrame(val) for key, val in self.symbol_raw_data.values()}
+    self.continue_backtest = False
+    self.symbol_raw_data = {key: pd.DataFrame(val) for key, val in self.symbol_raw_data.items()}
 
   def _finalize_and_push_bars(self):
     """
     Pushes the latest bar to the latest_symbol_data structure for all
     symbols in the symbol list. This will also generate a MarketEvent.
     """
+    mkt_close = False
     for symbol in self.symbol_list:
       bar = self.bar_dict[symbol]
       if not bar:
@@ -95,6 +100,7 @@ class LiveDataHandler(DataHandler):
           bar = None
 
       if bar is not None:
+        bar = self.BarTuple(**bar)
         self.symbol_raw_data[symbol].append(bar)
         self.latest_symbol_data[symbol].append(bar)
         mkt_close = bar.Index + pd.Timedelta(self.interval) >= bar.Index.replace(hour=int(self.exchange_closing_time.split(":")[0]), minute=int(self.exchange_closing_time.split(":")[1]))

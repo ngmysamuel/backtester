@@ -4,13 +4,6 @@ class Slippage(ABC):
   """
   Abstract base class for all portfolio types.
   """
-  
-  @abstractmethod
-  def generate_features(self):
-    """
-    Generates features required to model slippage based on OHLC data
-    """
-    pass
 
   @abstractmethod
   def calculate_slippage(self, ticker, trade_date, trade_size):

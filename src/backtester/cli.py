@@ -105,8 +105,7 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
 
   SlippageClass = load_class(config["slippage"][slippage]["name"])
   slippage_settings = config["slippage"][slippage].get("additional_parameters", None)
-  slippage_model = SlippageClass(data_handler.symbol_raw_data, slippage_settings)
-  slippage_model.generate_features()
+  slippage_model = SlippageClass(symbol_list, data_handler, slippage_settings, mode=data_source)
 
   StrategyClass = load_class(config["strategies"][strategy]["name"])
   additional_params = config["strategies"][strategy].get("additional_parameters", {})
@@ -139,6 +138,7 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
             print(e)
           else:
             raise e
+        slippage_model.on_market()
         execution_handler.on_market(event, mkt_close)  # check if any orders can be filled, if so, it will update the portfolio via a FILL event
         strategy_instance.generate_signals(event)  # generate signals based on market event
       elif event.type == "SIGNAL":
