@@ -91,16 +91,21 @@ class CSVDataHandler(DataHandler):
     Pushes the latest bar to the latest_symbol_data structure for all
     symbols in the symbol list. This will also generate a MarketEvent.
     """
+    mkt_close = False
+    start_time = None
     for s in self.symbol_list:
       try:
         bar = next(self._get_new_bar(s))
       except StopIteration:
         self.continue_backtest = False
+        return
       else:
         if bar is not None:
           self.latest_symbol_data[s].append(bar)
           mkt_close = bar.Index + pd.Timedelta(self.interval) >= bar.Index.replace(hour=int(self.exchange_closing_time.split(":")[0]),minute=int(self.exchange_closing_time.split(":")[1]))
-          self.event_queue.append(MarketEvent(bar.Index.timestamp(), mkt_close))
+          start_time = bar.Index.timestamp()
+
+    self.event_queue.append(MarketEvent(start_time, mkt_close))
 
 
   def get_latest_bars(self, symbol: str, n: int = 1):

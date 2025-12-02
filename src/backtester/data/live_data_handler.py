@@ -98,9 +98,10 @@ class LiveDataHandler(DataHandler):
         self.symbol_raw_data[symbol].append(bar)
         self.latest_symbol_data[symbol].append(bar)
         mkt_close = bar.Index + pd.Timedelta(self.interval) >= bar.Index.replace(hour=int(self.exchange_closing_time.split(":")[0]), minute=int(self.exchange_closing_time.split(":")[1]))
-        self.event_queue.append(MarketEvent(bar.Index.timestamp(), mkt_close))
 
       self.bar_dict[symbol] = {}  # reset for the next interval
+
+    self.event_queue.append(MarketEvent(self.start_time, mkt_close))
 
   def update_bars(self):
     """

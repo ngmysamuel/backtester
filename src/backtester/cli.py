@@ -83,9 +83,11 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
   typer_tbl.add_row("Strategy", strategy)
   typer_tbl.add_row("Symbols", ", ".join(symbol_list))
   typer_tbl.add_row("Initial Capital", str(initial_capital))
+  typer_tbl.add_row("Start Date", backtester_settings["start_date"])
+  typer_tbl.add_row("End Date", backtester_settings["end_date"])
   console.print(typer_tbl)
 
-  event_queue = collections.deque() # to update to Queue.queue
+  event_queue = collections.deque() # TODO: to update to Queue.queue
 
   DataHandlerClass = load_class(config["data_handler"][data_source]["name"])
   start_datetime = pd.to_datetime(start_timestamp, unit="s")
@@ -158,6 +160,8 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
   benchmark_data = data_handler.symbol_raw_data[benchmark_ticker]
   benchmark_returns = benchmark_data["close"].pct_change()
   benchmark_returns.name = benchmark_ticker
+
+  # TODO: if equity curve values are all the same, this will fail
   qs.reports.html(portfolio.equity_curve["returns"], benchmark=benchmark_returns, output="strategy_report.html", title=strategy, match_dates=False)
 
 
