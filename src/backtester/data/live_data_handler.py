@@ -1,4 +1,4 @@
-from backtester.data.data_handler import DataHandler
+from backtester.data.data_handler import DataHandler, BarTuple
 import threading
 import yfinance as yf
 from datetime import datetime
@@ -8,7 +8,6 @@ import pandas as pd
 from backtester.events.market_event import MarketEvent
 from collections import namedtuple
 from backtester.util.util import str_to_seconds
-
 
 class LiveDataHandler(DataHandler):
   """
@@ -37,7 +36,7 @@ class LiveDataHandler(DataHandler):
     self.exchange_closing_time = exchange_closing_time
 
     self.message_queue = Queue()
-    self.BarTuple = namedtuple("Bar", ["Index", "open", "high", "low", "close"])
+    # self.BarTuple = namedtuple("Bar", ["Index", "open", "high", "low", "close"])
     self.bar_dict = {ticker: {} for ticker in symbol_list}
     self.symbol_raw_data = {ticker: [] for ticker in symbol_list}
     self.latest_symbol_data = {ticker: [] for ticker in symbol_list}
@@ -59,28 +58,31 @@ class LiveDataHandler(DataHandler):
     Aggregates all messages from the websocket into a single bar
     """
     current_time = self.start_time
-    next_time = self.start_time + self.interval # to negate drift
     while current_time < self.final_time:
-      sleep_time = next_time - datetime.now().timestamp()
+      sleep_time = self.end_time - datetime.now().timestamp() # negates drift as well
       if sleep_time > 0:
-        time.sleep(self.interval)
-      next_time += self.interval
+        time.sleep(sleep_time) # sleep till end of interval
+      print(current_time, self.beginning_time, self.start_time, self.end_time, self.final_time)
       while not self.message_queue.empty():
         message = self.message_queue.get(block=False)
         ticker = message["id"]
         price = message["price"]
-        current_time = float(message["time"])
-        if current_time > self.end_time:  # we are in a new interval alr, push out whatever is present
-          self._finalize_and_push_bars()
-        if not self.bar_dict[ticker]:  # we are starting a new interval, reset bar_dict
-          self.start_time = self.end_time + 1
-          self.end_time = self.start_time + self.interval - 1
+        current_time = float(message["time"]) / 1000
+        if not self.bar_dict[ticker]:  # if empty dictionary for that ticker. we are in a new interval, reset bar_dict
           self.bar_dict[ticker] = {"Index": pd.to_datetime(self.start_time, unit="s").tz_localize(None), "open": price, "high": price, "low": price, "close": price}
+        if current_time > self.end_time:  # we are in a new interval alr, break, and let the interval end handling happen below
+          print(f"pushing, new interval is being created current time: {current_time} end time: {self.end_time}")
+          break
         else:  # we are still in the same interval, continue updating high, low, and close prices
           bar = self.bar_dict[ticker]
           bar["high"] = max(bar["high"], price)
           bar["low"] = max(bar["low"], price)
           bar["close"] = price
+      self._finalize_and_push_bars()
+      self.start_time = self.end_time + 1
+      self.end_time = self.start_time + self.interval - 1
+
+        # THERE ARE NOT ENOUGH _finalize_and_push_bars HAPPENING - WHAT HAPPENS IF THERE ARE MESSAGES BUT AT THE END, STILL NOT IN A NEW INTERVAL?
 
     self.continue_backtest = False
     self.symbol_raw_data = {key: pd.DataFrame(val) for key, val in self.symbol_raw_data.items()}
@@ -90,17 +92,19 @@ class LiveDataHandler(DataHandler):
     Pushes the latest bar to the latest_symbol_data structure for all
     symbols in the symbol list. This will also generate a MarketEvent.
     """
+    print("_finalize_and_push_bars is running...")
     mkt_close = False
     for symbol in self.symbol_list:
       bar = self.bar_dict[symbol]
       if not bar:
         if len(self.latest_symbol_data[symbol]) > 0:  # if we have previous data and only this interval has no movement, use previous data
-          bar = self.latest_symbol_data[symbol][-1]
+          bar = self.latest_symbol_data[symbol][-1]._replace()
         else:  # if no previous data, then this interval will have no data as well
           bar = None
+      else:
+        bar = BarTuple(**bar)
 
       if bar is not None:
-        bar = self.BarTuple(**bar)
         self.symbol_raw_data[symbol].append(bar)
         self.latest_symbol_data[symbol].append(bar)
         mkt_close = bar.Index + pd.Timedelta(self.interval) >= bar.Index.replace(hour=int(self.exchange_closing_time.split(":")[0]), minute=int(self.exchange_closing_time.split(":")[1]))

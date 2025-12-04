@@ -72,11 +72,13 @@ class MultiFactorSlippage(Slippage):
       return
     for ticker in self.symbol_list:
       new_row = self.data_handler.get_latest_bars(ticker)[0]
+      new_df = pd.DataFrame([new_row])
+      new_df.set_index("Index", inplace=True)
       if ticker not in self.live_buffers:
-        self.live_buffers[ticker] = new_row
+        self.live_buffers[ticker] = new_df
       else:
         # Append new row
-        self.live_buffers[ticker] = pd.concat([self.live_buffers[ticker], new_row])
+        self.live_buffers[ticker] = pd.concat([self.live_buffers[ticker], new_df])
 
         # Prune buffer to keep memory usage constant
         if len(self.live_buffers[ticker]) > self.max_lookback:

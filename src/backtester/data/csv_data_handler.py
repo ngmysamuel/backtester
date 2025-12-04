@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-from typing import Union
 
 import pandas as pd
 
@@ -14,7 +13,7 @@ class CSVDataHandler(DataHandler):
   historical data for each symbol from CSV files.
   """
 
-  def __init__(self, event_queue: list, csv_dir: str, start_date: Union[pd.Timestamp, datetime], end_date: Union[pd.Timestamp, datetime],  symbol_list: str, interval: str, exchange_closing_time: str):
+  def __init__(self, event_queue: list, csv_dir: str, start_date: pd.Timestamp | datetime, end_date: pd.Timestamp | datetime,  symbol_list: str, interval: str, exchange_closing_time: str):
     """
     Initializes the CSVDataHandler
     args:

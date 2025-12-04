@@ -158,6 +158,11 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
   portfolio.equity_curve.to_csv("equity_curve.csv")
 
   benchmark_data = data_handler.symbol_raw_data[benchmark_ticker]
+  print(benchmark_data)
+  benchmark_data = pd.DataFrame(benchmark_data)
+  print(benchmark_data.head(1))
+  benchmark_data.set_index("Index", inplace=True)
+  print(benchmark_data.head(1))
   benchmark_returns = benchmark_data["close"].pct_change()
   benchmark_returns.name = benchmark_ticker
 
