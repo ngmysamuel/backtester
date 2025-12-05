@@ -177,7 +177,6 @@ class MultiFactorSlippage(Slippage):
             current_df = self._compute_features_on_df(self.live_buffers[ticker].copy())
             characteristics = current_df.iloc[-1]
 
-        # --- The core math is now identical for both modes ---
 
         # 1. Participation Rate
         participation_rate = 0
@@ -185,7 +184,7 @@ class MultiFactorSlippage(Slippage):
             participation_rate = trade_size / characteristics["volume"]
 
         # 2. Market Impact
-        # Handle division by zero / nan issues robustly
+        # Handle division by zero / nan
         vol_ratio = characteristics["vol_ratio_med"] if characteristics["vol_ratio_med"] > 1e-8 else 1e-8
 
         market_impact = self.market_impact_factor * np.power(participation_rate / vol_ratio, self.power_law_exponent) * characteristics["vol_med"] * np.exp(-characteristics["turnover_vol"])
@@ -196,5 +195,5 @@ class MultiFactorSlippage(Slippage):
         # 4. Final Combination
         slippage = characteristics["spread_cost"] + market_impact * (1 + characteristics["volatility_cost"]) + characteristics["momentum_cost"] * characteristics["liquidity_cost"] + noise
 
-        # Cap at 5% (and ensure non-negative if desired, though slippage implies cost)
+        # Cap at 5%
         return float(np.clip(slippage, 0, 0.05))
