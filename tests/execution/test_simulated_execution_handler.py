@@ -1,4 +1,4 @@
-from collections import deque
+from queue import Queue
 from types import SimpleNamespace
 
 import pandas as pd
@@ -41,7 +41,7 @@ def mock_slippage_model():
 @pytest.fixture
 def execution_handler(mock_data_handler, mock_slippage_model):
     """Returns a SimulatedExecutionHandler instance."""
-    return SimulatedExecutionHandler(deque(), mock_data_handler, mock_slippage_model)
+    return SimulatedExecutionHandler(Queue(), mock_data_handler, mock_slippage_model)
 
 def create_mock_order(ticker, order_type, timestamp_str, direction=DirectionType.BUY):
     """Helper to create a mock order event."""
@@ -70,8 +70,9 @@ def test_on_market_fills_mkt_order(execution_handler):
 
     execution_handler.on_market(None, mkt_close=False)
     
-    assert len(execution_handler.events) == 1
-    fill = execution_handler.events[0]
+    events = list(execution_handler.events.queue)
+    assert len(events) == 1
+    fill = events[0]
     assert isinstance(fill, FillEvent)
     assert fill.ticker == "MSFT"
     assert fill.fill_cost == 1000  # 10 * 100 (open price) with 0 slippage
@@ -84,8 +85,9 @@ def test_on_market_fills_moc_order_at_close(execution_handler):
 
     execution_handler.on_market(None, mkt_close=True)
 
-    assert len(execution_handler.events) == 1
-    fill = execution_handler.events[0]
+    events = list(execution_handler.events.queue)
+    assert len(events) == 1
+    fill = events[0]
     assert fill.fill_cost == 1050  # 10 * 105 (close price)
     assert len(execution_handler.order_queue) == 0
 
@@ -96,7 +98,8 @@ def test_on_market_defers_moc_order_before_close(execution_handler):
 
     execution_handler.on_market(None, mkt_close=False)
 
-    assert len(execution_handler.events) == 0
+    events = list(execution_handler.events.queue)
+    assert len(events) == 0
     assert len(execution_handler.order_queue) == 1
 
 def test_on_market_defers_future_order(execution_handler):
@@ -107,7 +110,8 @@ def test_on_market_defers_future_order(execution_handler):
 
     execution_handler.on_market(None, mkt_close=False)
 
-    assert len(execution_handler.events) == 0
+    events = list(execution_handler.events.queue)
+    assert len(events) == 0
     assert len(execution_handler.order_queue) == 1
 
 def test_on_market_processes_mixed_orders(execution_handler):
@@ -120,15 +124,17 @@ def test_on_market_processes_mixed_orders(execution_handler):
     # First, run before market close
     execution_handler.on_market(None, mkt_close=False)
     
-    assert len(execution_handler.events) == 1  # Only MKT order filled
-    assert execution_handler.events[0].ticker == "MSFT"
+    events = list(execution_handler.events.queue)
+    assert len(events) == 1  # Only MKT order filled
+    assert events[0].ticker == "MSFT"
     assert len(execution_handler.order_queue) == 1 # MOC order remains
     
     # Now, run at market close
     execution_handler.on_market(None, mkt_close=True)
 
-    assert len(execution_handler.events) == 2 # MOC order is now filled
-    assert execution_handler.events[1].ticker == "AAPL"
+    events = list(execution_handler.events.queue)
+    assert len(events) == 2 # MOC order is now filled
+    assert events[1].ticker == "AAPL"
     assert len(execution_handler.order_queue) == 0
 
 def test_on_market_handles_no_bar_data(execution_handler):
@@ -145,32 +151,35 @@ def test_on_market_with_empty_queue(execution_handler):
         execution_handler.on_market(None, mkt_close=False)
     except Exception as e:
         pytest.fail(f"on_market with empty queue raised an exception: {e}")
-    assert len(execution_handler.events) == 0
+    events = list(execution_handler.events.queue)
+    assert len(events) == 0
 
 def test_on_market_fills_mkt_order_with_slippage_buy(mock_data_handler):
     """Test that slippage is correctly applied for a BUY MKT order."""
     mock_slippage_model = MockSlippageModel(slippage=0.01) # 1% slippage
-    execution_handler = SimulatedExecutionHandler(deque(), mock_data_handler, mock_slippage_model)
+    execution_handler = SimulatedExecutionHandler(Queue(), mock_data_handler, mock_slippage_model)
     
     order = create_mock_order("MSFT", OrderType.MKT, "2023-01-01", direction=DirectionType.BUY)
     execution_handler.on_order(order)
     execution_handler.on_market(None, mkt_close=False)
 
-    assert len(execution_handler.events) == 1
-    fill = execution_handler.events[0]
+    events = list(execution_handler.events.queue)
+    assert len(events) == 1
+    fill = events[0]
     assert fill.fill_cost == 1010 # 10 * 100 * (1 + 0.01)
 
 def test_on_market_fills_mkt_order_with_slippage_sell(mock_data_handler):
     """Test that slippage is correctly applied for a SELL MKT order."""
     mock_slippage_model = MockSlippageModel(slippage=0.01) # 1% slippage
-    execution_handler = SimulatedExecutionHandler(deque(), mock_data_handler, mock_slippage_model)
+    execution_handler = SimulatedExecutionHandler(Queue(), mock_data_handler, mock_slippage_model)
     
     order = create_mock_order("MSFT", OrderType.MKT, "2023-01-01", direction=DirectionType.SELL)
     execution_handler.on_order(order)
     execution_handler.on_market(None, mkt_close=False)
 
-    assert len(execution_handler.events) == 1
-    fill = execution_handler.events[0]
+    events = list(execution_handler.events.queue)
+    assert len(events) == 1
+    fill = events[0]
     assert fill.fill_cost == 990 # 10 * 100 * (1 - 0.01)
 
 def test_on_market_processes_multiple_mkt_orders(execution_handler):
@@ -182,7 +191,8 @@ def test_on_market_processes_multiple_mkt_orders(execution_handler):
 
     execution_handler.on_market(None, mkt_close=False)
 
-    assert len(execution_handler.events) == 2
-    assert execution_handler.events[0].ticker == "MSFT"
-    assert execution_handler.events[1].ticker == "AAPL"
+    events = list(execution_handler.events.queue)
+    assert len(events) == 2
+    assert events[0].ticker == "MSFT"
+    assert events[1].ticker == "AAPL"
     assert len(execution_handler.order_queue) == 0

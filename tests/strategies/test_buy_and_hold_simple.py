@@ -1,4 +1,4 @@
-from collections import deque
+from queue import Queue
 
 from backtester.strategies.buy_and_hold_simple import BuyAndHoldSimple
 from backtester.events.signal_event import SignalEvent
@@ -23,50 +23,54 @@ class FakeEvent:
 
 def test_initialization_sets_bought_flags():
     dh = FakeDataHandler(["AAPL", "MSFT"])
-    s = BuyAndHoldSimple(deque(), dh)
+    s = BuyAndHoldSimple(Queue(), dh)
     assert s.bought == {"AAPL": False, "MSFT": False}
 
 
 def test_generate_signals_happy_path_appends_signal_once():
-    events = deque()
+    events = Queue()
     dh = FakeDataHandler(["AAPL"], latest_bars={"AAPL": [{"close": 100}]})
     s = BuyAndHoldSimple(events, dh)
     ev = FakeEvent()
     s.generate_signals(ev)
-    assert len(events) == 1
-    sig = events.pop()
+    events_list = list(events.queue)
+    assert len(events_list) == 1
+    sig = events_list[0]
     assert isinstance(sig, SignalEvent)
     assert sig.ticker == "AAPL"
     assert sig.signal_type == SignalType.LONG
 
     # second MARKET should not append another signal
     s.generate_signals(ev)
-    assert len(events) == 0
+    events_list = list(events.queue)
+    assert len(events_list) == 1
 
 
 def test_get_latest_bars_empty_no_signal_appended():
-    events = deque()
+    events = Queue()
     dh = FakeDataHandler(["AAPL"], latest_bars={"AAPL": []})
     s = BuyAndHoldSimple(events, dh)
     ev = FakeEvent()
     s.generate_signals(ev)
     # No signal should be appended when there is no market data
-    assert len(events) == 0
+    events_list = list(events.queue)
+    assert len(events_list) == 0
     assert s.bought["AAPL"] is False
 
 
 def test_multiple_symbols_all_bought_independently():
-    events = deque()
+    events = Queue()
     dh = FakeDataHandler(["AAPL", "MSFT"], latest_bars={"AAPL": [1], "MSFT": [2]})
     s = BuyAndHoldSimple(events, dh)
     s.generate_signals(FakeEvent())
-    assert len(events) == 2
+    events_list = list(events.queue)
+    assert len(events_list) == 2
     # bought flags set
     assert s.bought["AAPL"] and s.bought["MSFT"]
 
 
 def test_generate_signals_continues_if_one_symbol_has_no_data():
-    events = deque()
+    events = Queue()
     # MSFT has no data
     dh = FakeDataHandler(["AAPL", "MSFT"], latest_bars={"AAPL": [{"close": 100}]})
     s = BuyAndHoldSimple(events, dh)
@@ -74,8 +78,9 @@ def test_generate_signals_continues_if_one_symbol_has_no_data():
     s.generate_signals(ev)
 
     # Should still generate a signal for AAPL
-    assert len(events) == 1
-    sig = events.pop()
+    events_list = list(events.queue)
+    assert len(events_list) == 1
+    sig = events_list[0]
     assert sig.ticker == "AAPL"
     assert s.bought["AAPL"] is True
 

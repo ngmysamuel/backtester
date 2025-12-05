@@ -2,10 +2,11 @@
 from backtester.data.csv_data_handler import CSVDataHandler
 import os
 import pandas as pd
+from queue import Queue
 
 # test init of CSVDataHandler
 def test_init_csv_data_handler():
-  event_queue = []
+  event_queue = Queue()
   # assumes the test CSV files are located at the project's highest directory level
   csv_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
   symbol_list = ["MSFT"]

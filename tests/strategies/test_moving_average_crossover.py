@@ -1,5 +1,5 @@
 import pytest
-from collections import deque
+from queue import Queue
 from types import SimpleNamespace
 
 from backtester.strategies.moving_average_crossover import MovingAverageCrossover
@@ -33,48 +33,48 @@ def make_bars(values):
 
 def test_not_market_event_no_signal():
     """Strategy should not generate signals for non-MARKET events."""
-    events = deque()
+    events = Queue()
     dh = FakeDataHandler(["AAPL"])
     s = MovingAverageCrossover(events, dh)
     # A non-market event
     event = SimpleNamespace(type="ORDER", timestamp=123)
     s.generate_signals(event)
-    assert len(events) == 0
+    assert events.qsize() == 0
 
 def test_insufficient_bars_no_signal():
     """Strategy should not generate a signal if there are not enough bars."""
-    events = deque()
+    events = Queue()
     # Not enough bars for the long window
     bars = make_bars([100] * 50)
     dh = FakeDataHandler(["AAPL"], {"AAPL": bars})
     s = MovingAverageCrossover(events, dh, short_window=10, long_window=100)
     event = SimpleNamespace(type="MARKET", timestamp=123)
     s.generate_signals(event)
-    assert len(events) == 0
+    assert events.qsize() == 0
     assert s.current_positions["AAPL"] == 0
 
 def test_no_signal_when_ma_equal():
     """Strategy should not generate a signal when moving averages are equal."""
-    events = deque()
+    events = Queue()
     bars = make_bars([100] * 101) # 101 bars to satisfy long_window+1
     dh = FakeDataHandler(["AAPL"], {"AAPL": bars})
     s = MovingAverageCrossover(events, dh, short_window=40, long_window=100)
     event = SimpleNamespace(type="MARKET", timestamp=123)
     s.generate_signals(event)
-    assert len(events) == 0
+    assert events.qsize() == 0
     assert s.current_positions["AAPL"] == 0
 
 def test_long_signal_when_short_crosses_above():
     """Strategy should generate a LONG signal when the short MA crosses above the long MA."""
-    events = deque()
+    events = Queue()
     # 61 bars at 100, 40 bars at 200 -> short_avg > long_avg
     bars = make_bars([100] * 61 + [200] * 40)
     dh = FakeDataHandler(["AAPL"], {"AAPL": bars})
     s = MovingAverageCrossover(events, dh, short_window=40, long_window=100)
     event = SimpleNamespace(type="MARKET", timestamp=123)
     s.generate_signals(event)
-    assert len(events) == 1
-    sig = events.pop()
+    assert events.qsize() == 1
+    sig = events.get()
     assert isinstance(sig, SignalEvent)
     assert sig.ticker == "AAPL"
     assert sig.signal_type == SignalType.LONG
@@ -82,35 +82,35 @@ def test_long_signal_when_short_crosses_above():
 
 def test_short_signal_when_short_crosses_below():
     """Strategy should generate a SHORT signal when the short MA crosses below the long MA."""
-    events = deque()
+    events = Queue()
     # 61 bars at 200, 40 bars at 100 -> short_avg < long_avg
     bars = make_bars([200] * 61 + [100] * 40)
     dh = FakeDataHandler(["AAPL"], {"AAPL": bars})
     s = MovingAverageCrossover(events, dh, short_window=40, long_window=100)
     event = SimpleNamespace(type="MARKET", timestamp=123)
     s.generate_signals(event)
-    assert len(events) == 1
-    sig = events.pop()
+    assert events.qsize() == 1
+    sig = events.get()
     assert sig.signal_type == SignalType.SHORT
     assert s.current_positions["AAPL"] == -1
 
 def test_no_duplicate_signals_on_repeated_events():
     """Strategy should not generate a new signal if the position is already established."""
-    events = deque()
+    events = Queue()
     bars = make_bars([100] * 61 + [200] * 40)
     dh = FakeDataHandler(["AAPL"], {"AAPL": bars})
     s = MovingAverageCrossover(events, dh, short_window=40, long_window=100)
     event = SimpleNamespace(type="MARKET", timestamp=123)
     # First call generates a LONG signal
     s.generate_signals(event)
-    assert len(events) == 1
+    assert events.qsize() == 1
     # Second call should not generate another signal because position is already 1
     s.generate_signals(event)
-    assert len(events) == 1
+    assert events.qsize() == 1
 
 def test_processes_all_symbols_on_market_event():
     """Strategy should process all symbols in its list on a market event."""
-    events = deque()
+    events = Queue()
     # AAPL should generate LONG, MSFT should generate SHORT
     bars_aapl = make_bars([100] * 61 + [200] * 40)
     bars_msft = make_bars([200] * 61 + [100] * 40)
@@ -118,11 +118,11 @@ def test_processes_all_symbols_on_market_event():
     s = MovingAverageCrossover(events, dh, short_window=40, long_window=100)
     event = SimpleNamespace(type="MARKET", timestamp=123)
     s.generate_signals(event)
-    assert len(events) == 2
+    assert events.qsize() == 2
     assert s.current_positions["AAPL"] == 1
     assert s.current_positions["MSFT"] == -1
     # Check signals
-    signals = {e.ticker: e.signal_type for e in events}
+    signals = {e.ticker: e.signal_type for e in list(events.queue)}
     assert signals["AAPL"] == SignalType.LONG
     assert signals["MSFT"] == SignalType.SHORT
 
@@ -139,17 +139,17 @@ def test_processes_all_symbols_on_market_event():
 )
 def test_parameterized_ma_cases(short_window, long_window, values, expected_signal):
     """Tests various moving average scenarios with parameterized inputs."""
-    events = deque()
+    events = Queue()
     bars = make_bars(values)
     dh = FakeDataHandler(["AAPL"], {"AAPL": bars})
     s = MovingAverageCrossover(events, dh, short_window=short_window, long_window=long_window)
     event = SimpleNamespace(type="MARKET", timestamp=123)
     s.generate_signals(event)
     if expected_signal is None:
-        assert len(events) == 0
+        assert events.qsize() == 0
     else:
-        assert len(events) == 1
-        sig = events.pop()
+        assert events.qsize() == 1
+        sig = events.get()
         assert sig.signal_type == expected_signal
 
 def test_sequence_evolving_data_detects_crossover():
@@ -157,7 +157,7 @@ def test_sequence_evolving_data_detects_crossover():
     Tests that a single strategy instance correctly detects a crossover
     as new data arrives over time.
     """
-    events = deque()
+    events = Queue()
     dh = FakeDataHandler(["AAPL"])
     s = MovingAverageCrossover(events, dh, short_window=10, long_window=20)
     event = SimpleNamespace(type="MARKET", timestamp=123)
@@ -169,8 +169,8 @@ def test_sequence_evolving_data_detects_crossover():
     dh.update_bars("AAPL", initial_bars)
     s.generate_signals(event)
 
-    assert len(events) == 1
-    first_signal = events.pop()
+    assert events.qsize() == 1
+    first_signal = events.get()
     assert first_signal.signal_type == SignalType.SHORT
     assert s.current_positions["AAPL"] == -1
 
@@ -184,7 +184,7 @@ def test_sequence_evolving_data_detects_crossover():
     dh.update_bars("AAPL", new_bars)
     s.generate_signals(event)
 
-    assert len(events) == 1
-    second_signal = events.pop()
+    assert events.qsize() == 1
+    second_signal = events.get()
     assert second_signal.signal_type == SignalType.LONG
     assert s.current_positions["AAPL"] == 1
