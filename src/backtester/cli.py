@@ -14,7 +14,6 @@ from rich import box
 from rich.console import Console
 from rich.table import Table
 
-from backtester.data.yf_data_handler import YFDataHandler
 from backtester.exceptions.negative_cash_exception import NegativeCashException
 from backtester.execution.simulated_execution_handler import SimulatedExecutionHandler
 from backtester.portfolios.naive_portfolio import NaivePortfolio
@@ -61,7 +60,10 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
         exception_contd: 1 or 0
     """
 
-    config = load_config()  # load data from yaml config file
+    ####################
+    # load data from yaml config file
+    ####################
+    config = load_config()
 
     backtester_settings = config["backtester_settings"]
 
@@ -74,6 +76,10 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
     period = backtester_settings["period"]
     exchange_closing_time = backtester_settings["exchange_closing_time"]
     benchmark_ticker = backtester_settings["benchmark"]
+
+    ####################
+    # display loaded configuration
+    ####################
 
     typer_tbl = Table(title="Parameter List", box=box.SQUARE_DOUBLE_HEAD, show_lines=True)
     typer_tbl.add_column("Parameter", style="cyan")
@@ -91,7 +97,11 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
     typer_tbl.add_row("Period (only for live)", period)
     console.print(typer_tbl)
 
-    event_queue = Queue()  # TODO: to update to Queue.queue
+    ####################
+    # set up helper classes / vars
+    ####################
+
+    event_queue = Queue()
 
     DataHandlerClass = load_class(config["data_handler"][data_source]["name"])
     start_datetime = pd.to_datetime(start_timestamp, unit="s")
@@ -122,6 +132,10 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
     mkt_close = False
     current_time_interval = None
     interval_seconds = str_to_seconds(interval)
+
+    ####################
+    # start up the main loop
+    ####################
 
     while data_handler.continue_backtest:
         data_handler.update_bars()
@@ -157,7 +171,9 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
             portfolio.end_of_day()  # deduct borrow costs and calculate margin
             mkt_close = False
 
-    # portfolio.liquidate()
+    ####################
+    # metrics and results
+    ####################
     portfolio.create_equity_curve()
     portfolio.equity_curve.to_csv("equity_curve.csv")
 
