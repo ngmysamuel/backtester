@@ -154,7 +154,8 @@ df.to_csv("MSFT.csv")
 - Logger
 - Other order types e.g. Limit order
 - Modelling probability of fill for limit orders
-- Live data
+- Use the decimal library instead of float types
+- An integrated test across different data source modes, comparing the output csv with a reference csv
 
 ### Notes
 

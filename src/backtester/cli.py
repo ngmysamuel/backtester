@@ -20,6 +20,8 @@ from backtester.execution.simulated_execution_handler import SimulatedExecutionH
 from backtester.portfolios.naive_portfolio import NaivePortfolio
 from backtester.util.util import str_to_seconds
 
+from queue import Queue
+
 console = Console()
 app = typer.Typer()
 
@@ -87,7 +89,7 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
   typer_tbl.add_row("End Date", backtester_settings["end_date"])
   console.print(typer_tbl)
 
-  event_queue = collections.deque() # TODO: to update to Queue.queue
+  event_queue = Queue() # TODO: to update to Queue.queue
 
   DataHandlerClass = load_class(config["data_handler"][data_source]["name"])
   start_datetime = pd.to_datetime(start_timestamp, unit="s")
@@ -122,8 +124,8 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
   while data_handler.continue_backtest:
     data_handler.update_bars()
     # Process events from the event queue (e.g., generate signals, execute orders, etc.)
-    while event_queue:
-      event = event_queue.popleft()
+    while not event_queue.empty():
+      event = event_queue.get(block=False)
       if event.type == "MARKET":
         if current_time_interval is None:
           current_time_interval = event.timestamp
@@ -158,13 +160,12 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
   portfolio.equity_curve.to_csv("equity_curve.csv")
 
   benchmark_data = data_handler.symbol_raw_data[benchmark_ticker]
-  print(benchmark_data)
-  benchmark_data = pd.DataFrame(benchmark_data)
-  print(benchmark_data.head(1))
-  benchmark_data.set_index("Index", inplace=True)
-  print(benchmark_data.head(1))
   benchmark_returns = benchmark_data["close"].pct_change()
   benchmark_returns.name = benchmark_ticker
+  print(benchmark_data.head(1))
+  print(benchmark_data.index.dtype)
+  print(benchmark_data.dtypes)
+  print(benchmark_returns)
 
   # TODO: if equity curve values are all the same, this will fail
   qs.reports.html(portfolio.equity_curve["returns"], benchmark=benchmark_returns, output="strategy_report.html", title=strategy, match_dates=False)

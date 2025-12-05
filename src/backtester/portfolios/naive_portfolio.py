@@ -1,5 +1,5 @@
 import collections
-from collections import deque
+import queue
 from copy import deepcopy
 
 import pandas as pd
@@ -25,7 +25,7 @@ class NaivePortfolio(Portfolio):
     data_handler: DataHandler,
     initial_capital: float,
     symbol_list: list[str],
-    events: deque,
+    events: queue.Queue,
     start_date: float,
     interval: str,
     position_sizer: PositionSizer,
@@ -43,7 +43,7 @@ class NaivePortfolio(Portfolio):
       data_handler (DataHandler): The data handler object to fetch market data.
       initial_capital (float): The starting capital for the portfolio.
       symbol_list (list): List of ticker symbols to include in the portfolio.
-      events (deque): The event queue to communicate with other components.
+      events (queue.Queue): The event queue to communicate with other components.
       start_date (float): The starting timestamp for the portfolio.
       interval (str):  one of the following - 1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
       allocation (float): The percentage of the portfolio that an asset is maximally allowed to take (default is 1).
@@ -112,13 +112,6 @@ class NaivePortfolio(Portfolio):
     order_type = OrderType.MKT
     cur_quantity = self.current_holdings[ticker]["position"]
 
-    # atr_list = self.historical_atr[ticker]
-    # if len(atr_list) > 0: # check for ATR > 0 to prevent ZeroDivisionError, else, reuse previous position size
-    #   atr = self.historical_atr[ticker][-1]
-    #   if atr:
-    #     capital_to_risk = min(self.current_holdings["cash"], self.risk_per_trade * self.current_holdings["total"])
-    #     self.position_size[ticker] = capital_to_risk // (atr * self.atr_multiplier)
-
     self.position_dict[ticker] = self.position_sizer.get_position_size(self, ticker)
     to_be_quantity = self.position_dict[ticker]
     if to_be_quantity is None:
@@ -141,7 +134,7 @@ class NaivePortfolio(Portfolio):
         order = OrderEvent(DirectionType(1), ticker, order_type, abs(cur_quantity), event.timestamp)
 
     if order:
-      self.events.append(order)
+      self.events.put(order)
 
   def on_fill(self, event):
     """
@@ -195,9 +188,6 @@ class NaivePortfolio(Portfolio):
     Also, updates the value of currently held positions
     """
     for ticker in self.symbol_list:
-      # atr = self._calc_atr(ticker)
-      # if atr:
-      #   self.historical_atr[ticker].append(atr)
       if isinstance(self.position_sizer, ATRPositionSizer):
         self.position_sizer.update_historical_atr(self, ticker)
 

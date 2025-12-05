@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-
+import queue
 import pandas as pd
 
 from backtester.data.data_handler import DataHandler
@@ -13,7 +13,7 @@ class CSVDataHandler(DataHandler):
   historical data for each symbol from CSV files.
   """
 
-  def __init__(self, event_queue: list, csv_dir: str, start_date: pd.Timestamp | datetime, end_date: pd.Timestamp | datetime,  symbol_list: str, interval: str, exchange_closing_time: str):
+  def __init__(self, event_queue: queue.Queue, csv_dir: str, start_date: pd.Timestamp | datetime, end_date: pd.Timestamp | datetime,  symbol_list: str, interval: str, exchange_closing_time: str):
     """
     Initializes the CSVDataHandler
     args:
@@ -104,7 +104,7 @@ class CSVDataHandler(DataHandler):
           mkt_close = bar.Index + pd.Timedelta(self.interval) >= bar.Index.replace(hour=int(self.exchange_closing_time.split(":")[0]),minute=int(self.exchange_closing_time.split(":")[1]))
           start_time = bar.Index.timestamp()
 
-    self.event_queue.append(MarketEvent(start_time, mkt_close))
+    self.event_queue.put(MarketEvent(start_time, mkt_close))
 
 
   def get_latest_bars(self, symbol: str, n: int = 1):

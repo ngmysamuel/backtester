@@ -6,28 +6,10 @@ from queue import Queue
 import time
 import pandas as pd
 from backtester.events.market_event import MarketEvent
-from collections import namedtuple
 from backtester.util.util import str_to_seconds
 
-class LiveDataHandler(DataHandler):
-  """
-  Spin up 2 threads
-    1. listens on the websocket
-        push any received messages into a thread safe queue
-    2. sets the current time as start time,
-        sleeps for <interval> period of time,
-        on waking up, consumes the queue till there are no more events or the message's timestamp is more than start time + interval
-        sets the O H L C of the bar and calls update_bars()
-  Need to update the main event loop
-    1. NOT call update_bars() if we are using live data
-    2. only call portfolio.end_of_interval() if we had gone into the "while event_queue" loop. See below Assumptions (1)
-  Assumptions
-    1. The "while event_queue" loop does not take longer than <interval> time
-      if take longer, we are missing calling portfolio.end_of_interval()
-      move portfolio.end_of_interval() to on MARKET event block?
-      keep track of the current interval start time in the "while event_queue" loop as well?
-  """
 
+class LiveDataHandler(DataHandler):
   def __init__(self, event_queue: list, symbol_list: list, interval: str, period: str, exchange_closing_time: str):
     self.event_queue = event_queue
     self.interval = str_to_seconds(interval)
@@ -36,10 +18,9 @@ class LiveDataHandler(DataHandler):
     self.exchange_closing_time = exchange_closing_time
 
     self.message_queue = Queue()
-    # self.BarTuple = namedtuple("Bar", ["Index", "open", "high", "low", "close"])
-    self.bar_dict = {ticker: {} for ticker in symbol_list}
-    self.symbol_raw_data = {ticker: [] for ticker in symbol_list}
-    self.latest_symbol_data = {ticker: [] for ticker in symbol_list}
+    self.bar_dict = {ticker: {} for ticker in symbol_list} # {string: BarTuple}
+    self.symbol_raw_data = {ticker: [] for ticker in symbol_list} # {string: list[pd.DataFrame]}
+    self.latest_symbol_data = {ticker: [] for ticker in symbol_list} # {string: list[BarTuple]}
     self.continue_backtest = True
 
     message_listener = threading.Thread(target=self._start_listening, args=(symbol_list,))
@@ -59,10 +40,10 @@ class LiveDataHandler(DataHandler):
     """
     current_time = self.start_time
     while current_time < self.final_time:
-      sleep_time = self.end_time - datetime.now().timestamp() # negates drift as well
+      sleep_time = self.end_time - datetime.now().timestamp()  # negates drift as well
       if sleep_time > 0:
-        time.sleep(sleep_time) # sleep till end of interval
-      print(current_time, self.beginning_time, self.start_time, self.end_time, self.final_time)
+        time.sleep(sleep_time)  # sleep till end of interval
+      print(f"Timestamp:: {self.start_time} <> {self.end_time}: {self.message_queue.qsize()} messages")
       while not self.message_queue.empty():
         message = self.message_queue.get(block=False)
         ticker = message["id"]
@@ -71,34 +52,35 @@ class LiveDataHandler(DataHandler):
         if not self.bar_dict[ticker]:  # if empty dictionary for that ticker. we are in a new interval, reset bar_dict
           self.bar_dict[ticker] = {"Index": pd.to_datetime(self.start_time, unit="s").tz_localize(None), "open": price, "high": price, "low": price, "close": price}
         if current_time > self.end_time:  # we are in a new interval alr, break, and let the interval end handling happen below
-          print(f"pushing, new interval is being created current time: {current_time} end time: {self.end_time}")
           break
         else:  # we are still in the same interval, continue updating high, low, and close prices
           bar = self.bar_dict[ticker]
           bar["high"] = max(bar["high"], price)
           bar["low"] = max(bar["low"], price)
           bar["close"] = price
-      self._finalize_and_push_bars()
+      self._finalize_and_push_bars(self.start_time)
       self.start_time = self.end_time + 1
       self.end_time = self.start_time + self.interval - 1
-
-        # THERE ARE NOT ENOUGH _finalize_and_push_bars HAPPENING - WHAT HAPPENS IF THERE ARE MESSAGES BUT AT THE END, STILL NOT IN A NEW INTERVAL?
+      if self.end_time > self.final_time:
+        break
 
     self.continue_backtest = False
-    self.symbol_raw_data = {key: pd.DataFrame(val) for key, val in self.symbol_raw_data.items()}
+    for key, val in self.symbol_raw_data.items(): # self.symbol_raw_data is a dictionry of ticker to dataframe
+      df = pd.DataFrame(val)
+      df.set_index("Index", inplace=True)
+      self.symbol_raw_data[key] = df
 
-  def _finalize_and_push_bars(self):
+  def _finalize_and_push_bars(self, start_time):
     """
     Pushes the latest bar to the latest_symbol_data structure for all
     symbols in the symbol list. This will also generate a MarketEvent.
     """
-    print("_finalize_and_push_bars is running...")
     mkt_close = False
     for symbol in self.symbol_list:
       bar = self.bar_dict[symbol]
       if not bar:
         if len(self.latest_symbol_data[symbol]) > 0:  # if we have previous data and only this interval has no movement, use previous data
-          bar = self.latest_symbol_data[symbol][-1]._replace()
+          bar = self.latest_symbol_data[symbol][-1]._replace(Index=pd.to_datetime(start_time, unit="s"))
         else:  # if no previous data, then this interval will have no data as well
           bar = None
       else:
@@ -111,7 +93,7 @@ class LiveDataHandler(DataHandler):
 
       self.bar_dict[symbol] = {}  # reset for the next interval
 
-    self.event_queue.append(MarketEvent(self.start_time, mkt_close))
+    self.event_queue.put(MarketEvent(self.start_time, mkt_close))
 
   def update_bars(self):
     """
@@ -133,6 +115,7 @@ class LiveDataHandler(DataHandler):
 
   def _handle_message(self, message):
     """
+    Handler for the message from the websocket. An example of the message from yf below
     {'id': 'AAPL', 'price': 239.8471, 'time': '1758116301000', 'exchange': 'NMS', 'quote_type': 8, 'market_hours': 1, 'change_percent': 0.7126236, 'day_volume': '3618459', 'change': 1.697113, 'price_hint': '2'}
     """
     self.message_queue.put(message)

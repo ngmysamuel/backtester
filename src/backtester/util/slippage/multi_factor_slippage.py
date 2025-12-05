@@ -65,12 +65,14 @@ class MultiFactorSlippage(Slippage):
 
   def on_market(self):
     """
-    Call this method in your live loop when new OHLCV data arrives.
-    new_bar: dict or Series containing open, high, low, close, volume
+    This method is called when new OHLCV data arrives.
+    new_bar: A namedtuple containing Index (timestamp), open, high, low, close
     """
     if self.mode != "live":
       return
     for ticker in self.symbol_list:
+      if not self.data_handler.get_latest_bars(ticker):
+        continue
       new_row = self.data_handler.get_latest_bars(ticker)[0]
       new_df = pd.DataFrame([new_row])
       new_df.set_index("Index", inplace=True)

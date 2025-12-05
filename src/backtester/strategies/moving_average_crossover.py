@@ -1,9 +1,10 @@
 from backtester.enums.signal_type import SignalType
 from backtester.events.signal_event import SignalEvent
-
+from backtester.data.data_handler import DataHandler
+import queue
 
 class MovingAverageCrossover:
-  def __init__(self, events, data_handler, short_window=40, long_window=100):
+  def __init__(self, events: queue.Queue, data_handler: DataHandler, short_window: int = 40, long_window: int = 100):
     print(f"Initializing MovingAverageCrossover with short_window={short_window}, long_window={long_window}")
     self.events= events
     self.data_handler = data_handler
@@ -30,8 +31,8 @@ class MovingAverageCrossover:
       short_avg /= self.short_window
       long_avg /= self.long_window
       if short_avg < long_avg and self.current_positions[ticker] >= 0: # GO SHORT
-        self.events.append(SignalEvent(timestamp, ticker, SignalType.SHORT))
+        self.events.put(SignalEvent(timestamp, ticker, SignalType.SHORT))
         self.current_positions[ticker] = -1
       elif short_avg > long_avg and self.current_positions[ticker] <= 0: # GO LONG
-        self.events.append(SignalEvent(timestamp, ticker, SignalType.LONG))
+        self.events.put(SignalEvent(timestamp, ticker, SignalType.LONG))
         self.current_positions[ticker] = 1

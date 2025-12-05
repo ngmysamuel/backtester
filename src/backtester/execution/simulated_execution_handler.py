@@ -1,10 +1,12 @@
+import queue
 from collections import deque
 
 import pandas as pd
 
 from backtester.enums.direction_type import DirectionType
 from backtester.events.fill_event import FillEvent
-
+from backtester.data.data_handler import DataHandler
+from backtester.util.slippage.slippage import Slippage
 
 class SimulatedExecutionHandler:
   """
@@ -12,7 +14,7 @@ class SimulatedExecutionHandler:
   they are received, assuming that all orders are filled at the next market
   open price. This class handles both Market and Market-On-Close orders.
   """
-  def __init__(self, events, data_handler, slippage_model):
+  def __init__(self, events: queue.Queue, data_handler: DataHandler, slippage_model: Slippage):
     """
     Initializes the SimulatedExecutionHandler
     args:
@@ -62,7 +64,7 @@ class SimulatedExecutionHandler:
       fill_event = FillEvent(
         current_time, order.ticker, "", order.quantity, order.direction, fill_cost, unit_cost, slippage
       )
-      self.events.append(fill_event)
+      self.events.put(fill_event)
 
   def on_order(self, event):
     """

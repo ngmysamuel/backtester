@@ -3,11 +3,10 @@ from backtester.data.data_handler import DataHandler
 from backtester.events.event import Event
 from backtester.events.signal_event import SignalEvent
 from backtester.enums.signal_type import SignalType
-from collections import deque
-
+import queue
 
 class BuyAndHoldSimple(Strategy):
-  def __init__(self, events: deque, data_handler: DataHandler):
+  def __init__(self, events: queue.Queue, data_handler: DataHandler):
     self.events = events
     self.data_handler = data_handler
     self.symbol_list = self.data_handler.symbol_list
@@ -27,4 +26,4 @@ class BuyAndHoldSimple(Strategy):
 
       if not self.bought[ticker]:
         self.bought[ticker] = True
-        self.events.append(SignalEvent(timestamp, ticker, SignalType.LONG))
+        self.events.put(SignalEvent(timestamp, ticker, SignalType.LONG))
