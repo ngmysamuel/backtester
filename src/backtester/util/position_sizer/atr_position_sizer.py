@@ -7,7 +7,6 @@ from backtester.util.position_sizer.position_sizer import PositionSizer
 
 class ATRPositionSizer(PositionSizer):
     def __init__(self, config: dict, symbol_list: list):
-        self.initial_position_size = config["initial_position_size"]
         self.atr_window = config["atr_window"]
         self.atr_multiplier = config["atr_multiplier"]
         self.symbol_list = symbol_list

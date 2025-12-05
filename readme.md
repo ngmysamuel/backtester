@@ -82,6 +82,9 @@ df.to_csv("MSFT.csv")
 3. Simulated Execution
     1. Market Orders are filled at open i.e. at the opening price of the next interval from the order placed. Market On Close are filled at close when the current interval of market data is the last slice of the day.
     2. All orders are filled entirely i.e. no partial filling
+4. Position Sizing (general)
+    1. return None if there is not enough data to generate a value. This will cause the portfolio module to reuse the last used position size
+    2. if it is the first trade, it will be backtester_settings.initial_position_size in config.yaml
 4. Position Sizing (ATR)
     1. Implemented as part of the position sizer module with attributes defined in config.yaml
     2. Calculated at the end of the interval, before new bars are added

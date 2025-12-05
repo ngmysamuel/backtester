@@ -15,7 +15,6 @@ class BuyAndHoldSimple(Strategy):
 
     def generate_signals(self, event: Event):
         timestamp = event.timestamp
-        ticker = event.ticker
 
         for ticker in self.symbol_list:
             # Retrieve latest bar(s) for ticker. If no data is available, do not generate a signal.

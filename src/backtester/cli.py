@@ -70,6 +70,7 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
     symbol_list = backtester_settings["symbol_list"]
 
     initial_capital = backtester_settings["initial_capital"]
+    initial_position_size = backtester_settings["initial_position_size"]
     start_timestamp = pd.to_datetime(backtester_settings["start_date"], dayfirst=True).timestamp()
     end_timestamp = pd.to_datetime(backtester_settings["end_date"], dayfirst=True).timestamp()
     interval = backtester_settings["interval"]
@@ -91,6 +92,7 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
     typer_tbl.add_row("Strategy", strategy)
     typer_tbl.add_row("Symbols", ", ".join(symbol_list))
     typer_tbl.add_row("Initial Capital", str(initial_capital))
+    typer_tbl.add_row("Initial Position Size", str(initial_position_size))
     typer_tbl.add_row("Start Date", backtester_settings["start_date"])
     typer_tbl.add_row("End Date", backtester_settings["end_date"])
     typer_tbl.add_row("Interval", interval)
@@ -125,7 +127,7 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
     additional_params = config["strategies"][strategy].get("additional_parameters", {})
     strategy_instance = StrategyClass(event_queue, data_handler, **additional_params)
 
-    portfolio = NaivePortfolio(data_handler, initial_capital, symbol_list, event_queue, start_timestamp, interval, position_sizer)
+    portfolio = NaivePortfolio(data_handler, initial_capital, initial_position_size, symbol_list, event_queue, start_timestamp, interval, position_sizer)
 
     execution_handler = SimulatedExecutionHandler(event_queue, data_handler, slippage_model)
 
@@ -176,6 +178,9 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
     ####################
     portfolio.create_equity_curve()
     portfolio.equity_curve.to_csv("equity_curve.csv")
+
+    for key in data_handler.symbol_raw_data.keys():
+        data_handler.symbol_raw_data[key].to_csv(f"{key}_test.csv")
 
     benchmark_data = data_handler.symbol_raw_data[benchmark_ticker]
     benchmark_returns = benchmark_data["close"].pct_change()

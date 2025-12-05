@@ -24,6 +24,7 @@ class NaivePortfolio(Portfolio):
         self,
         data_handler: DataHandler,
         initial_capital: float,
+        initial_position_size: float,
         symbol_list: list[str],
         events: queue.Queue,
         start_date: float,
@@ -33,8 +34,6 @@ class NaivePortfolio(Portfolio):
         borrow_cost: float = 0.01,
         maintenance_margin: float = 0.3,
         risk_per_trade: float = 0.01,
-        # atr_window: int = 14,
-        # atr_multiplier: int = 2
     ):
         """
         Initializes the NaivePortfolio with initial capital, a list of symbols, an event queue, and allocation percentage.
@@ -42,6 +41,7 @@ class NaivePortfolio(Portfolio):
         args:
           data_handler (DataHandler): The data handler object to fetch market data.
           initial_capital (float): The starting capital for the portfolio.
+          initial_position_size (float): Used by portfolio to size a trade in the absence of any other help
           symbol_list (list): List of ticker symbols to include in the portfolio.
           events (queue.Queue): The event queue to communicate with other components.
           start_date (float): The starting timestamp for the portfolio.
@@ -61,6 +61,7 @@ class NaivePortfolio(Portfolio):
 
         self.data_handler = data_handler
         self.initial_capital = initial_capital
+        self.initial_position_size = initial_position_size
         self.symbol_list = symbol_list
         self.events = events
         self.start_date = start_date
@@ -70,12 +71,9 @@ class NaivePortfolio(Portfolio):
         self.maintenance_margin = maintenance_margin
         self.risk_per_trade = risk_per_trade
         self.position_sizer = position_sizer
-        # self.atr_window = atr_window
-        # self.atr_multiplier = atr_multiplier
 
         self.margin_holdings = collections.defaultdict(int)
-        self.position_dict = {sym: 100 for sym in self.symbol_list}  # to be derived
-        # self.historical_atr = {sym: [] for sym in self.symbol_list}
+        self.position_dict = {sym: self.initial_position_size for sym in self.symbol_list}  # holds the position size last used (backup for sizer derivations)
 
         self.current_holdings = {sym: {"position": 0, "value": 0.0} for sym in self.symbol_list}
         self.current_holdings["margin"] = collections.defaultdict(int)
@@ -111,10 +109,10 @@ class NaivePortfolio(Portfolio):
         order_type = OrderType.MKT
         cur_quantity = self.current_holdings[ticker]["position"]
 
-        self.position_dict[ticker] = self.position_sizer.get_position_size(self, ticker)
-        to_be_quantity = self.position_dict[ticker]
+        to_be_quantity = self.position_sizer.get_position_size(self, ticker)
         if to_be_quantity is None:
-            return
+            to_be_quantity = self.position_dict[ticker]  # use the last used position size
+        self.position_dict[ticker] = to_be_quantity  # update the position dict with the position size we are going to use
 
         to_be_quantity *= event.strength
 

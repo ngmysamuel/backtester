@@ -65,7 +65,7 @@ class LiveDataHandler(DataHandler):
                 else:  # we are still in the same interval, continue updating high, low, and close prices
                     bar = self.bar_dict[ticker]
                     bar["high"] = max(bar["high"], price)
-                    bar["low"] = max(bar["low"], price)
+                    bar["low"] = min(bar["low"], price)
                     bar["close"] = price
             self._finalize_and_push_bars(self.start_time)
             self.start_time = self.end_time + 1
