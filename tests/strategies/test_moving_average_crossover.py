@@ -8,8 +8,10 @@ from backtester.enums.signal_type import SignalType
 
 # --- Test Helpers ---
 
+
 class FakeDataHandler:
     """A fake data handler that can be updated with new bars."""
+
     def __init__(self, symbols, initial_bars_map=None):
         self.symbol_list = symbols
         self._bars = initial_bars_map if initial_bars_map else {}
@@ -25,11 +27,14 @@ class FakeDataHandler:
             self._bars[ticker] = []
         self._bars[ticker].extend(new_bars)
 
+
 def make_bars(values):
     """Factory function to create a list of bar objects with a 'close' attribute."""
     return [SimpleNamespace(close=v) for v in values]
 
+
 # --- Tests ---
+
 
 def test_not_market_event_no_signal():
     """Strategy should not generate signals for non-MARKET events."""
@@ -40,6 +45,7 @@ def test_not_market_event_no_signal():
     event = SimpleNamespace(type="ORDER", timestamp=123)
     s.generate_signals(event)
     assert events.qsize() == 0
+
 
 def test_insufficient_bars_no_signal():
     """Strategy should not generate a signal if there are not enough bars."""
@@ -53,16 +59,18 @@ def test_insufficient_bars_no_signal():
     assert events.qsize() == 0
     assert s.current_positions["AAPL"] == 0
 
+
 def test_no_signal_when_ma_equal():
     """Strategy should not generate a signal when moving averages are equal."""
     events = Queue()
-    bars = make_bars([100] * 101) # 101 bars to satisfy long_window+1
+    bars = make_bars([100] * 101)  # 101 bars to satisfy long_window+1
     dh = FakeDataHandler(["AAPL"], {"AAPL": bars})
     s = MovingAverageCrossover(events, dh, short_window=40, long_window=100)
     event = SimpleNamespace(type="MARKET", timestamp=123)
     s.generate_signals(event)
     assert events.qsize() == 0
     assert s.current_positions["AAPL"] == 0
+
 
 def test_long_signal_when_short_crosses_above():
     """Strategy should generate a LONG signal when the short MA crosses above the long MA."""
@@ -80,6 +88,7 @@ def test_long_signal_when_short_crosses_above():
     assert sig.signal_type == SignalType.LONG
     assert s.current_positions["AAPL"] == 1
 
+
 def test_short_signal_when_short_crosses_below():
     """Strategy should generate a SHORT signal when the short MA crosses below the long MA."""
     events = Queue()
@@ -94,6 +103,7 @@ def test_short_signal_when_short_crosses_below():
     assert sig.signal_type == SignalType.SHORT
     assert s.current_positions["AAPL"] == -1
 
+
 def test_no_duplicate_signals_on_repeated_events():
     """Strategy should not generate a new signal if the position is already established."""
     events = Queue()
@@ -107,6 +117,7 @@ def test_no_duplicate_signals_on_repeated_events():
     # Second call should not generate another signal because position is already 1
     s.generate_signals(event)
     assert events.qsize() == 1
+
 
 def test_processes_all_symbols_on_market_event():
     """Strategy should process all symbols in its list on a market event."""
@@ -125,6 +136,7 @@ def test_processes_all_symbols_on_market_event():
     signals = {e.ticker: e.signal_type for e in list(events.queue)}
     assert signals["AAPL"] == SignalType.LONG
     assert signals["MSFT"] == SignalType.SHORT
+
 
 @pytest.mark.parametrize(
     "short_window,long_window,values,expected_signal",
@@ -151,6 +163,7 @@ def test_parameterized_ma_cases(short_window, long_window, values, expected_sign
         assert events.qsize() == 1
         sig = events.get()
         assert sig.signal_type == expected_signal
+
 
 def test_sequence_evolving_data_detects_crossover():
     """

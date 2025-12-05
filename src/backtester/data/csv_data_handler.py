@@ -8,107 +8,106 @@ from backtester.events.market_event import MarketEvent
 
 
 class CSVDataHandler(DataHandler):
-  """
-  CSVDataHandler is a concrete implementation of DataHandler that reads
-  historical data for each symbol from CSV files.
-  """
-
-  def __init__(self, event_queue: queue.Queue, csv_dir: str, start_date: pd.Timestamp | datetime, end_date: pd.Timestamp | datetime,  symbol_list: str, interval: str, exchange_closing_time: str):
     """
-    Initializes the CSVDataHandler
-    args:
-        event_queue: the Event Queue
-        csv_dir: absolute directory path folder containing all the CSV files
-        symbol_list: a list of symbol strings
-        interval: e.g. 5m means OHLC data for 5 minutes
-        exchange_closing_time: 24h time format - HH:MM
+    CSVDataHandler is a concrete implementation of DataHandler that reads
+    historical data for each symbol from CSV files.
     """
-    self.event_queue = event_queue
-    self.csv_dir = csv_dir
-    self.start_date = start_date
-    self.end_date = end_date
-    self.symbol_list = symbol_list
-    self.interval = interval
-    self.exchange_closing_time = exchange_closing_time
 
-    self.symbol_raw_data = {}
-    self.symbol_data = {}
-    self.latest_symbol_data = {}
-    self.continue_backtest = True
+    def __init__(self, event_queue: queue.Queue, csv_dir: str, start_date: pd.Timestamp | datetime, end_date: pd.Timestamp | datetime, symbol_list: str, interval: str, exchange_closing_time: str):
+        """
+        Initializes the CSVDataHandler
+        args:
+            event_queue: the Event Queue
+            csv_dir: absolute directory path folder containing all the CSV files
+            start_date: start date of the backtest
+            end_date: end date of the backtest
+            symbol_list: a list of symbol strings
+            interval: e.g. 5m means OHLC data for 5 minutes
+            exchange_closing_time: 24h time format - HH:MM
+        """
+        self.event_queue = event_queue
+        self.csv_dir = csv_dir
+        self.start_date = start_date
+        self.end_date = end_date
+        self.symbol_list = symbol_list
+        self.interval = interval
+        self.exchange_closing_time = exchange_closing_time
 
-    self._load_from_csv()
+        self.symbol_raw_data = {}
+        self.symbol_data = {}
+        self.latest_symbol_data = {}
+        self.continue_backtest = True
 
-  def _load_from_csv(self):
-    """
-    Opens the CSV files from the data directory, converting them into
-    pandas DataFrames within a symbol dictionary. Assumes the format
-    of the CSV files: date, open, high, low, close, volume
-    """
-    combined_index = None
+        self._load_from_csv()
 
-    for symbol in self.symbol_list:
-      # Load the CSV file
-      df = pd.read_csv(
-        os.path.join(self.csv_dir, f"{symbol}.csv"),
-        header=0,
-        parse_dates=True,
-        usecols=lambda x: x.lower() in ["open", "close", "high", "low", "volume", "date"],
-        converters={"Date": lambda x: pd.to_datetime(x).tz_localize(None)}
-      )
+    def _load_from_csv(self):
+        """
+        Opens the CSV files from the data directory, converting them into
+        pandas DataFrames within a symbol dictionary. Assumes the format
+        of the CSV files: date, open, high, low, close, volume
+        """
+        combined_index = None
 
-      df.set_index("Date", inplace=True)
-      df.sort_index(inplace=True) # ensure data is sorted
-      df.columns = [col.lower() for col in df.columns]
+        for symbol in self.symbol_list:
+            # Load the CSV file
+            df = pd.read_csv(
+              os.path.join(self.csv_dir, f"{symbol}.csv"),
+              header=0,
+              parse_dates=True,
+              usecols=lambda x: x.lower() in ["open", "close", "high", "low", "volume", "date"],
+              converters={"Date": lambda x: pd.to_datetime(x).tz_localize(None)}
+            )
 
-      df = df.loc[self.start_date : self.end_date]
+            df.set_index("Date", inplace=True)
+            df.sort_index(inplace=True)  # ensure data is sorted
+            df.columns = [col.lower() for col in df.columns]
 
-      self.symbol_raw_data[symbol] = df
-      self.symbol_data[symbol] = df
-      self.latest_symbol_data[symbol] = []
+            df = df.loc[self.start_date : self.end_date]
 
-      if combined_index is None:
-        combined_index = df.index
-      else:
-        combined_index = combined_index.union(df.index) # include any dates not in the previous files
+            self.symbol_raw_data[symbol] = df
+            self.symbol_data[symbol] = df
+            self.latest_symbol_data[symbol] = []
 
-    # Reindex the dataframes to the same index
-    for symbol in self.symbol_list:
-      self.symbol_data[symbol] = (
-        self.symbol_data[symbol].reindex(index=combined_index, method="pad").itertuples()
-      )
+            if combined_index is None:
+                combined_index = df.index
+            else:
+                combined_index = combined_index.union(df.index)  # include any dates not in the previous files
 
-  def _get_new_bar(self, symbol: str):
-    """
-    Returns the latest bar from the data feed as a tuple of
-    (datetime, open, high, low, close, volume).
-    """
-    for b in self.symbol_data[symbol]:
-      yield b
+        # Reindex the dataframes to the same index
+        for symbol in self.symbol_list:
+            self.symbol_data[symbol] = self.symbol_data[symbol].reindex(index=combined_index, method="pad").itertuples()
 
-  def update_bars(self):
-    """
-    Pushes the latest bar to the latest_symbol_data structure for all
-    symbols in the symbol list. This will also generate a MarketEvent.
-    """
-    mkt_close = False
-    start_time = None
-    for s in self.symbol_list:
-      try:
-        bar = next(self._get_new_bar(s))
-      except StopIteration:
-        self.continue_backtest = False
-        return
-      else:
-        if bar is not None:
-          self.latest_symbol_data[s].append(bar)
-          mkt_close = bar.Index + pd.Timedelta(self.interval) >= bar.Index.replace(hour=int(self.exchange_closing_time.split(":")[0]),minute=int(self.exchange_closing_time.split(":")[1]))
-          start_time = bar.Index.timestamp()
+    def _get_new_bar(self, symbol: str):
+        """
+        Returns the latest bar from the data feed as a tuple of
+        (datetime, open, high, low, close, volume).
+        """
+        for b in self.symbol_data[symbol]:
+            yield b
 
-    self.event_queue.put(MarketEvent(start_time, mkt_close))
+    def update_bars(self):
+        """
+        Pushes the latest bar to the latest_symbol_data structure for all
+        symbols in the symbol list. This will also generate a MarketEvent.
+        """
+        mkt_close = False
+        start_time = None
+        for s in self.symbol_list:
+            try:
+                bar = next(self._get_new_bar(s))
+            except StopIteration:
+                self.continue_backtest = False
+                return
+            else:
+                if bar is not None:
+                    self.latest_symbol_data[s].append(bar)
+                    mkt_close = bar.Index + pd.Timedelta(self.interval) >= bar.Index.replace(hour=int(self.exchange_closing_time.split(":")[0]), minute=int(self.exchange_closing_time.split(":")[1]))
+                    start_time = bar.Index.timestamp()
 
+        self.event_queue.put(MarketEvent(start_time, mkt_close))
 
-  def get_latest_bars(self, symbol: str, n: int = 1):
-    """
-    Returns the last N bars from the latest_symbol_data
-    """
-    return self.latest_symbol_data[symbol][-n:]
+    def get_latest_bars(self, symbol: str, n: int = 1):
+        """
+        Returns the last N bars from the latest_symbol_data
+        """
+        return self.latest_symbol_data[symbol][-n:]

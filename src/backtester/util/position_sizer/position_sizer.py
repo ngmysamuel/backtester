@@ -4,7 +4,6 @@ from backtester.portfolios.portfolio import Portfolio
 
 
 class PositionSizer(ABC):
-
-  @abstractmethod
-  def get_position_size(self, portfolio: Portfolio):
-    pass
+    @abstractmethod
+    def get_position_size(self, portfolio: Portfolio):
+        pass

@@ -29,5 +29,5 @@ build-backend = "poetry.core.masonry.api"
 backtester = "backtester.cli:app"
 
 [tool.ruff]
-indent-width = 2
-line-length = 320
+indent-width = 4
+line-length = 250
