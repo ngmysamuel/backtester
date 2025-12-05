@@ -180,11 +180,13 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
     portfolio.equity_curve.to_csv("equity_curve.csv")
 
     for key in data_handler.symbol_raw_data.keys():
-        data_handler.symbol_raw_data[key].to_csv(f"{key}_test.csv")
+        data_handler.symbol_raw_data[key].to_csv(f"{key}_prices.csv")
 
     benchmark_data = data_handler.symbol_raw_data[benchmark_ticker]
-    benchmark_returns = benchmark_data["close"].pct_change()
+    benchmark_returns = benchmark_data["close"].pct_change().fillna(0.0)
     benchmark_returns.name = benchmark_ticker
+
+    print(benchmark_returns)
 
     # TODO: if equity curve values are all the same, this will fail
     qs.reports.html(portfolio.equity_curve["returns"], benchmark=benchmark_returns, output="strategy_report.html", title=strategy, match_dates=False)
