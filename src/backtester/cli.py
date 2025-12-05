@@ -87,6 +87,8 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
     typer_tbl.add_row("Initial Capital", str(initial_capital))
     typer_tbl.add_row("Start Date", backtester_settings["start_date"])
     typer_tbl.add_row("End Date", backtester_settings["end_date"])
+    typer_tbl.add_row("Interval", interval)
+    typer_tbl.add_row("Period (only for live)", period)
     console.print(typer_tbl)
 
     event_queue = Queue()  # TODO: to update to Queue.queue
