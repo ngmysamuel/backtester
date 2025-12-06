@@ -1,5 +1,6 @@
 from collections import deque
 from copy import deepcopy
+from queue import Queue
 from types import SimpleNamespace
 
 import pandas as pd
@@ -45,7 +46,7 @@ def mock_data_handler():
 @pytest.fixture
 def portfolio(mock_data_handler):
     """Returns a NaivePortfolio instance with default settings."""
-    events = deque()
+    events = Queue()
     position_sizer = NoPositionSizer({"initial_position_size": 100})
     return NaivePortfolio(
         data_handler=mock_data_handler,
@@ -100,8 +101,9 @@ def test_on_signal_long_from_flat(portfolio):
     """Tests creating a LONG order from a flat position."""
     signal = SignalEvent(123, "MSFT", SignalType.LONG)
     portfolio.on_signal(signal)
-    assert len(portfolio.events) == 1
-    order = portfolio.events.pop()
+    events = list(portfolio.events.queue)
+    assert len(events) == 1
+    order = events[0]
     assert order.direction == DirectionType.BUY
     assert order.quantity == 100
 
@@ -110,8 +112,9 @@ def test_on_signal_short_from_long(portfolio):
     portfolio.current_holdings["MSFT"]["position"] = 100
     signal = SignalEvent(123, "MSFT", SignalType.SHORT)
     portfolio.on_signal(signal)
-    assert len(portfolio.events) == 1
-    order = portfolio.events.pop()
+    events = list(portfolio.events.queue)
+    assert len(events) == 1
+    order = events[0]
     assert order.direction == DirectionType.SELL
     assert order.quantity == 200 # 100 to close, 100 to open short
 
@@ -120,22 +123,22 @@ def test_on_signal_exit_from_long(portfolio):
     portfolio.current_holdings["MSFT"]["position"] = 100
     signal = SignalEvent(123, "MSFT", SignalType.EXIT)
     portfolio.on_signal(signal)
-    assert len(portfolio.events) == 1
-    order = portfolio.events.pop()
+    events = list(portfolio.events.queue)
+    assert len(events) == 1
+    order = events[0]
     assert order.direction == DirectionType.SELL
     assert order.quantity == 100
 
-def test_on_signal_exit_from_short_bug(portfolio):
+def test_on_signal_exit_from_short(portfolio):
     """
-    This test exposes a bug. The quantity for an order should always be positive.
-    When exiting a short, the current implementation passes a negative quantity.
+    Tests that when exiting a short position, the resulting BUY order
+    has a positive quantity.
     """
     portfolio.current_holdings["MSFT"]["position"] = -100
     signal = SignalEvent(123, "MSFT", SignalType.EXIT)
     portfolio.on_signal(signal)
-    order = portfolio.events.pop()
+    order = portfolio.events.get()
     assert order.direction == DirectionType.BUY
-    # This will fail with the current code. The quantity should be positive.
     assert order.quantity == 100
 
 def test_on_fill_buy(portfolio):
@@ -351,8 +354,8 @@ def test_on_signal_with_position_sizer(portfolio):
     
     portfolio.on_signal(signal)
     
-    assert len(portfolio.events) == 1
-    order = portfolio.events.pop()
+    assert len(portfolio.events.queue) == 1
+    order = portfolio.events.queue.pop()
     assert order.quantity == 250
 
 def test_on_signal_with_no_position_size(portfolio):
@@ -362,4 +365,4 @@ def test_on_signal_with_no_position_size(portfolio):
     
     portfolio.on_signal(signal)
     
-    assert len(portfolio.events) == 0
+    assert len(portfolio.events.queue) == 0
