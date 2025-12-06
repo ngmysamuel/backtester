@@ -1,4 +1,3 @@
-import collections
 import importlib
 import importlib.resources
 import runpy
@@ -179,8 +178,8 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
     portfolio.create_equity_curve()
     portfolio.equity_curve.to_csv("equity_curve.csv")
 
-    # for key in data_handler.symbol_raw_data.keys():
-    #     data_handler.symbol_raw_data[key].to_csv(f"{key}_prices.csv")
+    for key in data_handler.symbol_raw_data.keys():
+        data_handler.symbol_raw_data[key].to_csv(f"{key}_prices.csv")
 
     benchmark_data = data_handler.symbol_raw_data[benchmark_ticker]
     benchmark_returns = benchmark_data["close"].pct_change().fillna(0.0)

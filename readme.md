@@ -74,6 +74,7 @@ df.to_csv("MSFT.csv")
     1. Value of positions are calculated using the closing price of each interval. 
     2. Total portfolio value is calculated as the sum of the useable cash, value of positions (shorts are considered negative), and margin locked up
     3. Cash shown is useable cash i.e. not locked up as margin
+    4. Initial trade size is defined by backtester_settings.initial_position_size
 2. Shorting
     1. Short sold position in a stock is possible but many assumptions are made. You can borrow the shares indefinitely. 
     2. Borrow costs and margin are calculated at the end of the trading day
@@ -82,7 +83,11 @@ df.to_csv("MSFT.csv")
 3. Simulated Execution
     1. Market Orders are filled at open i.e. at the opening price of the next interval from the order placed. Market On Close are filled at close when the current interval of market data is the last slice of the day.
     2. All orders are filled entirely i.e. no partial filling
-4. Position Sizing (general)
+4. Data Handling (Live)
+    1. Consolidates all ticks within interval timespan (backtester_settings.interval) into a single bar of high, low, open, and close.
+    2. Stop when the time spent listening for messages exceeds the period (backtester_settings.period)
+    3. For short periods, use the buy_and_hold_simple strategy to ensure the tearsheet generation works (there will be no buy signals generated using moving_average strategy as the time span of its windows are too long)
+4. Position Sizing (General)
     1. return None if there is not enough data to generate a value. This will cause the portfolio module to reuse the last used position size
     2. if it is the first trade, it will be backtester_settings.initial_position_size in config.yaml
 4. Position Sizing (ATR)
