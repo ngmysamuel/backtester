@@ -154,7 +154,7 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
                     portfolio.on_market(event)  # update portfolio valuation
                 except NegativeCashException as e:
                     if exception_contd:
-                        print(e)
+                        console.print(f"[yellow bold]Warning![/yellow bold] {e}")
                     else:
                         raise e
                 slippage_model.on_market()

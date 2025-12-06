@@ -47,10 +47,11 @@ def mock_data_handler():
 def portfolio(mock_data_handler):
     """Returns a NaivePortfolio instance with default settings."""
     events = Queue()
-    position_sizer = NoPositionSizer({"initial_position_size": 100})
+    position_sizer = NoPositionSizer({"constant_position_size": 100})
     return NaivePortfolio(
         data_handler=mock_data_handler,
         initial_capital=100000.0,
+        initial_position_size=100,
         symbol_list=["MSFT", "AAPL"],
         events=events,
         start_date=pd.to_datetime("2023-01-01").timestamp(),
@@ -365,4 +366,8 @@ def test_on_signal_with_no_position_size(portfolio):
     
     portfolio.on_signal(signal)
     
-    assert len(portfolio.events.queue) == 0
+    assert len(portfolio.events.queue) == 1
+
+    order = portfolio.events.queue[0]
+    assert order.quantity == portfolio.initial_position_size
+    assert order.direction == DirectionType.BUY
