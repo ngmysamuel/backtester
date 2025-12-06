@@ -7,3 +7,6 @@ class NoSlippage(Slippage):
 
     def calculate_slippage(self, ticker, trade_date, trade_size):
         return 0
+
+    def on_market(self):
+        pass

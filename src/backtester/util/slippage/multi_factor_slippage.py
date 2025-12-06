@@ -50,7 +50,7 @@ class MultiFactorSlippage(Slippage):
         """Pre-computes features on the entire history for speed."""
         for ticker, df in df_dict.items():
             # We work on a copy to avoid side effects
-            processed_df = self._compute_features_on_df(df.copy())
+            processed_df = self._compute_features_on_df(df.copy()) # compute all the ratios now
             self.feature_df_dict[ticker] = processed_df
 
     def _init_live_mode(self, df_dict):
@@ -59,7 +59,7 @@ class MultiFactorSlippage(Slippage):
             for ticker, df in df_dict.items():
                 # Keep only the tail needed for calculation
                 if df:
-                    self.live_buffers[ticker] = df[-self.max_lookback :].copy()
+                    self.live_buffers[ticker] = df[-self.max_lookback :].copy() # update our df, computation happens on demand
 
     def on_market(self):
         """
@@ -92,56 +92,80 @@ class MultiFactorSlippage(Slippage):
         if len(df) < 2:
             return df
 
-        # --- Volatility Metrics ---
+        # Basic price metrics
         df["returns"] = df["close"].pct_change()
 
         # Helper for filling NaNs specific to this method scope
         def clean_col(cols, fill_val=0):
-            df[cols] = df[cols].fillna(method="ffill").fillna(fill_val)
+            df[cols] = df[cols].ffill().fillna(fill_val)
 
+        ##################
+        # Volatility Metrics
+        ##################
+
+        # Volatility with different timeframes
         df["vol_short"] = df["returns"].rolling(self.short_window).std() * np.sqrt(self.PERIODS_IN_YEAR)
         df["vol_med"] = df["returns"].rolling(self.med_window).std() * np.sqrt(self.PERIODS_IN_YEAR)
         df["vol_long"] = df["returns"].rolling(self.long_window).std() * np.sqrt(self.PERIODS_IN_YEAR)
         clean_col(["returns", "vol_short", "vol_med", "vol_long"], 0)
 
-        # --- Volume Metrics ---
+        ##################
+        # Volume Metrics
+        ##################
+
+        # Volume moving averages with different timeframes
         df["vol_ma_short"] = df["volume"].rolling(self.short_window).mean()
         df["vol_ma_med"] = df["volume"].rolling(self.med_window).mean()
         df["vol_ma_long"] = df["volume"].rolling(self.long_window).mean()
 
+        # Volume ratios
         # Handle division by zero if volume MA is 0
         df["vol_ratio_short"] = df["volume"] / df["vol_ma_short"].replace(0, np.nan)
         df["vol_ratio_med"] = df["volume"] / df["vol_ma_med"].replace(0, np.nan)
         df["vol_ratio_long"] = df["volume"] / df["vol_ma_long"].replace(0, np.nan)
-
+        
+        # Non-linear volume metrics
+        #   Indicator if today's volume is an outlier - capped to a max to prevent extreme events from 
+        #   diproportionately affecting the model
+        #   Use long term average of the volume for outlier identification
         df["vol_surge"] = np.clip(df["vol_ratio_long"], None, self.upper_lim_vol_surge)
         clean_col(["vol_ma_short", "vol_ma_med", "vol_ma_long", "vol_surge"], 1)
 
-        # --- Composite Metrics ---
-        # Amihud
-        df["amihud_illiq"] = abs(df["returns"]) / (df["volume"] * df["close"]).replace(0, np.nan)
+        ##################
+        # Composite Metrics
+        ##################
 
+        # Amihud - Price movement per dollar traded - a high value means very illiquid
+        #   https://breakingdownfinance.com/finance-topics/alternative-investments/amihud-illiquidity-measure/
+        #   https://www.cis.upenn.edu/~mkearns/finread/amihud.pdf
+        df["amihud_illiq"] = abs(df["returns"]) / (df["volume"] * df["close"]).replace(0, np.nan)
+        
+        # Total dollar value in a trading interval
         df["turnover"] = df["volume"] * df["close"]
 
-        # Turnover Volatility
+        # Calculates the Coeff of Variation by dividing the standard deviation with the mean giving a standardised
+        # measure of volatility that can be used across shares of different capitalization
         to_roll_std = df["turnover"].rolling(self.med_window).std()
         to_roll_mean = df["turnover"].rolling(self.med_window).mean()
-        df["turnover_vol"] = to_roll_std / to_roll_mean.replace(0, np.nan)
+        df["turnover_vol"] = to_roll_std / to_roll_mean
 
+        # indicates the direction of market this stock is moving in
         df["price_acceleration"] = df["returns"].diff()
 
-        # BidAsk spread
+        # Bid-ask spread estimation - https://github.com/eguidotti/bidask
         # Only run if we have enough data, otherwise 0
         if len(df) >= self.bidask_window:
             df["spread_cost"] = bidask.edge_rolling(df[["open", "high", "low", "close"]], self.bidask_window) / 2
         else:
             df["spread_cost"] = 0
 
-        # Cost Models
+        # models the cost of a chaotic market
         df["volatility_cost"] = df["vol_med"] * np.exp(df["vol_surge"] - 1) * self.volatility_cost_factor
 
+        # models the cost of chasing a moving target
         df["momentum_cost"] = self.momentum_cost_factor * abs(df["returns"]) * np.sign(df["price_acceleration"])
 
+        # models the cost of trading in a blue chip MSFT vs a penny stock no one knows
         df["liquidity_cost"] = self.liquidity_cost_factor * np.power(np.clip(df["amihud_illiq"], 1e-8, None), self.liquidity_cost_exponent)
 
         impact_cols = ["amihud_illiq", "turnover", "turnover_vol", "price_acceleration", "spread_cost", "volatility_cost", "momentum_cost", "liquidity_cost"]

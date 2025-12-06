@@ -9,6 +9,8 @@ class BarTuple(NamedTuple):
     high: float
     low: float
     close: float
+    volume: int
+    raw_volume: int
 
 
 class DataHandler(ABC):
