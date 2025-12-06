@@ -38,51 +38,17 @@ class MultiFactorSlippage(Slippage):
 
         # State containers
         self.feature_df_dict = {}  # For Backtest (Pre-computed)
-        self.live_buffers = {}  # For Live (Rolling window)
 
         # Initialization logic
-        if self.mode == "live":
-            self._init_live_mode(self.df_dict)
-        else:
+        if self.mode != "live":
             self._init_backtest_mode(self.df_dict)
 
     def _init_backtest_mode(self, df_dict):
         """Pre-computes features on the entire history for speed."""
         for ticker, df in df_dict.items():
             # We work on a copy to avoid side effects
-            processed_df = self._compute_features_on_df(df.copy()) # compute all the ratios now
+            processed_df = self._compute_features_on_df(df.copy())  # compute all the ratios now
             self.feature_df_dict[ticker] = processed_df
-
-    def _init_live_mode(self, df_dict):
-        """Initializes buffers, optionally warming up with history."""
-        if df_dict:
-            for ticker, df in df_dict.items():
-                # Keep only the tail needed for calculation
-                if df:
-                    self.live_buffers[ticker] = df[-self.max_lookback :].copy() # update our df, computation happens on demand
-
-    def on_market(self):
-        """
-        This method is called when new OHLCV data arrives.
-        new_bar: A namedtuple containing Index (timestamp), open, high, low, close
-        """
-        if self.mode != "live":
-            return
-        for ticker in self.symbol_list:
-            if not self.data_handler.get_latest_bars(ticker):
-                continue
-            new_row = self.data_handler.get_latest_bars(ticker)[0]
-            new_df = pd.DataFrame([new_row])
-            new_df.set_index("Index", inplace=True)
-            if ticker not in self.live_buffers:
-                self.live_buffers[ticker] = new_df
-            else:
-                # Append new row
-                self.live_buffers[ticker] = pd.concat([self.live_buffers[ticker], new_df])
-
-                # Prune buffer to keep memory usage constant
-                if len(self.live_buffers[ticker]) > self.max_lookback:
-                    self.live_buffers[ticker] = self.live_buffers[ticker].iloc[-self.max_lookback :]
 
     def _compute_features_on_df(self, df):
         """
@@ -124,9 +90,9 @@ class MultiFactorSlippage(Slippage):
         df["vol_ratio_short"] = df["volume"] / df["vol_ma_short"].replace(0, np.nan)
         df["vol_ratio_med"] = df["volume"] / df["vol_ma_med"].replace(0, np.nan)
         df["vol_ratio_long"] = df["volume"] / df["vol_ma_long"].replace(0, np.nan)
-        
+
         # Non-linear volume metrics
-        #   Indicator if today's volume is an outlier - capped to a max to prevent extreme events from 
+        #   Indicator if today's volume is an outlier - capped to a max to prevent extreme events from
         #   diproportionately affecting the model
         #   Use long term average of the volume for outlier identification
         df["vol_surge"] = np.clip(df["vol_ratio_long"], None, self.upper_lim_vol_surge)
@@ -141,7 +107,7 @@ class MultiFactorSlippage(Slippage):
         #   https://breakingdownfinance.com/finance-topics/alternative-investments/amihud-illiquidity-measure/
         #   https://www.cis.upenn.edu/~mkearns/finread/amihud.pdf
         df["amihud_illiq"] = abs(df["returns"]) / (df["volume"] * df["close"]).replace(0, np.nan)
-        
+
         # Total dollar value in a trading interval
         df["turnover"] = df["volume"] * df["close"]
 
@@ -188,8 +154,7 @@ class MultiFactorSlippage(Slippage):
                 raise ValueError("Backtest mode requires trade_date")
             try:
                 characteristics = self.feature_df_dict[ticker].loc[trade_date]
-            except KeyError:
-                # Fallback if date missing
+            except KeyError:  # Fallback if date missing
                 return 0.0
         else:
             # LIVE MODE
@@ -197,12 +162,11 @@ class MultiFactorSlippage(Slippage):
                 # Not enough data yet to calculate slippage
                 return 0.0
 
-            # 1. Update features on the buffer
-            # Note: For high-freq, optimize this to not re-calc whole buffer every time.
-            # But for standard bars, this is fast enough.
-            current_df = self._compute_features_on_df(self.live_buffers[ticker].copy())
+            # 1. Update features
+            # TODO: optimize this to not re-calc whole buffer every time. But for standard bars, this is fast enough.
+            # Follow what has been done with ATR calculation
+            current_df = self._compute_features_on_df(pd.DataFrame(self.data_handler.latest_symbol_data[ticker]))
             characteristics = current_df.iloc[-1]
-
 
         # 1. Participation Rate
         participation_rate = 0
@@ -210,7 +174,6 @@ class MultiFactorSlippage(Slippage):
             participation_rate = trade_size / characteristics["volume"]
 
         # 2. Market Impact
-        # Handle division by zero / nan
         vol_ratio = characteristics["vol_ratio_med"] if characteristics["vol_ratio_med"] > 1e-8 else 1e-8
 
         market_impact = self.market_impact_factor * np.power(participation_rate / vol_ratio, self.power_law_exponent) * characteristics["vol_med"] * np.exp(-characteristics["turnover_vol"])

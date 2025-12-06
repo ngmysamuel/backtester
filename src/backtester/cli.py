@@ -138,13 +138,13 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
     # start up the main loop
     ####################
 
-    while data_handler.continue_backtest or not event_queue.empty(): # continue_backtest - to be made thread safe?
+    while data_handler.continue_backtest or not event_queue.empty():  # continue_backtest - to be made thread safe?
         data_handler.update_bars()
         # Process events from the event queue (e.g., generate signals, execute orders, etc.)
         while not event_queue.empty():
             event = event_queue.get(block=False)
             if event.type == "MARKET":
-                if current_time_interval is None:
+                if current_time_interval is None:  # this is the first market event - set current_time_interval to the timestamp
                     current_time_interval = event.timestamp
                 if event.timestamp >= current_time_interval + interval_seconds:  # the marketEvent timestamp is always the timestamp of the interval start
                     portfolio.end_of_interval()
@@ -153,21 +153,18 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
                 try:
                     portfolio.on_market(event)  # update portfolio valuation
                 except NegativeCashException as e:
-                    if exception_contd:
-                        console.print(f"[yellow bold]Warning![/yellow bold] {e}")
-                    else:
+                    if exception_contd == 0:
                         raise e
-                slippage_model.on_market()
+                    console.print(f"[yellow bold]Warning![/yellow bold] {e}")
                 execution_handler.on_market(event, mkt_close)  # check if any orders can be filled, if so, it will update the portfolio via a FILL event
                 strategy_instance.generate_signals(event)  # generate signals based on market event
             elif event.type == "SIGNAL":
-                if event.ticker != benchmark_ticker:  # we skip any isignals generated for the benchmark
+                if event.ticker != benchmark_ticker:  # we skip any signals generated for the benchmark
                     portfolio.on_signal(event)
             elif event.type == "ORDER":
                 execution_handler.on_order(event)
             elif event.type == "FILL":
                 portfolio.on_fill(event)
-        # portfolio.end_of_interval()
         if mkt_close:
             portfolio.end_of_day()  # deduct borrow costs and calculate margin
             mkt_close = False
