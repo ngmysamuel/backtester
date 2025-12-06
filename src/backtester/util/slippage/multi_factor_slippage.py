@@ -107,6 +107,7 @@ class MultiFactorSlippage(Slippage):
         df["vol_short"] = df["returns"].rolling(self.short_window).std() * np.sqrt(self.PERIODS_IN_YEAR)
         df["vol_med"] = df["returns"].rolling(self.med_window).std() * np.sqrt(self.PERIODS_IN_YEAR)
         df["vol_long"] = df["returns"].rolling(self.long_window).std() * np.sqrt(self.PERIODS_IN_YEAR)
+
         clean_col(["returns", "vol_short", "vol_med", "vol_long"], 0)
 
         ##################
@@ -129,6 +130,7 @@ class MultiFactorSlippage(Slippage):
         #   diproportionately affecting the model
         #   Use long term average of the volume for outlier identification
         df["vol_surge"] = np.clip(df["vol_ratio_long"], None, self.upper_lim_vol_surge)
+
         clean_col(["vol_ma_short", "vol_ma_med", "vol_ma_long", "vol_surge"], 1)
 
         ##################

@@ -144,7 +144,6 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
         while not event_queue.empty():
             event = event_queue.get(block=False)
             if event.type == "MARKET":
-                print("on market: ", event.timestamp)
                 if current_time_interval is None:
                     current_time_interval = event.timestamp
                 if event.timestamp >= current_time_interval + interval_seconds:  # the marketEvent timestamp is always the timestamp of the interval start
@@ -152,7 +151,6 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
                     current_time_interval = event.timestamp
                 mkt_close = event.is_eod
                 try:
-                    print("calling portfolio")
                     portfolio.on_market(event)  # update portfolio valuation
                 except NegativeCashException as e:
                     if exception_contd:
@@ -187,8 +185,6 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
     benchmark_data = data_handler.symbol_raw_data[benchmark_ticker]
     benchmark_returns = benchmark_data["close"].pct_change().fillna(0.0)
     benchmark_returns.name = benchmark_ticker
-
-    print(benchmark_returns)
 
     # TODO: if equity curve values are all the same, this will fail
     qs.reports.html(portfolio.equity_curve["returns"], benchmark=benchmark_returns, output="strategy_report.html", title=strategy, match_dates=False)

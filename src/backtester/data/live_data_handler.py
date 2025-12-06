@@ -83,7 +83,6 @@ class LiveDataHandler(DataHandler):
 
         self.continue_backtest = False
         for key, val in self.symbol_raw_data.items():  # self.symbol_raw_data is a dictionry of ticker to dataframe
-            print("key: ", key, " val: ", val)
             df = pd.DataFrame(val)
             if "Index" in df.columns:
                 df.set_index("Index", inplace=True)
@@ -150,5 +149,4 @@ class LiveDataHandler(DataHandler):
         {'id': 'AAPL', 'price': 239.8471, 'time': '1758116301000', 'exchange': 'NMS', 'quote_type': 8, 'market_hours': 1, 'change_percent': 0.7126236, 'day_volume': '3618459', 'change': 1.697113, 'price_hint': '2'}
         {'id': 'BTC-USD', 'price': 89633.69, 'time': '1764996000000', 'currency': 'USD', 'exchange': 'CCC', 'quote_type': 41, 'market_hours': 1, 'change_percent': -2.5575025, 'day_volume': '62136492032', 'day_high': 89793.9, 'day_low': 89124.484, 'change': -2352.5547, 'open_price': 89360.836, 'last_size': '62136492032', 'price_hint': '2', 'vol_24hr': '62136492032', 'vol_all_currencies': '62136492032', 'from_currency': 'BTC', 'circulating_supply': 19958140.0, 'market_cap': 1788921640000.0}
         """
-        print(f"{message['id']}'s original day volume: ", int(message["day_volume"]))
         self.message_queue.put(message)

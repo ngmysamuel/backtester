@@ -173,6 +173,8 @@ df.to_csv("MSFT.csv")
 - Modelling probability of fill for limit orders
 - Use the decimal library instead of float types
 - An integrated test across different data source modes, comparing the output csv with a reference csv
+- Warm up historical data for calculations like ATR position sizing
+- Handling web socket failure - auto reconnect
 
 ### Notes
 

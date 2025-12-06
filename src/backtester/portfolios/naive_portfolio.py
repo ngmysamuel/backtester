@@ -100,8 +100,6 @@ class NaivePortfolio(Portfolio):
         self.current_holdings["slippage"] = ""
         self.historical_holdings.append(self.current_holdings)
 
-        print(len(self.historical_holdings))
-
         if self.current_holdings["cash"] < 0:
             raise NegativeCashException(self.current_holdings["cash"])
 
@@ -112,7 +110,7 @@ class NaivePortfolio(Portfolio):
         cur_quantity = self.current_holdings[ticker]["position"]
 
         to_be_quantity = self.position_sizer.get_position_size(self, ticker)
-        print(f"atr position size: {to_be_quantity}")
+
         if to_be_quantity is None:
             to_be_quantity = self.position_dict[ticker]  # use the last used position size
         self.position_dict[ticker] = to_be_quantity  # update the position dict with the position size we are going to use
