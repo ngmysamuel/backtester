@@ -64,7 +64,7 @@ df.to_csv("MSFT.csv")
 
 ### Important Caveats
 1. Slippage Model 
-    - The multi factor slippage model only supports daily data
+    - The multi factor slippage model assumes daily data
     - If you have data of other intervals, you must update the parameters used by it in config.yaml
     - If you do not wish the hassle, use the NoSlippage model
     - Note backtester_settings.interval config as well
@@ -87,10 +87,19 @@ df.to_csv("MSFT.csv")
     1. Consolidates all ticks within interval timespan (backtester_settings.interval) into a single bar of high, low, open, and close.
     2. Stop when the time spent listening for messages exceeds the period (backtester_settings.period)
     3. For short periods, use the buy_and_hold_simple strategy to ensure the tearsheet generation works (there will be no buy signals generated using moving_average strategy as the time span of its windows are too long)
-4. Position Sizing (General)
+5. Volume (Live)
+    - Note that live data from yfinance doesn't seem to have clean volume information i.e. it is not monotonically increasing. This is handled by:
+        - 2 dictionaries capturing the volumes on a day basis and an interval basis
+        - The day basis dictionary updates at the end of every interval.
+            - It is incremented by the interval basis value at the end of every interval. It is reset to zero at the end of the trading day
+        - The interval basis dictionary updates on every message
+            - It takes the message volume and subtracts the volume in the day basis dictionary to get the current interval's volume.
+            - If the result is smaller than the previous interval value, it is ignored
+            - It is reset to 0 at the end of every interval
+6. Position Sizing (General)
     1. return None if there is not enough data to generate a value. This will cause the portfolio module to reuse the last used position size
     2. if it is the first trade, it will be backtester_settings.initial_position_size in config.yaml
-4. Position Sizing (ATR)
+7. Position Sizing (ATR)
     1. Implemented as part of the position sizer module with attributes defined in config.yaml
     2. Calculated at the end of the interval, before new bars are added
     3. position_size = capital_to_risk // (atr * atr_multiplier) where
@@ -102,7 +111,7 @@ df.to_csv("MSFT.csv")
             1. https://www.macroption.com/atr-calculation/#exponential-moving-average-ema-method
             2. https://www.macroption.com/atr-excel-wilder/
         2. initialization is handled with a simple average of the true range over the number of periods
-5. Metrics
+8. Metrics
     1. Quantstats
         1. https://github.com/ranaroussi/quantstats/blob/main/quantstats/reports.py
         2. https://github.com/ranaroussi/quantstats/blob/main/quantstats/stats.py
@@ -110,11 +119,11 @@ df.to_csv("MSFT.csv")
     3. Note that there are differnces in the values you see in the tearsheet versus what I've calculated and presented via Steamlit
         1. For example, Quantstats starts their calculation from the first date where there is a non-zero return. Refer to _match_dates() in reports.py. For e.g. CAGR is 1.6% if we go by the full time span while Quanstats, relying on a smaller time period, returns a larger CAGR - 1.9%
         2. Another example, Longest Drawdown Duration is present by Quantstats as the number of days from start to end while I present the number of trading intervals
-6. Annulization of Sharpe
+9. Annulization of Sharpe
     1. The factor depends on what kind of time period we are calculating Sharpe over which in turn depends on the data interval we are using. If the data interval is daily, the Sharpe Ratio is daily. To get the sharpe ratio for the year, we need to "increase" the ratio to a year's basis. There are 252 trading days in a year which means the annualization factor is 252.
     2. Uses the the interval stated in config.yaml
     3. If its daily, annualization factor is 252. If its minutely, 98280. See get_annualization_factor() in _util.py
-7. Transaction Cost Modelling
+10. Transaction Cost Modelling
     1. Commisions
     2. Slippage Modelling
         1. Principles
@@ -164,6 +173,12 @@ df.to_csv("MSFT.csv")
 - Modelling probability of fill for limit orders
 - Use the decimal library instead of float types
 - An integrated test across different data source modes, comparing the output csv with a reference csv
+- Warm up historical data for calculations like ATR position sizing
+    - another config parameter that contains the names of all the window parameters
+    - For historical CSV, check if there exists a data point that is the max of all those window parameters behind
+    - For live, check if the data dir is give. If so, look for a data point that is the max of all those window parameters behind
+    - If at any point, there isn't, send a warning
+- Handling web socket failure - auto reconnect
 
 ### Notes
 

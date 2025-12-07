@@ -31,6 +31,8 @@ class LiveDataHandler(DataHandler):
         self.symbol_raw_data = {ticker: [] for ticker in symbol_list}  # {string: list[pd.DataFrame]}
         self.latest_symbol_data = {ticker: [] for ticker in symbol_list}  # {string: list[BarTuple]}
         self.continue_backtest = True
+        self.day_vol = {ticker: 0 for ticker in symbol_list} # {string: int}
+        self.interval_vol = {ticker: 0 for ticker in symbol_list} # {string: int}
 
         message_listener = threading.Thread(target=self._start_listening, args=(symbol_list,))
         message_listener.daemon = True
@@ -57,9 +59,14 @@ class LiveDataHandler(DataHandler):
                 message = self.message_queue.get(block=False)
                 ticker = message["id"]
                 price = message["price"]
+                message_vol = int(message["day_volume"])
+                if message_vol >= self.day_vol[ticker]: # start of a new day, no prior intervals / valid volume information
+                    if self.day_vol[ticker] == 0 :
+                        self.day_vol[ticker] = message_vol # init the day volume - starting the engine in the middle of the day
+                    self.interval_vol[ticker] = max(self.interval_vol[ticker], message_vol - self.day_vol[ticker])
                 current_time = float(message["time"]) / 1000
                 if not self.bar_dict[ticker]:  # if empty dictionary for that ticker. we are in a new interval, reset bar_dict
-                    self.bar_dict[ticker] = {"Index": pd.to_datetime(self.start_time, unit="s").tz_localize(None), "open": price, "high": price, "low": price, "close": price}
+                    self.bar_dict[ticker] = {"Index": pd.to_datetime(self.start_time, unit="s").tz_localize(None), "open": price, "high": price, "low": price, "close": price, "volume": self.interval_vol[ticker], "raw_volume": message_vol}
                 if current_time > self.end_time:  # we are in a new interval alr, break, and let the interval end handling happen below
                     break
                 else:  # we are still in the same interval, continue updating high, low, and close prices
@@ -67,6 +74,7 @@ class LiveDataHandler(DataHandler):
                     bar["high"] = max(bar["high"], price)
                     bar["low"] = min(bar["low"], price)
                     bar["close"] = price
+                    bar["volume"] = self.interval_vol[ticker]
             self._finalize_and_push_bars(self.start_time)
             self.start_time = self.end_time + 1
             self.end_time = self.start_time + self.interval - 1
@@ -76,7 +84,8 @@ class LiveDataHandler(DataHandler):
         self.continue_backtest = False
         for key, val in self.symbol_raw_data.items():  # self.symbol_raw_data is a dictionry of ticker to dataframe
             df = pd.DataFrame(val)
-            df.set_index("Index", inplace=True)
+            if "Index" in df.columns:
+                df.set_index("Index", inplace=True)
             self.symbol_raw_data[key] = df
 
     def _finalize_and_push_bars(self, start_time: float):
@@ -101,14 +110,18 @@ class LiveDataHandler(DataHandler):
                 self.symbol_raw_data[symbol].append(bar)
                 self.latest_symbol_data[symbol].append(bar)
                 mkt_close = (
-                  bar.Index + pd.Timedelta(self.interval) 
-                  >= bar.Index.replace(
-                    hour=int(self.exchange_closing_time.split(":")[0])
-                    , minute=int(self.exchange_closing_time.split(":")[1])
-                    )
+                  bar.Index + pd.Timedelta(self.interval) >= bar.Index.replace(
+                        hour=int(self.exchange_closing_time.split(":")[0]), minute=int(self.exchange_closing_time.split(":")[1]))
                   )
+            
+            if mkt_close: # reset day volume information
+                self.day_vol[symbol] = 0
+            else: # increment volume traded today so far by the volume traded in the last interval
+                self.day_vol[symbol] += self.interval_vol[symbol]
 
-            self.bar_dict[symbol] = {}  # reset for the next interval
+            # reset for the next interval
+            self.bar_dict[symbol] = {}
+            self.interval_vol[symbol] = 0
 
         self.event_queue.put(MarketEvent(self.start_time, mkt_close))
 
@@ -132,7 +145,8 @@ class LiveDataHandler(DataHandler):
 
     def _handle_message(self, message):
         """
-        Handler for the message from the websocket. An example of the message from yf below
+        Handler for the message from the websocket. Examples of the message from yf below
         {'id': 'AAPL', 'price': 239.8471, 'time': '1758116301000', 'exchange': 'NMS', 'quote_type': 8, 'market_hours': 1, 'change_percent': 0.7126236, 'day_volume': '3618459', 'change': 1.697113, 'price_hint': '2'}
+        {'id': 'BTC-USD', 'price': 89633.69, 'time': '1764996000000', 'currency': 'USD', 'exchange': 'CCC', 'quote_type': 41, 'market_hours': 1, 'change_percent': -2.5575025, 'day_volume': '62136492032', 'day_high': 89793.9, 'day_low': 89124.484, 'change': -2352.5547, 'open_price': 89360.836, 'last_size': '62136492032', 'price_hint': '2', 'vol_24hr': '62136492032', 'vol_all_currencies': '62136492032', 'from_currency': 'BTC', 'circulating_supply': 19958140.0, 'market_cap': 1788921640000.0}
         """
         self.message_queue.put(message)

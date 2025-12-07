@@ -110,6 +110,7 @@ class NaivePortfolio(Portfolio):
         cur_quantity = self.current_holdings[ticker]["position"]
 
         to_be_quantity = self.position_sizer.get_position_size(self, ticker)
+
         if to_be_quantity is None:
             to_be_quantity = self.position_dict[ticker]  # use the last used position size
         self.position_dict[ticker] = to_be_quantity  # update the position dict with the position size we are going to use
