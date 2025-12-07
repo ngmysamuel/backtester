@@ -64,7 +64,7 @@ df.to_csv("MSFT.csv")
 
 ### Important Caveats
 1. Slippage Model 
-    - The multi factor slippage model only supports daily data
+    - The multi factor slippage model assumes daily data
     - If you have data of other intervals, you must update the parameters used by it in config.yaml
     - If you do not wish the hassle, use the NoSlippage model
     - Note backtester_settings.interval config as well
