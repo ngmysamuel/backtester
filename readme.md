@@ -174,6 +174,10 @@ df.to_csv("MSFT.csv")
 - Use the decimal library instead of float types
 - An integrated test across different data source modes, comparing the output csv with a reference csv
 - Warm up historical data for calculations like ATR position sizing
+    - another config parameter that contains the names of all the window parameters
+    - For historical CSV, check if there exists a data point that is the max of all those window parameters behind
+    - For live, check if the data dir is give. If so, look for a data point that is the max of all those window parameters behind
+    - If at any point, there isn't, send a warning
 - Handling web socket failure - auto reconnect
 
 ### Notes
