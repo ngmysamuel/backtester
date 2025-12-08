@@ -21,7 +21,7 @@ There are 6 parameters
     - Default is None
 2. data-source
     - Available options are in config.yaml under "data_handler"
-    - Default is "csv"
+    - Default is "yf"
 3. position_calc
     - Method used to calculate the position size of each trade
     - Available options are in config.yaml under "position_sizer"

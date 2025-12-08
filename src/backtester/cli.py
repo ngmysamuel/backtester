@@ -47,7 +47,7 @@ def load_class(path_to_class: str):
 
 
 @app.command()
-def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_calc: Optional[str] = "atr", slippage: Optional[str] = "multi_factor_slippage", strategy: Optional[str] = "buy_and_hold_simple", exception_contd: Optional[int] = 1):
+def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", position_calc: Optional[str] = "atr", slippage: Optional[str] = "multi_factor_slippage", strategy: Optional[str] = "buy_and_hold_simple", exception_contd: Optional[int] = 1):
     """
     Run the backtester with a given strategy and date range.
     args:
