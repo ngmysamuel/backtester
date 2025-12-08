@@ -160,6 +160,7 @@ df.to_csv("MSFT.csv")
         - An approach: https://www.stephendiehl.com/posts/slippage/
         - Heavily adapted from: https://github.com/QuantJourneyOrg/qj_public_code/blob/main/slippage-analysis.py
         - Explanations: https://quantjourney.substack.com/p/slippage-a-comprehensive-analysis
+11. One way negative cash arises because we use market orders - we might have position sized to use up all remaining cash based on the ATR of the ticker. But on the next open, price rockets and the order fulfilled for a value more than what cash is available.
 
 ### To Do
 - Slippage model  - supporting other time periods automatically 

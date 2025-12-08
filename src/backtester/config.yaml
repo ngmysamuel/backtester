@@ -15,6 +15,13 @@ backtester_settings:
   maintenance_margin: 0.3 # margin to hold on short positions - 30%
   risk_per_trade: 0.01 # percentage of total portfolio value willing to risk in a single trade
 
+risk_settings:
+  max_order_quantity: -1
+  max_notional_value: -1
+  max_daily_loss: 0.01
+  rate_limit: 50 # max orders per second
+  participation_limit: 0.05
+
 data_handler:
   yf: 
     name: backtester.data.yf_data_handler.YFDataHandler
