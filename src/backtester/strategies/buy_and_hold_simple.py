@@ -7,14 +7,16 @@ import queue
 
 
 class BuyAndHoldSimple(Strategy):
-    def __init__(self, events: queue.Queue, data_handler: DataHandler):
+    def __init__(self, events: queue.Queue, data_handler: DataHandler, symbol_list: list[str], **kwargs):
         self.events = events
         self.data_handler = data_handler
-        self.symbol_list = self.data_handler.symbol_list
+        self.symbol_list = symbol_list
         self.bought = {sym: False for sym in self.symbol_list}
+        self.counter = 0
 
     def generate_signals(self, event: Event):
         timestamp = event.timestamp
+        self.counter += 1
 
         for ticker in self.symbol_list:
             # Retrieve latest bar(s) for ticker. If no data is available, do not generate a signal.
@@ -24,6 +26,7 @@ class BuyAndHoldSimple(Strategy):
             if not ohlcv_data:
                 continue
 
-            if not self.bought[ticker]:
+            if not self.bought[ticker] and self.counter >= 5:
                 self.bought[ticker] = True
                 self.events.put(SignalEvent(timestamp, ticker, SignalType.LONG))
+                print("=== STRATEGY BUYING ===")

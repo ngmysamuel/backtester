@@ -78,6 +78,8 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     exchange_closing_time = backtester_settings["exchange_closing_time"]
     benchmark_ticker = backtester_settings["benchmark"]
 
+    strategy_interval = config["strategies"][strategy]["additional_parameters"]["interval"]
+
     ####################
     # display loaded configuration
     ####################
@@ -96,6 +98,8 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     typer_tbl.add_row("Start Date", backtester_settings["start_date"])
     typer_tbl.add_row("End Date", backtester_settings["end_date"])
     typer_tbl.add_row("Base Interval", interval)
+    typer_tbl.add_row("Metrics Interval", metrics_interval)
+    typer_tbl.add_row("Strategy Interval", strategy_interval)
     typer_tbl.add_row("Period (only for live)", period)
     console.print(typer_tbl)
 
@@ -104,8 +108,6 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     ####################
 
     event_queue = Queue()
-
-    strategy_interval = config["strategies"][strategy]["additional_parameters"]["interval"]
 
     DataHandlerClass = load_class(config["data_handler"][data_source]["name"])
     start_datetime = pd.to_datetime(start_timestamp, unit="s")
@@ -122,7 +124,7 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
 
     PositionSizerClass = load_class(config["position_sizer"][position_calc]["name"])
     position_sizer_settings = config["position_sizer"][position_calc].get("additional_parameters", None)
-    position_sizer = PositionSizerClass(position_sizer_settings, symbol_list)
+    position_sizer = PositionSizerClass(position_sizer_settings, symbol_list, strategy_data_handler)
 
     SlippageClass = load_class(config["slippage"][slippage]["name"])
     slippage_settings = config["slippage"][slippage].get("additional_parameters", None)
@@ -130,7 +132,7 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
 
     StrategyClass = load_class(config["strategies"][strategy]["name"])
     additional_params = config["strategies"][strategy].get("additional_parameters", {})
-    strategy_instance = StrategyClass(event_queue, strategy_data_handler, **additional_params)
+    strategy_instance = StrategyClass(event_queue, strategy_data_handler, symbol_list, **additional_params)
 
     portfolio = NaivePortfolio(data_handler, initial_capital, initial_position_size, symbol_list, event_queue, start_timestamp, interval, metrics_interval, position_sizer)
 
@@ -162,7 +164,9 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
                 if start_of_strategy_interval_time is None:  # this is the first market event - set start_of_strategy_interval_time to the timestamp
                     start_of_strategy_interval_time = event.timestamp
                 if event.timestamp >= start_of_strategy_interval_time + strategy_interval_seconds: 
+                    print("===== MARKET EVENT FOR STRATEGY =====")
                     strategy_data_handler.update_bars()
+                    position_sizer.update_historical_atr()
                     start_of_strategy_interval_time = event.timestamp
                 mkt_close = event.is_eod
                 try:
@@ -173,6 +177,7 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
                     console.print(f"[yellow bold]Warning![/yellow bold] {e}")
                 execution_handler.on_market(event, mkt_close)  # check if any orders can be filled, if so, it will update the portfolio via a FILL event
                 if event.interval == strategy_interval: # only execute if this market event is the correct interval for this strategy
+                    print("===== STRATEGY CHECKING... =====")
                     strategy_instance.generate_signals(event)  # generate signals based on market event
             elif event.type == "SIGNAL":
                 if event.ticker != benchmark_ticker:  # we skip any signals generated for the benchmark
@@ -188,12 +193,16 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     ####################
     # metrics and results
     ####################
+    print("============= historcal_atr =============")
+    print(portfolio.position_sizer.historical_atr["MSFT"])
+    print("=====================")
+
     portfolio.create_equity_curve()
     portfolio.equity_curve.to_csv("equity_curve.csv")
 
     for key, val in data_handler.symbol_raw_data.items():
         if len(val) > 0:
-            val.to_csv(f"{key}_prices.csv")
+            val.to_csv(f"{key}_{interval}_prices.csv")
 
     benchmark_data = data_handler.symbol_raw_data[benchmark_ticker]
     benchmark_returns = benchmark_data["close"].pct_change().fillna(0.0)

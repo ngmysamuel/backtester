@@ -5,11 +5,11 @@ import queue
 
 
 class MovingAverageCrossover:
-    def __init__(self, events: queue.Queue, data_handler: DataHandler, short_window: int = 40, long_window: int = 100):
+    def __init__(self, events: queue.Queue, data_handler: DataHandler, symbol_list: list[str], short_window: int = 40, long_window: int = 100, **kwargs):
         print(f"Initializing MovingAverageCrossover with short_window={short_window}, long_window={long_window}")
         self.events = events
         self.data_handler = data_handler
-        self.symbol_list = data_handler.symbol_list
+        self.symbol_list = symbol_list
         self.short_window = short_window
         self.long_window = long_window
 

@@ -1,6 +1,5 @@
 import queue
 from datetime import datetime
-from typing import Union
 
 import pandas as pd
 import yfinance as yf
@@ -10,7 +9,7 @@ from backtester.events.market_event import MarketEvent
 
 
 class YFDataHandler(DataHandler):
-  def __init__(self, event_queue: queue.Queue, start_date: Union[pd.Timestamp, datetime], end_date: Union[pd.Timestamp, datetime], symbol_list: str, interval: str, exchange_closing_time: str):
+  def __init__(self, event_queue: queue.Queue, start_date: pd.Timestamp | datetime, end_date: pd.Timestamp | datetime, symbol_list: str, interval: str, exchange_closing_time: str):
     """
     Initializes the YFDataHandler
     args:
@@ -46,6 +45,7 @@ class YFDataHandler(DataHandler):
     for symbol in self.symbol_list:
       df = yf.download(symbol, start=start, end=end, interval=self.interval, multi_level_index=False)
       df = df[["Open", "High", "Low", "Close", "Volume"]]
+      df.index = df.index.tz_localize(None)
 
       self.symbol_raw_data[symbol] = df
       self.symbol_data[symbol] = df

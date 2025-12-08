@@ -9,8 +9,8 @@ backtester_settings:
   exchange_closing_time: "16:00" # 24h time format - HH:MM
   initial_capital: 100000.0
   initial_position_size: 1 # used by portfolio to size a trade in the absence of any other signal
-  start_date: "01/12/2025 00:00:00"
-  end_date: "04/12/2025 00:00:00"
+  start_date: "17/11/2025 00:00:00"
+  end_date: "25/11/2025 00:00:00" # exclusive
   borrow_cost: 0.01 # interest on short sold stock - 1%
   maintenance_margin: 0.3 # margin to hold on short positions - 30%
   risk_per_trade: 0.01 # percentage of total portfolio value willing to risk in a single trade
@@ -36,7 +36,7 @@ position_sizer:
   atr:
     name: backtester.util.position_sizer.atr_position_sizer.ATRPositionSizer
     additional_parameters:
-      atr_window: 14 # number of days used when calculating average true range
+      atr_window: 4 # number of days used when calculating average true range
       atr_multiplier: 2
   no_position_sizer:
     name: backtester.util.position_sizer.no_position_sizer.NoPositionSizer

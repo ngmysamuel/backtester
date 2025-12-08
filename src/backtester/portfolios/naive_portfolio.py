@@ -67,6 +67,7 @@ class NaivePortfolio(Portfolio):
         self.events = events
         self.start_date = start_date
         self.interval = interval
+        self.metrics_interval = metrics_interval
         self.allocation = allocation
         self.daily_borrow_rate = borrow_cost / self._get_annualization_factor(interval)  # assuming 252 trading days in a year
         self.maintenance_margin = maintenance_margin
@@ -112,6 +113,8 @@ class NaivePortfolio(Portfolio):
 
         to_be_quantity = self.position_sizer.get_position_size(self, ticker)
 
+        print(f"=== PORTFOLIO position sizer size: {to_be_quantity}")
+
         if to_be_quantity is None:
             to_be_quantity = self.position_dict[ticker]  # use the last used position size
         self.position_dict[ticker] = to_be_quantity  # update the position dict with the position size we are going to use
@@ -132,6 +135,7 @@ class NaivePortfolio(Portfolio):
             elif cur_quantity < 0:  # EXIT a short position
                 order = OrderEvent(DirectionType(1), ticker, order_type, abs(cur_quantity), event.timestamp)
 
+        print(f"=== PORTFOLIO ORDER: q: {order.quantity}, type: {order.order_type} ===")
         if order:
             self.events.put(order)
 
@@ -187,9 +191,6 @@ class NaivePortfolio(Portfolio):
         Also, updates the value of currently held positions
         """
         for ticker in self.symbol_list:
-            if isinstance(self.position_sizer, ATRPositionSizer):
-                self.position_sizer.update_historical_atr(self, ticker)
-
             # Mark-to-market valuation at the end of the interval
             bar = self.data_handler.get_latest_bars(ticker)[0]
             initial_holding = self.current_holdings[ticker]["value"]
@@ -200,10 +201,21 @@ class NaivePortfolio(Portfolio):
         curve = pd.DataFrame(self.historical_holdings)
         curve["timestamp"] = pd.to_datetime(curve["timestamp"], unit="s")
         curve.set_index("timestamp", inplace=True)
-        curve = curve.resample(util.str_to_pandas(self.metrics_interval)).last()
+        curve = curve.resample(util.str_to_pandas(self.metrics_interval)).agg(self._form_dict())
         curve["returns"] = curve["total"].pct_change().fillna(0.0)
         curve["equity_curve"] = (1.0 + curve["returns"]).cumprod()
         self.equity_curve = curve
+
+    def _form_dict(self):
+        d = {ticker: "last" for ticker in self.symbol_list}
+        d["margin"] = "last"
+        d["cash"] = "last"
+        d["total"] = "last"
+        d["commissions"] = lambda x: " + ".join([str(comms) for comms in x if comms != 0.0])
+        d["borrow_costs"] = lambda x: " + ".join([str(bcosts) for bcosts in x if bcosts != 0.0])
+        d["order"] = lambda x: " | ".join([order for order in x if order is not None and order != ""])
+        d["slippage"] = lambda x: " | ".join([slippage for slippage in x if slippage is not None and slippage != ""])
+        return d
 
     def _get_annualization_factor(self, interval: str) -> float:
         """
