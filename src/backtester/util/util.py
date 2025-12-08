@@ -22,3 +22,10 @@ def str_to_seconds(interval):
             return 86400
         case _:
             raise ValueError(f"{interval} is not supported")
+
+def str_to_pandas(interval): # 1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
+    if "m" in interval:
+        return interval.replace("m", "min")
+    elif "d" in interval:
+        return interval.replace("d", "D")
+    return interval

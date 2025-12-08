@@ -12,12 +12,12 @@ from backtester.exceptions.negative_cash_exception import NegativeCashException
 from backtester.portfolios.portfolio import Portfolio
 from backtester.util.position_sizer.atr_position_sizer import ATRPositionSizer
 from backtester.util.position_sizer.position_sizer import PositionSizer
+from backtester.util import util
 
 
 class NaivePortfolio(Portfolio):
     """
     A naive portfolio implementation.
-    This class handles things like Risk Management, Position Sizing, and Portfolio Allocation / Valuation (albeit not handle / naively).
     """
 
     def __init__(
@@ -29,6 +29,7 @@ class NaivePortfolio(Portfolio):
         events: queue.Queue,
         start_date: float,
         interval: str,
+        metrics_interval: str,
         position_sizer: PositionSizer,
         allocation: float = 1,
         borrow_cost: float = 0.01,
@@ -199,6 +200,7 @@ class NaivePortfolio(Portfolio):
         curve = pd.DataFrame(self.historical_holdings)
         curve["timestamp"] = pd.to_datetime(curve["timestamp"], unit="s")
         curve.set_index("timestamp", inplace=True)
+        curve = curve.resample(util.str_to_pandas(self.metrics_interval)).last()
         curve["returns"] = curve["total"].pct_change().fillna(0.0)
         curve["equity_curve"] = (1.0 + curve["returns"]).cumprod()
         self.equity_curve = curve

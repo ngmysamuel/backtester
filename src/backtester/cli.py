@@ -72,7 +72,8 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
     initial_position_size = backtester_settings["initial_position_size"]
     start_timestamp = pd.to_datetime(backtester_settings["start_date"], dayfirst=True).timestamp()
     end_timestamp = pd.to_datetime(backtester_settings["end_date"], dayfirst=True).timestamp()
-    interval = backtester_settings["interval"]
+    interval = backtester_settings["base_interval"]
+    metrics_interval = backtester_settings["metrics_interval"]
     period = backtester_settings["period"]
     exchange_closing_time = backtester_settings["exchange_closing_time"]
     benchmark_ticker = backtester_settings["benchmark"]
@@ -94,7 +95,7 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
     typer_tbl.add_row("Initial Position Size", str(initial_position_size))
     typer_tbl.add_row("Start Date", backtester_settings["start_date"])
     typer_tbl.add_row("End Date", backtester_settings["end_date"])
-    typer_tbl.add_row("Interval", interval)
+    typer_tbl.add_row("Base Interval", interval)
     typer_tbl.add_row("Period (only for live)", period)
     console.print(typer_tbl)
 
@@ -104,15 +105,20 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
 
     event_queue = Queue()
 
+    strategy_interval = config["strategies"][strategy]["additional_parameters"]["interval"]
+
     DataHandlerClass = load_class(config["data_handler"][data_source]["name"])
     start_datetime = pd.to_datetime(start_timestamp, unit="s")
     end_datetime = pd.to_datetime(end_timestamp, unit="s")
     if data_source == "yf":
         data_handler = DataHandlerClass(event_queue, start_datetime, end_datetime, symbol_list + [benchmark_ticker], interval, exchange_closing_time)
+        strategy_data_handler = DataHandlerClass(event_queue, start_datetime, end_datetime, symbol_list + [benchmark_ticker], strategy_interval, exchange_closing_time)
     elif data_source == "live":
         data_handler = DataHandlerClass(event_queue, symbol_list + [benchmark_ticker], interval, period, exchange_closing_time)
+        strategy_data_handler = DataHandlerClass(event_queue, symbol_list + [benchmark_ticker], strategy_interval, period, exchange_closing_time)
     else:
         data_handler = DataHandlerClass(event_queue, data_dir, start_datetime, end_datetime, symbol_list + [benchmark_ticker], interval, exchange_closing_time)
+        strategy_data_handler = DataHandlerClass(event_queue, data_dir, start_datetime, end_datetime, symbol_list + [benchmark_ticker], strategy_interval, exchange_closing_time)
 
     PositionSizerClass = load_class(config["position_sizer"][position_calc]["name"])
     position_sizer_settings = config["position_sizer"][position_calc].get("additional_parameters", None)
@@ -124,15 +130,17 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
 
     StrategyClass = load_class(config["strategies"][strategy]["name"])
     additional_params = config["strategies"][strategy].get("additional_parameters", {})
-    strategy_instance = StrategyClass(event_queue, data_handler, **additional_params)
+    strategy_instance = StrategyClass(event_queue, strategy_data_handler, **additional_params)
 
-    portfolio = NaivePortfolio(data_handler, initial_capital, initial_position_size, symbol_list, event_queue, start_timestamp, interval, position_sizer)
+    portfolio = NaivePortfolio(data_handler, initial_capital, initial_position_size, symbol_list, event_queue, start_timestamp, interval, metrics_interval, position_sizer)
 
     execution_handler = SimulatedExecutionHandler(event_queue, data_handler, slippage_model)
 
     mkt_close = False
-    current_time_interval = None
+    start_of_interval_time = None
+    start_of_strategy_interval_time = None
     interval_seconds = str_to_seconds(interval)
+    strategy_interval_seconds = str_to_seconds(strategy_interval)
 
     ####################
     # start up the main loop
@@ -144,11 +152,18 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
         while not event_queue.empty():
             event = event_queue.get(block=False)
             if event.type == "MARKET":
-                if current_time_interval is None:  # this is the first market event - set current_time_interval to the timestamp
-                    current_time_interval = event.timestamp
-                if event.timestamp >= current_time_interval + interval_seconds:  # the marketEvent timestamp is always the timestamp of the interval start
+                # for live data handling
+                if start_of_interval_time is None:  # this is the first market event - set start_of_interval_time to the timestamp
+                    start_of_interval_time = event.timestamp
+                if event.timestamp >= start_of_interval_time + interval_seconds:  # the marketEvent timestamp is always the timestamp of the interval start
                     portfolio.end_of_interval()
-                    current_time_interval = event.timestamp
+                    start_of_interval_time = event.timestamp
+                # for strategy frequency handling
+                if start_of_strategy_interval_time is None:  # this is the first market event - set start_of_strategy_interval_time to the timestamp
+                    start_of_strategy_interval_time = event.timestamp
+                if event.timestamp >= start_of_strategy_interval_time + strategy_interval_seconds: 
+                    strategy_data_handler.update_bars()
+                    start_of_strategy_interval_time = event.timestamp
                 mkt_close = event.is_eod
                 try:
                     portfolio.on_market(event)  # update portfolio valuation
@@ -157,7 +172,8 @@ def run(data_dir: Optional["str"], data_source: Optional[str] = "csv", position_
                         raise e
                     console.print(f"[yellow bold]Warning![/yellow bold] {e}")
                 execution_handler.on_market(event, mkt_close)  # check if any orders can be filled, if so, it will update the portfolio via a FILL event
-                strategy_instance.generate_signals(event)  # generate signals based on market event
+                if event.interval == strategy_interval: # only execute if this market event is the correct interval for this strategy
+                    strategy_instance.generate_signals(event)  # generate signals based on market event
             elif event.type == "SIGNAL":
                 if event.ticker != benchmark_ticker:  # we skip any signals generated for the benchmark
                     portfolio.on_signal(event)
