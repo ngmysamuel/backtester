@@ -23,9 +23,14 @@ def str_to_seconds(interval):
         case _:
             raise ValueError(f"{interval} is not supported")
 
-def str_to_pandas(interval): # 1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
+def str_to_pandas(interval):
+    """
+    Used to convert the interval-strings used in Yahoo to those used in Pandas
+    Yahoo: 1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
+    Pandas: https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#dateoffset-objects
+    """
     if "m" in interval:
         return interval.replace("m", "min")
     elif "d" in interval:
-        return interval.replace("d", "D")
+        return interval.replace("d", "B")
     return interval

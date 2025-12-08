@@ -171,7 +171,7 @@ df.to_csv("MSFT.csv")
 - Add explanation for how create own implementation of various items e.g. position sizer, slippage model, etc
 - Logger
 - Other order types e.g. Limit order
-- Modelling probability of fill for limit orders
+    - Modelling probability of fill for limit orders
 - Use the decimal library instead of float types
 - An integrated test across different data source modes, comparing the output csv with a reference csv
 - Warm up historical data for calculations like ATR position sizing
@@ -180,6 +180,12 @@ df.to_csv("MSFT.csv")
     - For live, check if the data dir is give. If so, look for a data point that is the max of all those window parameters behind
     - If at any point, there isn't, send a warning
 - Handling web socket failure - auto reconnect
+- Dual frequency
+    - only yf handles dual freq now, to extend for CSV and Live
+        CSV - naming of the excels will have to change
+        Live - how to test?
+- Risk manager
+- Multi strategy backtesting
 
 ### Notes
 
