@@ -2,6 +2,7 @@ import streamlit as st
 import backtester.metrics.dashboard._util as utils
 from millify import millify
 import plotly.express as px
+import pandas as pd
 
 st.set_page_config(layout="wide")
 st.title("Performance Analysis")
@@ -52,9 +53,15 @@ with col5:
     st.plotly_chart(fig_return_histogram)
 with col6:
     histo_window = st.selectbox("Distribution Windows", ("Weekly", "Monthly", "Quaterly", "Yearly"), index=1, key="histo_window")
-    st.metric("Excess Kurtosis", millify(kurtosis, precision=3))
+    if pd.isna(kurtosis):
+        st.metric("Excess Kurtosis", "No Kurtosis")
+    else:
+        st.metric("Excess Kurtosis", millify(kurtosis, precision=3))
     st.caption("A higher value indicates a greater possibility of outlier returns")
-    st.metric("Skewness", millify(skewness, precision=3))
+    if pd.isna(skewness):
+        st.metric("Excess skewness", "No Skewness")
+    else:
+        st.metric("Skewness", millify(skewness, precision=3))
     st.caption("A positive value indicates many small losses and a few very large winners")
 
 

@@ -72,7 +72,7 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     initial_position_size = backtester_settings["initial_position_size"]
     start_timestamp = pd.to_datetime(backtester_settings["start_date"], dayfirst=True).timestamp()
     end_timestamp = pd.to_datetime(backtester_settings["end_date"], dayfirst=True).timestamp()
-    interval = backtester_settings["base_interval"]
+    base_interval = backtester_settings["base_interval"]
     metrics_interval = backtester_settings["metrics_interval"]
     period = backtester_settings["period"]
     exchange_closing_time = backtester_settings["exchange_closing_time"]
@@ -97,7 +97,7 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     typer_tbl.add_row("Initial Position Size", str(initial_position_size))
     typer_tbl.add_row("Start Date", backtester_settings["start_date"])
     typer_tbl.add_row("End Date", backtester_settings["end_date"])
-    typer_tbl.add_row("Base Interval", interval)
+    typer_tbl.add_row("Base Interval", base_interval)
     typer_tbl.add_row("Metrics Interval", metrics_interval)
     typer_tbl.add_row("Strategy Interval", strategy_interval)
     typer_tbl.add_row("Period (only for live)", period)
@@ -113,13 +113,13 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     start_datetime = pd.to_datetime(start_timestamp, unit="s")
     end_datetime = pd.to_datetime(end_timestamp, unit="s")
     if data_source == "yf":
-        data_handler = DataHandlerClass(event_queue, start_datetime, end_datetime, symbol_list + [benchmark_ticker], interval, exchange_closing_time)
+        data_handler = DataHandlerClass(event_queue, start_datetime, end_datetime, symbol_list + [benchmark_ticker], base_interval, exchange_closing_time)
         strategy_data_handler = DataHandlerClass(event_queue, start_datetime, end_datetime, symbol_list + [benchmark_ticker], strategy_interval, exchange_closing_time)
     elif data_source == "live":
-        data_handler = DataHandlerClass(event_queue, symbol_list + [benchmark_ticker], interval, period, exchange_closing_time)
+        data_handler = DataHandlerClass(event_queue, symbol_list + [benchmark_ticker], base_interval, period, exchange_closing_time)
         strategy_data_handler = DataHandlerClass(event_queue, symbol_list + [benchmark_ticker], strategy_interval, period, exchange_closing_time)
     else:
-        data_handler = DataHandlerClass(event_queue, data_dir, start_datetime, end_datetime, symbol_list + [benchmark_ticker], interval, exchange_closing_time)
+        data_handler = DataHandlerClass(event_queue, data_dir, start_datetime, end_datetime, symbol_list + [benchmark_ticker], base_interval, exchange_closing_time)
         strategy_data_handler = DataHandlerClass(event_queue, data_dir, start_datetime, end_datetime, symbol_list + [benchmark_ticker], strategy_interval, exchange_closing_time)
 
     PositionSizerClass = load_class(config["position_sizer"][position_calc]["name"])
@@ -134,18 +134,21 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     additional_params = config["strategies"][strategy].get("additional_parameters", {})
     strategy_instance = StrategyClass(event_queue, strategy_data_handler, symbol_list, **additional_params)
 
-    portfolio = NaivePortfolio(data_handler, initial_capital, initial_position_size, symbol_list, event_queue, start_timestamp, interval, metrics_interval, position_sizer)
+    portfolio = NaivePortfolio(data_handler, initial_capital, initial_position_size, symbol_list, event_queue, start_timestamp, base_interval, metrics_interval, position_sizer)
 
     execution_handler = SimulatedExecutionHandler(event_queue, data_handler, slippage_model)
 
     mkt_close = False
     start_of_interval_time = None
     start_of_strategy_interval_time = None
-    interval_seconds = str_to_seconds(interval)
+    interval_seconds = str_to_seconds(base_interval)
     strategy_interval_seconds = str_to_seconds(strategy_interval)
 
     ####################
     # start up the main loop
+    #   the base interval acts as the hearbeat of the whole system
+    #   strategy intervals will take its cue from the base interval
+    #   eventual plan is to consolidate all intervals from different strategies with a data handler for each interval. Loop over all strat intervals
     ####################
 
     while data_handler.continue_backtest or not event_queue.empty():  # continue_backtest - to be made thread safe?
@@ -153,7 +156,7 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
         # Process events from the event queue (e.g., generate signals, execute orders, etc.)
         while not event_queue.empty():
             event = event_queue.get(block=False)
-            if event.type == "MARKET":
+            if event.type == "MARKET" and event.interval == base_interval:
                 # for live data handling
                 if start_of_interval_time is None:  # this is the first market event - set start_of_interval_time to the timestamp
                     start_of_interval_time = event.timestamp
@@ -163,8 +166,7 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
                 # for strategy frequency handling
                 if start_of_strategy_interval_time is None:  # this is the first market event - set start_of_strategy_interval_time to the timestamp
                     start_of_strategy_interval_time = event.timestamp
-                if event.timestamp >= start_of_strategy_interval_time + strategy_interval_seconds: 
-                    print("===== MARKET EVENT FOR STRATEGY =====")
+                if event.timestamp >= start_of_strategy_interval_time + strategy_interval_seconds: # generate a market event for strategy
                     strategy_data_handler.update_bars()
                     position_sizer.update_historical_atr()
                     start_of_strategy_interval_time = event.timestamp
@@ -176,9 +178,9 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
                         raise e
                     console.print(f"[yellow bold]Warning![/yellow bold] {e}")
                 execution_handler.on_market(event, mkt_close)  # check if any orders can be filled, if so, it will update the portfolio via a FILL event
-                if event.interval == strategy_interval: # only execute if this market event is the correct interval for this strategy
-                    print("===== STRATEGY CHECKING... =====")
-                    strategy_instance.generate_signals(event)  # generate signals based on market event
+            elif event.type == "MARKET" and event.interval == strategy_interval: # only execute if this market event is the correct interval for this strategy
+                print(f"===== STRATEGY CHECKING... {event.timestamp}=====")
+                strategy_instance.generate_signals(event)  # generate signals based on market event
             elif event.type == "SIGNAL":
                 if event.ticker != benchmark_ticker:  # we skip any signals generated for the benchmark
                     portfolio.on_signal(event)
@@ -193,16 +195,8 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     ####################
     # metrics and results
     ####################
-    print("============= historcal_atr =============")
-    print(portfolio.position_sizer.historical_atr["MSFT"])
-    print("=====================")
-
     portfolio.create_equity_curve()
     portfolio.equity_curve.to_csv("equity_curve.csv")
-
-    for key, val in data_handler.symbol_raw_data.items():
-        if len(val) > 0:
-            val.to_csv(f"{key}_{interval}_prices.csv")
 
     benchmark_data = data_handler.symbol_raw_data[benchmark_ticker]
     benchmark_returns = benchmark_data["close"].pct_change().fillna(0.0)
@@ -218,7 +212,7 @@ def dashboard():
     Plot the results of the last backtest.
     """
     config = load_config()
-    interval = config["backtester_settings"]["interval"]
+    interval = config["backtester_settings"]["metrics_interval"]
     streamlit_script_path = Path("src/backtester/metrics/dashboard/streamlit_app.py").resolve()
     console.print(f"Loading [underline]{streamlit_script_path}[/underline]")
     sys.argv = ["streamlit", "run", streamlit_script_path, "--global.disableWidgetStateDuplicationWarning", "true", f" -- --interval {interval}"]  # for more arguments, add ', " -- --what ee"' to the end

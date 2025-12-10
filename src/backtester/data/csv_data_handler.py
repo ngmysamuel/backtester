@@ -51,14 +51,15 @@ class CSVDataHandler(DataHandler):
         for symbol in self.symbol_list:
             # Load the CSV file
             df = pd.read_csv(
-              os.path.join(self.csv_dir, f"{symbol}.csv"),
+              os.path.join(self.csv_dir, f"{symbol}_{self.interval}.csv"),
               header=0,
               parse_dates=True,
-              usecols=lambda x: x.lower() in ["open", "close", "high", "low", "volume", "date"],
-              converters={"Date": lambda x: pd.to_datetime(x).tz_localize(None)}
+              usecols=lambda x: x.lower() in ["open", "close", "high", "low", "volume", "date", "datetime"]
             )
 
-            df.set_index("Date", inplace=True)
+            index_col = "Date" if "Date" in df.columns else "Datetime"
+            df[index_col] = pd.to_datetime(df[index_col], utc=True).dt.tz_localize(None)
+            df.set_index(index_col, inplace=True)
             df.sort_index(inplace=True)  # ensure data is sorted
             df.columns = [col.lower() for col in df.columns]
 
@@ -104,7 +105,7 @@ class CSVDataHandler(DataHandler):
                     mkt_close = bar.Index + pd.Timedelta(self.interval) >= bar.Index.replace(hour=int(self.exchange_closing_time.split(":")[0]), minute=int(self.exchange_closing_time.split(":")[1]))
                     start_time = bar.Index.timestamp()
 
-        self.event_queue.put(MarketEvent(start_time, mkt_close))
+        self.event_queue.put(MarketEvent(start_time, mkt_close, self.interval))
 
     def get_latest_bars(self, symbol: str, n: int = 1):
         """

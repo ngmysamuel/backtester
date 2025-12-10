@@ -493,6 +493,9 @@ def plot_stacked_pnl_by_holding_period(ticker: str, df: pd.DataFrame):
     """
     Creates a stacked bar chart showing Gross Profit vs. Gross Loss for each bin.
     """
+    if df.empty:
+        return "No closed trades"
+
     if ticker != "All":
         df = df[df["Ticker"] == ticker]
 

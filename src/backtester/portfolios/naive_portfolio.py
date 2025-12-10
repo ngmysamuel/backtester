@@ -13,6 +13,7 @@ from backtester.portfolios.portfolio import Portfolio
 from backtester.util.position_sizer.atr_position_sizer import ATRPositionSizer
 from backtester.util.position_sizer.position_sizer import PositionSizer
 from backtester.util import util
+from backtester.events.event import Event
 
 
 class NaivePortfolio(Portfolio):
@@ -139,7 +140,7 @@ class NaivePortfolio(Portfolio):
         if order:
             self.events.put(order)
 
-    def on_fill(self, event):
+    def on_fill(self, event: Event):
         """
         Updates the portfolio's positions and holdings based on a FillEvent.
         """

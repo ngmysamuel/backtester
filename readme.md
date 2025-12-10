@@ -57,9 +57,8 @@ poetry run pytest tests\execution\test_simulated_execution_handler.py
 Identical to using data-source = "yf"
 ```
 import yfinance as yf
-dat = yf.Ticker("MSFT")
-df = dat.history(period='5y') # period must be one of: 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max
-df.to_csv("MSFT.csv")
+dat = yf.download("msft", start="2025-11-24", end="2025-11-29", interval="1m",multi_level_index=False,ignore_tz=True)
+dat.to_csv("MSFT_1m.csv")
 ```
 
 ### Important Caveats

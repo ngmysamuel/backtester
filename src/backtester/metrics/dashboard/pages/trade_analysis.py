@@ -35,20 +35,23 @@ with col2:
 
 st.header("Closed Trades Profit and Loss")
 pnl = utils.book_trades(trades_df)
-st.dataframe(
-    pnl,
-    hide_index=True,
-    column_config={
-        "Quantity": st.column_config.TextColumn("Quantity"),
-        "EOD Nett Position": st.column_config.TextColumn("EOD Nett Position"),
-        "Entry Price": st.column_config.NumberColumn("Entry Price", format="dollar"),
-        "Exit Price": st.column_config.NumberColumn("Exit Price", format="dollar"),
-        "PnL": st.column_config.NumberColumn("PnL", format="$%d"),
-        "Return": st.column_config.NumberColumn("Return", format="%.2f%%"),
-    },
-)
-col1, col2 = st.columns([0.9, 0.1])
-with col1:
-    st.plotly_chart(utils.plot_stacked_pnl_by_holding_period(st.session_state.trade_analysis_ticker_pnl, pnl))
-with col2:
-    trade_analysis_ticker_pnl = st.selectbox("Filter by Ticker", ["All"] + [*trades_df["Ticker"].unique()], index=0, key="trade_analysis_ticker_pnl")
+if pnl.empty:
+    st.warning("No trades were closed during this backtest.")
+else:
+    st.dataframe(
+        pnl,
+        hide_index=True,
+        column_config={
+            "Quantity": st.column_config.TextColumn("Quantity"),
+            "EOD Nett Position": st.column_config.TextColumn("EOD Nett Position"),
+            "Entry Price": st.column_config.NumberColumn("Entry Price", format="dollar"),
+            "Exit Price": st.column_config.NumberColumn("Exit Price", format="dollar"),
+            "PnL": st.column_config.NumberColumn("PnL", format="$%d"),
+            "Return": st.column_config.NumberColumn("Return", format="%.2f%%"),
+        },
+    )
+    col1, col2 = st.columns([0.9, 0.1])
+    with col1:
+        st.plotly_chart(utils.plot_stacked_pnl_by_holding_period(st.session_state.trade_analysis_ticker_pnl, pnl))
+    with col2:
+        trade_analysis_ticker_pnl = st.selectbox("Filter by Ticker", ["All"] + [*trades_df["Ticker"].unique()], index=0, key="trade_analysis_ticker_pnl")

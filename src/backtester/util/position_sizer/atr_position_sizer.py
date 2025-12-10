@@ -20,21 +20,18 @@ class ATRPositionSizer(PositionSizer):
             atr = self.historical_atr[ticker][-1]
             if atr:
                 capital_to_risk = min(portfolio.current_holdings["cash"], portfolio.risk_per_trade * portfolio.current_holdings["total"])
-                print(f"=== POSITION SIZER capital_to_risk: {capital_to_risk}, atr: {atr}, atr_multiplier: {self.atr_multiplier}")
                 return capital_to_risk // (atr * self.atr_multiplier)
         return None
 
     def update_historical_atr(self):
         for ticker in self.symbol_list:
             atr = self._calc_atr(ticker)
-            print(f"ATR update hist atr {ticker}: {atr}")
             if atr:
                 self.historical_atr[ticker].append(atr)
 
     def _calc_atr(self, ticker: str):  # # Use Wilder's Smoothing
         if len(self.historical_atr[ticker]) < 1:  # initialization of average true range uses simple arithmetic mean
             bar_data = self.data_handler.get_latest_bars(ticker, self.atr_window + 1)
-            print(f"ATR calc atr bar_data: {len(bar_data)}")
             if len(bar_data) < self.atr_window + 1:
                 return
 
