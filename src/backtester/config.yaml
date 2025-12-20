@@ -1,8 +1,5 @@
 backtester_settings:
-  # symbol_list: ["BTC-USD"]
   # benchmark: "ETH-USD"
-  # interval: "1m" # 1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
-  symbol_list: ["MSFT"]
   benchmark: "SPY"
   period: "10m" # used for live data handling - how long to run
   exchange_closing_time: "16:00" # 24h time format - HH:MM
@@ -14,8 +11,8 @@ backtester_settings:
   borrow_cost: 0.01 # interest on short sold stock - 1%
   maintenance_margin: 0.3 # margin to hold on short positions - 30%
   risk_per_trade: 0.01 # percentage of total portfolio value willing to risk in a single trade
-  base_interval: "1d"
-  metrics_interval: "1d"
+  base_interval: "1d" # 1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
+  metrics_interval: "1d" # the granularity of the output equity curve
 
 risk_settings:
   max_order_quantity: -1
@@ -36,8 +33,10 @@ position_sizer:
   atr:
     name: backtester.util.position_sizer.atr_position_sizer.ATRPositionSizer
     additional_parameters:
-      atr_window: 4 # number of days used when calculating average true range
+      atr_window: 14 # number of days used when calculating average true range
       atr_multiplier: 2
+      # atr_window: 4 # number of days used when calculating average true range
+      # atr_multiplier: 2
   no_position_sizer:
     name: backtester.util.position_sizer.no_position_sizer.NoPositionSizer
     additional_parameters:
@@ -69,6 +68,7 @@ strategies:
     additional_parameters:
       interval: "1d"
       symbol_list: ["MSFT"]
+      # symbol_list: ["BTC-USD"]
   moving_average:
     name: "backtester.strategies.moving_average_crossover.MovingAverageCrossover"
     display_name: "Moving Average"
@@ -77,3 +77,4 @@ strategies:
       short_window: 50
       interval: "1d"
       symbol_list: ["MSFT"]
+      # symbol_list: ["BTC-USD"]

@@ -66,8 +66,6 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
 
     backtester_settings = config["backtester_settings"]
 
-    symbol_list = backtester_settings["symbol_list"]
-
     initial_capital = backtester_settings["initial_capital"]
     initial_position_size = backtester_settings["initial_position_size"]
     start_timestamp = pd.to_datetime(backtester_settings["start_date"], dayfirst=True).timestamp()
@@ -78,7 +76,9 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     exchange_closing_time = backtester_settings["exchange_closing_time"]
     benchmark_ticker = backtester_settings["benchmark"]
 
+    # TODO: enhance for multi strategy handling
     strategy_interval = config["strategies"][strategy]["additional_parameters"]["interval"]
+    symbol_list = config["strategies"][strategy]["additional_parameters"]["symbol_list"]
 
     ####################
     # display loaded configuration
