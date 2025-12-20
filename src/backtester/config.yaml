@@ -8,12 +8,13 @@ backtester_settings:
   exchange_closing_time: "16:00" # 24h time format - HH:MM
   initial_capital: 100000.0
   initial_position_size: 1 # used by portfolio to size a trade in the absence of any other signal
-  start_date: "11/11/2025 00:00:00"
-  end_date: "08/12/2025 00:00:00" # exclusive
+  # start_date: "11/11/2025 00:00:00" 
+  start_date: "15/09/2020 00:00:00"
+  end_date: "19/12/2025 00:00:00" # exclusive
   borrow_cost: 0.01 # interest on short sold stock - 1%
   maintenance_margin: 0.3 # margin to hold on short positions - 30%
   risk_per_trade: 0.01 # percentage of total portfolio value willing to risk in a single trade
-  base_interval: "1m"
+  base_interval: "1d"
   metrics_interval: "1d"
 
 risk_settings:
@@ -67,6 +68,7 @@ strategies:
     name: "backtester.strategies.buy_and_hold_simple.BuyAndHoldSimple"
     additional_parameters:
       interval: "1d"
+      symbol_list: ["MSFT"]
   moving_average:
     name: "backtester.strategies.moving_average_crossover.MovingAverageCrossover"
     display_name: "Moving Average"
@@ -74,3 +76,4 @@ strategies:
       long_window: 200
       short_window: 50
       interval: "1d"
+      symbol_list: ["MSFT"]

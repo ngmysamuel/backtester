@@ -5,7 +5,7 @@ import pandas as pd
 
 from backtester.data.data_handler import DataHandler
 from backtester.events.market_event import MarketEvent
-
+from backtester.util.util import BarTuple
 
 class CSVDataHandler(DataHandler):
     """
@@ -88,6 +88,7 @@ class CSVDataHandler(DataHandler):
 
     def update_bars(self):
         """
+        TODO: to be made more memory efficient - there are 2 copies here, and another in bar_manager.py
         Pushes the latest bar to the latest_symbol_data structure for all
         symbols in the symbol list. This will also generate a MarketEvent.
         """
@@ -107,7 +108,7 @@ class CSVDataHandler(DataHandler):
 
         self.event_queue.put(MarketEvent(start_time, mkt_close, self.interval))
 
-    def get_latest_bars(self, symbol: str, n: int = 1):
+    def get_latest_bars(self, symbol: str, n: int = 1) -> BarTuple:
         """
         Returns the last N bars from the latest_symbol_data
         """

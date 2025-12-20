@@ -91,9 +91,13 @@ class NaivePortfolio(Portfolio):
 
     def on_market(self, event):
         """
+        TODO: can be made on demand instead? Does the RiskManager require on every heartbeat?
         This method is called whenever a new market event is received.
         Sets up the new phase of current_holdings by creating a new map object and placing the previous
         'current_holdings' into historical_holdings
+        Also,
+        The end of a trading interval e.g. 5mins, 1day - perform tasks that can only take place only take place at the END of the current interval
+        Also, updates the value of currently held positions
         """
         self.current_holdings = deepcopy(self.current_holdings)
         self.current_holdings["commissions"] = 0.0
@@ -102,6 +106,13 @@ class NaivePortfolio(Portfolio):
         self.current_holdings["order"] = ""
         self.current_holdings["slippage"] = ""
         self.historical_holdings.append(self.current_holdings)
+
+        for ticker in self.symbol_list:
+            # Mark-to-market valuation at the end of the interval
+            bar = self.data_handler.get_latest_bars(ticker)[0]
+            initial_holding = self.current_holdings[ticker]["value"]
+            self.current_holdings[ticker]["value"] = self.current_holdings[ticker]["position"] * bar.close
+            self.current_holdings["total"] += self.current_holdings[ticker]["value"] - initial_holding
 
         if self.current_holdings["cash"] < 0:
             raise NegativeCashException(self.current_holdings["cash"])
@@ -186,17 +197,6 @@ class NaivePortfolio(Portfolio):
         self.current_holdings["total"] += self.current_holdings["cash"]
         self.current_holdings["margin"] = self.margin_holdings.copy()
 
-    def end_of_interval(self):
-        """
-        The end of a trading interval e.g. 5mins, 1day - perform tasks that can only take place only take place at the END of the current interval
-        Also, updates the value of currently held positions
-        """
-        for ticker in self.symbol_list:
-            # Mark-to-market valuation at the end of the interval
-            bar = self.data_handler.get_latest_bars(ticker)[0]
-            initial_holding = self.current_holdings[ticker]["value"]
-            self.current_holdings[ticker]["value"] = self.current_holdings[ticker]["position"] * bar.close
-            self.current_holdings["total"] += self.current_holdings[ticker]["value"] - initial_holding
 
     def create_equity_curve(self):
         curve = pd.DataFrame(self.historical_holdings)

@@ -1,3 +1,15 @@
+from typing import NamedTuple  # identical to collections.namedtuple
+import datetime
+
+class BarTuple(NamedTuple):
+    Index: datetime.datetime
+    open: float
+    high: float
+    low: float
+    close: float
+    volume: int
+    raw_volume: int
+
 def str_to_seconds(interval):
     match interval:
         case "1m":
@@ -9,7 +21,7 @@ def str_to_seconds(interval):
         case "5m":
             return 300
         case "10m":
-          return 600
+            return 600
         case "15m":
             return 900
         case "30m":
@@ -22,6 +34,7 @@ def str_to_seconds(interval):
             return 86400
         case _:
             raise ValueError(f"{interval} is not supported")
+
 
 def str_to_pandas(interval):
     """

@@ -185,6 +185,7 @@ dat.to_csv("MSFT_1m.csv")
         Live - how to test?
 - Risk manager
 - Multi strategy backtesting
+- Use mypy for static analysis
 
 ### Notes
 

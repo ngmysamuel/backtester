@@ -65,7 +65,7 @@ class SimulatedExecutionHandler:
                     continue
             fill_event = FillEvent(current_time, order.ticker, "", order.quantity, order.direction, fill_cost, unit_cost, slippage)
 
-            print(f"=== EXECUTION unit_cost: unit_cost: {fill_event.unit_cost}, total cost: {fill_event.fill_cost} ===")
+            print(f"=== EXECUTION unit_cost: unit_cost: {fill_event.unit_cost}, slippage: {slippage}, total cost: {fill_event.fill_cost} ===")
             self.events.put(fill_event)
 
     def on_order(self, event):

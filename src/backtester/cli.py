@@ -16,7 +16,7 @@ from rich.table import Table
 from backtester.exceptions.negative_cash_exception import NegativeCashException
 from backtester.execution.simulated_execution_handler import SimulatedExecutionHandler
 from backtester.portfolios.naive_portfolio import NaivePortfolio
-from backtester.util.util import str_to_seconds
+from backtester.util.bar_manager import BarManager
 
 from queue import Queue
 
@@ -114,35 +114,34 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     end_datetime = pd.to_datetime(end_timestamp, unit="s")
     if data_source == "yf":
         data_handler = DataHandlerClass(event_queue, start_datetime, end_datetime, symbol_list + [benchmark_ticker], base_interval, exchange_closing_time)
-        strategy_data_handler = DataHandlerClass(event_queue, start_datetime, end_datetime, symbol_list + [benchmark_ticker], strategy_interval, exchange_closing_time)
     elif data_source == "live":
         data_handler = DataHandlerClass(event_queue, symbol_list + [benchmark_ticker], base_interval, period, exchange_closing_time)
-        strategy_data_handler = DataHandlerClass(event_queue, symbol_list + [benchmark_ticker], strategy_interval, period, exchange_closing_time)
     else:
         data_handler = DataHandlerClass(event_queue, data_dir, start_datetime, end_datetime, symbol_list + [benchmark_ticker], base_interval, exchange_closing_time)
-        strategy_data_handler = DataHandlerClass(event_queue, data_dir, start_datetime, end_datetime, symbol_list + [benchmark_ticker], strategy_interval, exchange_closing_time)
+
+    bar_manager = BarManager(data_handler)
 
     PositionSizerClass = load_class(config["position_sizer"][position_calc]["name"])
     position_sizer_settings = config["position_sizer"][position_calc].get("additional_parameters", None)
-    position_sizer = PositionSizerClass(position_sizer_settings, symbol_list, strategy_data_handler)
+    position_sizer = PositionSizerClass(position_sizer_settings, symbol_list)
+    for ticker in symbol_list:
+        bar_manager.subscribe(strategy_interval, ticker, position_sizer)
+
+    StrategyClass = load_class(config["strategies"][strategy]["name"])
+    additional_params = config["strategies"][strategy].get("additional_parameters", {})
+    strategy_instance = StrategyClass(event_queue, **additional_params)
+    for ticker in symbol_list:
+        bar_manager.subscribe(strategy_interval, ticker, strategy_instance)
 
     SlippageClass = load_class(config["slippage"][slippage]["name"])
     slippage_settings = config["slippage"][slippage].get("additional_parameters", None)
     slippage_model = SlippageClass(symbol_list, data_handler, slippage_settings, mode=data_source)
-
-    StrategyClass = load_class(config["strategies"][strategy]["name"])
-    additional_params = config["strategies"][strategy].get("additional_parameters", {})
-    strategy_instance = StrategyClass(event_queue, strategy_data_handler, symbol_list, **additional_params)
 
     portfolio = NaivePortfolio(data_handler, initial_capital, initial_position_size, symbol_list, event_queue, start_timestamp, base_interval, metrics_interval, position_sizer)
 
     execution_handler = SimulatedExecutionHandler(event_queue, data_handler, slippage_model)
 
     mkt_close = False
-    start_of_interval_time = None
-    start_of_strategy_interval_time = None
-    interval_seconds = str_to_seconds(base_interval)
-    strategy_interval_seconds = str_to_seconds(strategy_interval)
 
     ####################
     # start up the main loop
@@ -156,20 +155,8 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
         # Process events from the event queue (e.g., generate signals, execute orders, etc.)
         while not event_queue.empty():
             event = event_queue.get(block=False)
-            if event.type == "MARKET" and event.interval == base_interval:
-                # for live data handling
-                if start_of_interval_time is None:  # this is the first market event - set start_of_interval_time to the timestamp
-                    start_of_interval_time = event.timestamp
-                if event.timestamp >= start_of_interval_time + interval_seconds:  # the marketEvent timestamp is always the timestamp of the interval start
-                    portfolio.end_of_interval()
-                    start_of_interval_time = event.timestamp
-                # for strategy frequency handling
-                if start_of_strategy_interval_time is None:  # this is the first market event - set start_of_strategy_interval_time to the timestamp
-                    start_of_strategy_interval_time = event.timestamp
-                if event.timestamp >= start_of_strategy_interval_time + strategy_interval_seconds: # generate a market event for strategy
-                    strategy_data_handler.update_bars()
-                    position_sizer.update_historical_atr()
-                    start_of_strategy_interval_time = event.timestamp
+            if event.type == "MARKET":
+                bar_manager.on_heartbeat(event)
                 mkt_close = event.is_eod
                 try:
                     portfolio.on_market(event)  # update portfolio valuation
@@ -178,9 +165,6 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
                         raise e
                     console.print(f"[yellow bold]Warning![/yellow bold] {e}")
                 execution_handler.on_market(event, mkt_close)  # check if any orders can be filled, if so, it will update the portfolio via a FILL event
-            elif event.type == "MARKET" and event.interval == strategy_interval: # only execute if this market event is the correct interval for this strategy
-                print(f"===== STRATEGY CHECKING... {event.timestamp}=====")
-                strategy_instance.generate_signals(event)  # generate signals based on market event
             elif event.type == "SIGNAL":
                 if event.ticker != benchmark_ticker:  # we skip any signals generated for the benchmark
                     portfolio.on_signal(event)
