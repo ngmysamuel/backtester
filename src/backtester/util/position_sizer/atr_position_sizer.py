@@ -19,6 +19,7 @@ class ATRPositionSizer(PositionSizer):
             atr = self.historical_atr[ticker][-1]
             if atr:
                 capital_to_risk = min(portfolio.current_holdings["cash"], portfolio.risk_per_trade * portfolio.current_holdings["total"])
+                print("atr: ", atr, " capital_to_risk: ", capital_to_risk)
                 return capital_to_risk // (atr * self.atr_multiplier)
         return None
 

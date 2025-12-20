@@ -147,7 +147,7 @@ class NaivePortfolio(Portfolio):
             elif cur_quantity < 0:  # EXIT a short position
                 order = OrderEvent(DirectionType(1), ticker, order_type, abs(cur_quantity), event.timestamp)
 
-        print(f"=== PORTFOLIO ORDER: q: {order.quantity}, type: {order.order_type} ===")
+        print(f"=== PORTFOLIO ORDER: dir: {order.direction} qty: {order.quantity}, type: {order.order_type} ===")
         if order:
             self.events.put(order)
 

@@ -47,7 +47,7 @@ def load_class(path_to_class: str):
 
 
 @app.command()
-def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", position_calc: Optional[str] = "atr", slippage: Optional[str] = "multi_factor_slippage", strategy: Optional[str] = "buy_and_hold_simple", exception_contd: Optional[int] = 1):
+def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", position_calc: Optional[str] = "atr", slippage: Optional[str] = "multi_factor_slippage", strategy: Optional[str] = "buy_and_hold_simple", exception_contd: Optional[int] = 0):
     """
     Run the backtester with a given strategy and date range.
     args:
@@ -135,7 +135,9 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
 
     SlippageClass = load_class(config["slippage"][slippage]["name"])
     slippage_settings = config["slippage"][slippage].get("additional_parameters", None)
-    slippage_model = SlippageClass(symbol_list, data_handler, slippage_settings, mode=data_source)
+    slippage_model = SlippageClass(slippage_settings)
+    for ticker in symbol_list:
+        bar_manager.subscribe(strategy_interval, ticker, slippage_model)
 
     portfolio = NaivePortfolio(data_handler, initial_capital, initial_position_size, symbol_list, event_queue, start_timestamp, base_interval, metrics_interval, position_sizer)
 

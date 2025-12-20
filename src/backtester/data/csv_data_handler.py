@@ -106,7 +106,7 @@ class CSVDataHandler(DataHandler):
                     mkt_close = bar.Index + pd.Timedelta(self.interval) >= bar.Index.replace(hour=int(self.exchange_closing_time.split(":")[0]), minute=int(self.exchange_closing_time.split(":")[1]))
                     start_time = bar.Index.timestamp()
 
-        self.event_queue.put(MarketEvent(start_time, mkt_close, self.interval))
+        self.event_queue.put(MarketEvent(start_time, mkt_close))
 
     def get_latest_bars(self, symbol: str, n: int = 1) -> BarTuple:
         """

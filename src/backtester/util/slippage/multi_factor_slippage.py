@@ -3,23 +3,20 @@ import numpy as np
 import pandas as pd
 
 from backtester.util.slippage.slippage import Slippage
-
+from backtester.util.util import BarTuple
+from backtester.util.util import get_annualization_factor
 
 class MultiFactorSlippage(Slippage):
-    def __init__(self, symbol_list, data_handler, config, mode="backtest"):
+    def __init__(self, config: dict[str,str]):
         """
-        :param df_dict: Dictionary of historical DataFrames (required for backtest, optional for live warm-up)
         :param config: Configuration dictionary
-        :param mode: 'backtest' or 'live'
         """
-        self.symbol_list = symbol_list
-        self.data_handler = data_handler
-        self.df_dict = data_handler.symbol_raw_data
         self.config = config
-        self.mode = mode
+
+        self.history = {}
+        self.annualization_factors = {}
 
         # Unpack config vars
-        self.PERIODS_IN_YEAR = config["periods_in_year"]
         self.short_window = config["short_window"]
         self.med_window = config["med_window"]
         self.long_window = config["long_window"]
@@ -36,21 +33,19 @@ class MultiFactorSlippage(Slippage):
         # Determine the maximum lookback needed for calculation
         self.max_lookback = max(self.long_window, self.med_window, self.short_window, self.bidask_window) + 5  # Add buffer for diff/pct_change calculations
 
-        # State containers
-        self.feature_df_dict = {}  # For Backtest (Pre-computed)
 
-        # Initialization logic
-        if self.mode != "live":
-            self._init_backtest_mode(self.df_dict)
+    def on_interval(self, history: dict[str, list[BarTuple]]):
+        """
+        Receives references to the master history lists.
+        If BarManager updates this list later, we see the update automatically.
+        """
+        for (ticker, interval), history_list in history.items():
+            self.history[ticker] = history_list
 
-    def _init_backtest_mode(self, df_dict):
-        """Pre-computes features on the entire history for speed."""
-        for ticker, df in df_dict.items():
-            # We work on a copy to avoid side effects
-            processed_df = self._compute_features_on_df(df.copy())  # compute all the ratios now
-            self.feature_df_dict[ticker] = processed_df
+            if ticker not in self.annualization_factors:
+                self.annualization_factors[ticker] = get_annualization_factor(interval)
 
-    def _compute_features_on_df(self, df):
+    def _compute_features_on_df(self, df: pd.DataFrame, periods_in_year: float):
         """
         Pure logic method. Applies math columns to ANY DataFrame
         (whether it's 10 years of history or a 50-day live buffer).
@@ -70,9 +65,9 @@ class MultiFactorSlippage(Slippage):
         ##################
 
         # Volatility with different timeframes
-        df["vol_short"] = df["returns"].rolling(self.short_window).std() * np.sqrt(self.PERIODS_IN_YEAR)
-        df["vol_med"] = df["returns"].rolling(self.med_window).std() * np.sqrt(self.PERIODS_IN_YEAR)
-        df["vol_long"] = df["returns"].rolling(self.long_window).std() * np.sqrt(self.PERIODS_IN_YEAR)
+        df["vol_short"] = df["returns"].rolling(self.short_window).std() * np.sqrt(periods_in_year)
+        df["vol_med"] = df["returns"].rolling(self.med_window).std() * np.sqrt(periods_in_year)
+        df["vol_long"] = df["returns"].rolling(self.long_window).std() * np.sqrt(periods_in_year)
 
         clean_col(["returns", "vol_short", "vol_med", "vol_long"], 0)
 
@@ -144,29 +139,19 @@ class MultiFactorSlippage(Slippage):
     def calculate_slippage(self, ticker, trade_date, trade_size):
         """
         Calculates slippage.
-        If mode is 'backtest', 'trade_date' is required.
-        If mode is 'live', 'trade_date' is ignored, uses latest buffer data.
         """
 
-        # Get characteristics based on mode
-        if self.mode != "live":
-            if trade_date is None:
-                raise ValueError("Backtest mode requires trade_date")
-            try:
-                characteristics = self.feature_df_dict[ticker].loc[trade_date]
-            except KeyError:  # Fallback if date missing
-                return 0.0
-        else:
-            # LIVE MODE
-            if ticker not in self.live_buffers or len(self.live_buffers[ticker]) < self.short_window:
-                # Not enough data yet to calculate slippage
-                return 0.0
+        if ticker not in self.history or len(self.history[ticker]) < self.max_lookback:
+            # Not enough data yet to calculate slippage
+            return 0.0
 
-            # 1. Update features
-            # TODO: optimize this to not re-calc whole buffer every time. But for standard bars, this is fast enough.
-            # Follow what has been done with ATR calculation
-            current_df = self._compute_features_on_df(pd.DataFrame(self.data_handler.latest_symbol_data[ticker]))
-            characteristics = current_df.iloc[-1]
+        periods_in_year = self.annualization_factors.get(ticker, 252.0)
+
+        # 1. Update features
+        # TODO: optimize this to not re-calc whole buffer every time. But for standard bars, this is fast enough.
+        # Follow what has been done with ATR calculation
+        current_df = self._compute_features_on_df(pd.DataFrame(self.history[ticker][-self.max_lookback:]), periods_in_year)
+        characteristics = current_df.iloc[-1]
 
         # 1. Participation Rate
         participation_rate = 0

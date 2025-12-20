@@ -35,7 +35,7 @@ There are 6 parameters
 6. exception-contd
     - either 1 or 0
     - indicates whether to continue the backtest if portfolio cash balance drops below 0
-    - Default is 1
+    - Default is 0
 
 ### Dashboard
 Run this to view and interact with the data generated from a backtest. You must have ran a backtest at least once.
@@ -62,11 +62,8 @@ dat.to_csv("MSFT_1m.csv")
 ```
 
 ### Important Caveats
-1. Slippage Model 
-    - The multi factor slippage model assumes daily data
-    - If you have data of other intervals, you must update the parameters used by it in config.yaml
-    - If you do not wish the hassle, use the NoSlippage model
-    - Note backtester_settings.interval config as well
+1. Intervals
+    - The base interval must be most granular time interval across all strategies, etc.
 
 ### Implementation Details
 1. Portfolio
@@ -133,7 +130,8 @@ dat.to_csv("MSFT_1m.csv")
             - Rolling annulized standard deviation based on the close price across several window sizes
         2. Bid Ask Spread
             - Based on Ardia et al. (2024), an efficient estimator (EDGE) described in https://doi.org/10.1016/j.jfineco.2024.103916
-            - Does not assume continuously observed prices, unlike previous estimators, resulting in a more accurate spread without the downward bias
+            - Does not assume continuously observed prices. For example, on daily data (low frequency), the "fundamental volatility" (the trend) usually drowns out the "microstructure noise" (the spread), causing other estimators to be heavily biased or return zeros.
+            Thus unlike the previous estimators, this results in a more accurate spread without the downward bias
             - By making use of various combinations of OHLC prices (across time, if high equals open, etc), 4 estimators can be derived which the paper calls Discrete Generalized Estimators. These 4 estimators work best in different market conditions; some being more accurate in volatile situations for example. The paper blends them together, weighting them accordingly to achieve a final estimator that has the smallest estimation variance under any scenario
             - EDGE, as a result, is a robust and more accurate estimator which can be applied to a wide range of frequencies (albeit it is mentioned that higher frequency data is better) 
         3. Volume Metrics
