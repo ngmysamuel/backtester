@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from backtester.portfolios.portfolio import Portfolio
+import math
 from backtester.util.position_sizer.position_sizer import PositionSizer
 from backtester.util.util import BarTuple
 
@@ -13,22 +13,31 @@ class ATRPositionSizer(PositionSizer):
 
         self.historical_atr = {sym: [] for sym in self.symbol_list}
 
-    def get_position_size(self, portfolio: Portfolio, ticker: str):
+    def get_position_size(self, risk_per_trade: float, total_holdings: float, rounding: int, ticker: str):
+        """
+        Note there is a flaw in the rounding to nearest decimal place which is inherent in floating point arithmetic
+        TODO: move to the decimal library
+        """
         atr_list = self.historical_atr[ticker]
         if len(atr_list) > 0:  # check for ATR > 0 to prevent ZeroDivisionError, else, reuse previous position size
             atr = self.historical_atr[ticker][-1]
             if atr:
-                capital_to_risk = min(portfolio.current_holdings["cash"], portfolio.risk_per_trade * portfolio.current_holdings["total"])
+                capital_to_risk = risk_per_trade * total_holdings
                 print("atr: ", atr, " capital_to_risk: ", capital_to_risk)
-                return capital_to_risk // (atr * self.atr_multiplier)
+                position_size = capital_to_risk / (atr * self.atr_multiplier) # btc can come in fractional amts, hence cannot use integer division
+                 # round to the nearest integer
+                if rounding == 0:
+                    return math.floor(position_size)
+                # round to the nearest decimal place
+                multiplier = 10 ** rounding
+                position_size *= multiplier
+                position_size = int(position_size)
+                position_size /= multiplier
+                return position_size
         return None
 
 
     def on_interval(self, histories: dict[str, list[BarTuple]]):
-        self.update_historical_atr(histories)
-
-
-    def update_historical_atr(self, histories: dict[tuple[str,str], list[BarTuple]]):
         for (ticker, interval), history in histories.items():
             atr = self._calc_atr(ticker, history)
             if atr:

@@ -12,9 +12,9 @@ Trigger a backtest
 git clone https://github.com/ngmysamuel/backtester.git
 cd backtester
 poetry install
-poetry run backtester run --data-dir path\to\data_dir\ --strategy moving_average --exception-contd 1
+poetry run backtester run --data-dir path\to\data_dir\ --strategy moving_average
 ```
-There are 6 parameters
+There are 5 parameters
 1. data-dir
     - The path to the directory where the CSVs of OHLC data of the tickers you specified in config.yaml
     - Necessary if data-source is csv
@@ -32,10 +32,6 @@ There are 6 parameters
 5. strategy
     - Available options are in config.yaml under "strategies"
     - Default is "buy_and_hold_simple"
-6. exception-contd
-    - either 1 or 0
-    - indicates whether to continue the backtest if portfolio cash balance drops below 0
-    - Default is 0
 
 ### Dashboard
 Run this to view and interact with the data generated from a backtest. You must have ran a backtest at least once.
@@ -98,8 +94,8 @@ dat.to_csv("MSFT_1m.csv")
 7. Position Sizing (ATR)
     1. Implemented as part of the position sizer module with attributes defined in config.yaml
     2. Calculated at the end of the interval, before new bars are added
-    3. position_size = capital_to_risk // (atr * atr_multiplier) where
-    4. position_size = number of stocks to buy
+    3. position_size = capital_to_risk / (atr * atr_multiplier) where
+    4. position_size = number of stocks to buy, rounded to the decimal you have specified in config.yaml
     5. captial_to_risk = risk_per_trade * total_portfolio_value where
         1. risk_per_trade = a percent that you are willing lose in a single trade
     6. atr = average true range where

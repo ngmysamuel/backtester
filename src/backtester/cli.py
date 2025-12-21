@@ -66,6 +66,7 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
 
     backtester_settings = config["backtester_settings"]
 
+    cash_buffer = backtester_settings["cash_buffer"]
     initial_capital = backtester_settings["initial_capital"]
     initial_position_size = backtester_settings["initial_position_size"]
     start_timestamp = pd.to_datetime(backtester_settings["start_date"], dayfirst=True).timestamp()
@@ -79,6 +80,7 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     # TODO: enhance for multi strategy handling
     strategy_interval = config["strategies"][strategy]["additional_parameters"]["interval"]
     symbol_list = config["strategies"][strategy]["additional_parameters"]["symbol_list"]
+    rounding_list = config["strategies"][strategy]["additional_parameters"]["rounding_list"]
 
     ####################
     # display loaded configuration
@@ -128,8 +130,8 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
         bar_manager.subscribe(strategy_interval, ticker, position_sizer)
 
     StrategyClass = load_class(config["strategies"][strategy]["name"])
-    additional_params = config["strategies"][strategy].get("additional_parameters", {})
-    strategy_instance = StrategyClass(event_queue, **additional_params)
+    strategy_settings = config["strategies"][strategy].get("additional_parameters", {})
+    strategy_instance = StrategyClass(event_queue, **strategy_settings)
     for ticker in symbol_list:
         bar_manager.subscribe(strategy_interval, ticker, strategy_instance)
 
@@ -139,7 +141,9 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     for ticker in symbol_list:
         bar_manager.subscribe(strategy_interval, ticker, slippage_model)
 
-    portfolio = NaivePortfolio(data_handler, initial_capital, initial_position_size, symbol_list, event_queue, start_timestamp, base_interval, metrics_interval, position_sizer)
+    portfolio = NaivePortfolio(cash_buffer, initial_capital, initial_position_size, symbol_list, rounding_list, event_queue, start_timestamp, base_interval, metrics_interval, position_sizer)
+    for ticker in symbol_list:
+        bar_manager.subscribe(base_interval, ticker, portfolio)
 
     execution_handler = SimulatedExecutionHandler(event_queue, data_handler, slippage_model)
 
@@ -160,12 +164,6 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
             if event.type == "MARKET":
                 bar_manager.on_heartbeat(event)
                 mkt_close = event.is_eod
-                try:
-                    portfolio.on_market(event)  # update portfolio valuation
-                except NegativeCashException as e:
-                    if exception_contd == 0:
-                        raise e
-                    console.print(f"[yellow bold]Warning![/yellow bold] {e}")
                 execution_handler.on_market(event, mkt_close)  # check if any orders can be filled, if so, it will update the portfolio via a FILL event
             elif event.type == "SIGNAL":
                 if event.ticker != benchmark_ticker:  # we skip any signals generated for the benchmark
