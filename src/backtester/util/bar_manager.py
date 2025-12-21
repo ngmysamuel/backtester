@@ -5,8 +5,10 @@ from collections import defaultdict
 from backtester.protocols.on_interval_protocol import OnIntervalProtocol
 from backtester.util.util import str_to_seconds
 class BarManager:
-    def __init__(self, data_handler: DataHandler):
+    def __init__(self, data_handler: DataHandler, base_interval: str):
         self.data_handler = data_handler
+        self.base_interval = base_interval
+
         self.aggregators = {} # (ticker, interval) -> aggregator
         self.subscribers = defaultdict(list) # (ticker, interval) -> list[Any] => the object must implement on_interval
 
@@ -47,5 +49,5 @@ class BarManager:
             subscriber - satifies the OnIntervalProtocol
         """
         if (ticker, interval) not in self.aggregators:
-            self.aggregators[(ticker, interval)] = BarAggregator(str_to_seconds(interval), ticker, self.data_handler)
+            self.aggregators[(ticker, interval)] = BarAggregator(str_to_seconds(self.base_interval), str_to_seconds(interval), ticker, self.data_handler)
         self.subscribers[(ticker, interval)].append(subscriber)

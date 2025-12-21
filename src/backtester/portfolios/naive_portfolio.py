@@ -166,7 +166,7 @@ class NaivePortfolio(Portfolio):
             if order.direction == DirectionType.BUY:
                 max_affordable_qty = (eff_cash_available * self.cash_buffer) / estimated_price
             elif order.direction == DirectionType.SELL:
-                max_affordable_qty = (eff_cash_available * self.cash_buffer) / (self.maintenance_margin * estimated_price)
+                max_affordable_qty = (eff_cash_available * self.cash_buffer) / (1 + self.maintenance_margin * estimated_price)
             # clamp. We can't buy more than cash allows or sell more than the margin that can be afforded
             if delta_quantity > max_affordable_qty:
                 print(f"WARN: Sizer requested {delta_quantity}, but maximum affordable qty is {max_affordable_qty}. Clamping.")
@@ -181,13 +181,6 @@ class NaivePortfolio(Portfolio):
         Updates the portfolio's positions and holdings based on a FillEvent.
         """
         initial_holding = self.current_holdings[event.ticker]["value"]
-        cur_quantity = self.current_holdings[event.ticker]["position"]
-
-        # update margin
-        if cur_quantity < 0 and event.direction == DirectionType.BUY and event.quantity >= abs(cur_quantity): # SHORT -> LONG/FLAT
-            self.margin_holdings[event.ticker] = 0
-        elif event.direction == DirectionType.SELL:
-            self.margin_holdings[event.ticker] += self.maintenance_margin * event.fill_cost
 
         # Update position and cash
         self.current_holdings[event.ticker]["position"] += event.direction.value * event.quantity
@@ -202,6 +195,16 @@ class NaivePortfolio(Portfolio):
         self.current_holdings["order"] += f"{event.direction.name} {event.quantity} {event.ticker} @ {event.unit_cost:,.2f} | "
 
         self.current_holdings["slippage"] += f"{event.slippage} | "
+
+        # MARGIN
+        if self.current_holdings[event.ticker]["position"] < 0:  # nett SHORT position
+            margin_diff = self.margin_holdings[event.ticker] + (self.current_holdings[event.ticker]["value"]) * (1 + self.maintenance_margin)  # margin change
+            self.current_holdings["cash"] += margin_diff  # cash frozen for margin, reduction if margin_diff is -ve
+            self.margin_holdings[event.ticker] -= margin_diff
+            self.current_holdings["total"] += self.margin_holdings[event.ticker]  # total portfolio value is inclusive of margin
+        else:  # nett LONG position
+            self.current_holdings["cash"] += self.margin_holdings[event.ticker]  # release any margin being held
+            self.margin_holdings[event.ticker] = 0  # reset margin
 
     def end_of_day(self):
         """

@@ -121,7 +121,7 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     else:
         data_handler = DataHandlerClass(event_queue, data_dir, start_datetime, end_datetime, symbol_list + [benchmark_ticker], base_interval, exchange_closing_time)
 
-    bar_manager = BarManager(data_handler)
+    bar_manager = BarManager(data_handler, base_interval)
 
     PositionSizerClass = load_class(config["position_sizer"][position_calc]["name"])
     position_sizer_settings = config["position_sizer"][position_calc].get("additional_parameters", None)
@@ -153,7 +153,6 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     # start up the main loop
     #   the base interval acts as the hearbeat of the whole system
     #   strategy intervals will take its cue from the base interval
-    #   eventual plan is to consolidate all intervals from different strategies with a data handler for each interval. Loop over all strat intervals
     ####################
 
     while data_handler.continue_backtest or not event_queue.empty():  # continue_backtest - to be made thread safe?
