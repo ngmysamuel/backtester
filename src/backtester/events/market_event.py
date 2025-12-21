@@ -9,8 +9,9 @@ class MarketEvent(Event):
     def __init__(self, timestamp: float, is_eod: bool):
         """
         Initialises the MarketEvent with a ticker indicating this ticker has a new movement in its price.
-        Parameters:
-        timestamp - The timestamp at which the market event was generated - simulated.
+        args:
+            timestamp - The timestamp at which the market event was generated, simulated.
+            is_eod - to signify the end of the trading day
         """
         self.type = "MARKET"
         self.timestamp = timestamp

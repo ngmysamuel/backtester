@@ -5,7 +5,7 @@ import pandas as pd
 
 from backtester.data.data_handler import DataHandler
 from backtester.events.market_event import MarketEvent
-
+from backtester.util.util import BarTuple
 
 class CSVDataHandler(DataHandler):
     """
@@ -51,14 +51,15 @@ class CSVDataHandler(DataHandler):
         for symbol in self.symbol_list:
             # Load the CSV file
             df = pd.read_csv(
-              os.path.join(self.csv_dir, f"{symbol}.csv"),
+              os.path.join(self.csv_dir, f"{symbol}_{self.interval}.csv"),
               header=0,
               parse_dates=True,
-              usecols=lambda x: x.lower() in ["open", "close", "high", "low", "volume", "date"],
-              converters={"Date": lambda x: pd.to_datetime(x).tz_localize(None)}
+              usecols=lambda x: x.lower() in ["open", "close", "high", "low", "volume", "date", "datetime"]
             )
 
-            df.set_index("Date", inplace=True)
+            index_col = "Date" if "Date" in df.columns else "Datetime"
+            df[index_col] = pd.to_datetime(df[index_col], utc=True).dt.tz_localize(None)
+            df.set_index(index_col, inplace=True)
             df.sort_index(inplace=True)  # ensure data is sorted
             df.columns = [col.lower() for col in df.columns]
 
@@ -87,6 +88,7 @@ class CSVDataHandler(DataHandler):
 
     def update_bars(self):
         """
+        TODO: to be made more memory efficient - there are 2 copies here, and another in bar_manager.py
         Pushes the latest bar to the latest_symbol_data structure for all
         symbols in the symbol list. This will also generate a MarketEvent.
         """
@@ -106,7 +108,7 @@ class CSVDataHandler(DataHandler):
 
         self.event_queue.put(MarketEvent(start_time, mkt_close))
 
-    def get_latest_bars(self, symbol: str, n: int = 1):
+    def get_latest_bars(self, symbol: str, n: int = 1) -> BarTuple:
         """
         Returns the last N bars from the latest_symbol_data
         """

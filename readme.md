@@ -12,9 +12,9 @@ Trigger a backtest
 git clone https://github.com/ngmysamuel/backtester.git
 cd backtester
 poetry install
-poetry run backtester run --data-dir path\to\data_dir\ --strategy moving_average --exception-contd 1
+poetry run backtester run --data-dir path\to\data_dir\ --strategy moving_average
 ```
-There are 6 parameters
+There are 5 parameters
 1. data-dir
     - The path to the directory where the CSVs of OHLC data of the tickers you specified in config.yaml
     - Necessary if data-source is csv
@@ -32,10 +32,6 @@ There are 6 parameters
 5. strategy
     - Available options are in config.yaml under "strategies"
     - Default is "buy_and_hold_simple"
-6. exception-contd
-    - either 1 or 0
-    - indicates whether to continue the backtest if portfolio cash balance drops below 0
-    - Default is 1
 
 ### Dashboard
 Run this to view and interact with the data generated from a backtest. You must have ran a backtest at least once.
@@ -57,17 +53,13 @@ poetry run pytest tests\execution\test_simulated_execution_handler.py
 Identical to using data-source = "yf"
 ```
 import yfinance as yf
-dat = yf.Ticker("MSFT")
-df = dat.history(period='5y') # period must be one of: 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max
-df.to_csv("MSFT.csv")
+dat = yf.download("msft", start="2025-11-24", end="2025-11-29", interval="1m",multi_level_index=False,ignore_tz=True)
+dat.to_csv("MSFT_1m.csv")
 ```
 
 ### Important Caveats
-1. Slippage Model 
-    - The multi factor slippage model assumes daily data
-    - If you have data of other intervals, you must update the parameters used by it in config.yaml
-    - If you do not wish the hassle, use the NoSlippage model
-    - Note backtester_settings.interval config as well
+1. Intervals
+    - The base interval must be most granular time interval across all strategies, etc.
 
 ### Implementation Details
 1. Portfolio
@@ -102,8 +94,8 @@ df.to_csv("MSFT.csv")
 7. Position Sizing (ATR)
     1. Implemented as part of the position sizer module with attributes defined in config.yaml
     2. Calculated at the end of the interval, before new bars are added
-    3. position_size = capital_to_risk // (atr * atr_multiplier) where
-    4. position_size = number of stocks to buy
+    3. position_size = capital_to_risk / (atr * atr_multiplier) where
+    4. position_size = number of stocks to buy, rounded to the decimal you have specified in config.yaml
     5. captial_to_risk = risk_per_trade * total_portfolio_value where
         1. risk_per_trade = a percent that you are willing lose in a single trade
     6. atr = average true range where
@@ -134,7 +126,8 @@ df.to_csv("MSFT.csv")
             - Rolling annulized standard deviation based on the close price across several window sizes
         2. Bid Ask Spread
             - Based on Ardia et al. (2024), an efficient estimator (EDGE) described in https://doi.org/10.1016/j.jfineco.2024.103916
-            - Does not assume continuously observed prices, unlike previous estimators, resulting in a more accurate spread without the downward bias
+            - Does not assume continuously observed prices. For example, on daily data (low frequency), the "fundamental volatility" (the trend) usually drowns out the "microstructure noise" (the spread), causing other estimators to be heavily biased or return zeros.
+            Thus unlike the previous estimators, this results in a more accurate spread without the downward bias
             - By making use of various combinations of OHLC prices (across time, if high equals open, etc), 4 estimators can be derived which the paper calls Discrete Generalized Estimators. These 4 estimators work best in different market conditions; some being more accurate in volatile situations for example. The paper blends them together, weighting them accordingly to achieve a final estimator that has the smallest estimation variance under any scenario
             - EDGE, as a result, is a robust and more accurate estimator which can be applied to a wide range of frequencies (albeit it is mentioned that higher frequency data is better) 
         3. Volume Metrics
@@ -160,6 +153,7 @@ df.to_csv("MSFT.csv")
         - An approach: https://www.stephendiehl.com/posts/slippage/
         - Heavily adapted from: https://github.com/QuantJourneyOrg/qj_public_code/blob/main/slippage-analysis.py
         - Explanations: https://quantjourney.substack.com/p/slippage-a-comprehensive-analysis
+11. One way negative cash arises because we use market orders - we might have position sized to use up all remaining cash based on the ATR of the ticker. But on the next open, price rockets and the order fulfilled for a value more than what cash is available.
 
 ### To Do
 - Slippage model  - supporting other time periods automatically 
@@ -170,7 +164,7 @@ df.to_csv("MSFT.csv")
 - Add explanation for how create own implementation of various items e.g. position sizer, slippage model, etc
 - Logger
 - Other order types e.g. Limit order
-- Modelling probability of fill for limit orders
+    - Modelling probability of fill for limit orders
 - Use the decimal library instead of float types
 - An integrated test across different data source modes, comparing the output csv with a reference csv
 - Warm up historical data for calculations like ATR position sizing
@@ -179,6 +173,13 @@ df.to_csv("MSFT.csv")
     - For live, check if the data dir is give. If so, look for a data point that is the max of all those window parameters behind
     - If at any point, there isn't, send a warning
 - Handling web socket failure - auto reconnect
+- Dual frequency
+    - only yf handles dual freq now, to extend for CSV and Live
+        CSV - naming of the excels will have to change
+        Live - how to test?
+- Risk manager
+- Multi strategy backtesting
+- Use mypy for static analysis
 
 ### Notes
 

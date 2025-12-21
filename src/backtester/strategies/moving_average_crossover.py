@@ -1,26 +1,22 @@
+from backtester.strategies.strategy import Strategy
 from backtester.enums.signal_type import SignalType
 from backtester.events.signal_event import SignalEvent
-from backtester.data.data_handler import DataHandler
 import queue
+from backtester.util.util import BarTuple
 
-
-class MovingAverageCrossover:
-    def __init__(self, events: queue.Queue, data_handler: DataHandler, short_window: int = 40, long_window: int = 100):
-        print(f"Initializing MovingAverageCrossover with short_window={short_window}, long_window={long_window}")
-        self.events = events
-        self.data_handler = data_handler
-        self.symbol_list = data_handler.symbol_list
-        self.short_window = short_window
-        self.long_window = long_window
-
+class MovingAverageCrossover(Strategy):
+    def __init__(self, events: queue.Queue, **kwargs):
+        super().__init__(events, kwargs["symbol_list"], kwargs["interval"])
+        self.short_window = kwargs.get("short_window", 40)
+        self.long_window = kwargs.get("long_window", 100)
         self.current_positions = {sym: 0 for sym in self.symbol_list}  # to track position history
+        print(f"Initializing MovingAverageCrossover with short_window={self.short_window}, long_window={self.long_window}")
 
-    def generate_signals(self, event):
-        if event.type != "MARKET":
-            return
-        timestamp = event.timestamp
-        for ticker in self.symbol_list:
-            data = self.data_handler.get_latest_bars(ticker, n=self.long_window + 1)
+    def generate_signals(self, histories: dict[tuple[str,str], list[BarTuple]]):
+        for (ticker,interval), history in histories.items():
+            timestamp = history[-1].Index.timestamp()
+
+            data = history[-self.long_window - 1:]
             if len(data) < self.long_window + 1:
                 return  # Not enough data to compute moving averages
             short_avg = long_avg = 0
