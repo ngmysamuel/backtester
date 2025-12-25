@@ -46,13 +46,13 @@ poetry run pytest
 ```
 For only unit tests
 ```
-poetry run pytest -m "not integration and not live_integration"
+poetry run pytest -m "not integration"
 ```
-For a specific unit test file
+For a specific file
 ```
 poetry run pytest tests\execution\test_simulated_execution_handler.py
 ```
-For integration tests
+For all integration tests. Tests requiring internet access are labelled "live_integration"
 ```
 poetry run pytest -m "integration"
 ```

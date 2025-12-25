@@ -3,6 +3,7 @@ import importlib.resources
 import runpy
 import sys
 from pathlib import Path
+from queue import Queue
 from typing import Optional
 
 import pandas as pd
@@ -13,12 +14,9 @@ from rich import box
 from rich.console import Console
 from rich.table import Table
 
-from backtester.exceptions.negative_cash_exception import NegativeCashException
 from backtester.execution.simulated_execution_handler import SimulatedExecutionHandler
 from backtester.portfolios.naive_portfolio import NaivePortfolio
 from backtester.util.bar_manager import BarManager
-
-from queue import Queue
 
 console = Console()
 app = typer.Typer()

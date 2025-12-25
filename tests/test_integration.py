@@ -96,7 +96,8 @@ class TestIntegration:
             assert abs(order_quantity - position_quantity) < 1e-6, f"Order quantity {order_quantity} doesn't match position {position_quantity}"
 
         # Clean up only if all assertions pass
-        os.remove(output_path)
+        if os.path.exists(output_path):
+            os.remove(output_path)
 
     @pytest.mark.live_integration
     def test_e2e_backtest_yf(self):
@@ -208,8 +209,8 @@ class TestIntegration:
         assert not (df["equity_curve"] == 1.0).all(), "No market movement detected"
 
         # Clean up
-        # if os.path.exists(output_path):
-        #     os.remove(output_path)
+        if os.path.exists(output_path):
+            os.remove(output_path)
 
     @pytest.mark.live_integration
     def test_live_data_structure(self):
