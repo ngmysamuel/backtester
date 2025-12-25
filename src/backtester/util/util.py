@@ -106,6 +106,6 @@ def str_to_pandas(interval: str) -> str:
     """
     if "m" in interval:
         return interval.replace("m", "min")
-    elif "d" in interval:
-        return interval.replace("d", "B")
+    # elif "d" in interval: # do not assume Business Days
+    #     return interval.replace("d", "B")
     return interval

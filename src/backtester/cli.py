@@ -24,8 +24,13 @@ console = Console()
 app = typer.Typer()
 
 
-def load_config():
+def load_config(config_path: Optional[str] = None):
     """Loads the configuration from config.yaml."""
+    if config_path:
+        with open(config_path, "r") as f:
+            config = yaml.safe_load(f)
+        return config
+
     try:
         # For Python 3.9+
         config_path = importlib.resources.files("backtester") / "config.yaml"
@@ -47,7 +52,7 @@ def load_class(path_to_class: str):
 
 
 @app.command()
-def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", position_calc: Optional[str] = "atr", slippage: Optional[str] = "multi_factor_slippage", strategy: Optional[str] = "buy_and_hold_simple", exception_contd: Optional[int] = 0):
+def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", position_calc: Optional[str] = "atr", slippage: Optional[str] = "multi_factor_slippage", strategy: Optional[str] = "buy_and_hold_simple", exception_contd: Optional[int] = 0, config_path: Optional[str] = None, output_path: Optional[str] = None):
     """
     Run the backtester with a given strategy and date range.
     args:
@@ -57,12 +62,14 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
         slippage (str): the model used to calculate slippage
         strategy: the strategy to backtest; this name should match those found in config.yaml.
         exception_contd: 1 or 0
+        config_path: Path to a custom config file (optional)
+        output_path: Path to save the equity curve CSV (optional, default: equity_curve.csv)
     """
 
     ####################
     # load data from yaml config file
     ####################
-    config = load_config()
+    config = load_config(config_path)
 
     backtester_settings = config["backtester_settings"]
 
@@ -85,7 +92,6 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     ####################
     # display loaded configuration
     ####################
-
     typer_tbl = Table(title="Parameter List", box=box.SQUARE_DOUBLE_HEAD, show_lines=True)
     typer_tbl.add_column("Parameter", style="cyan")
     typer_tbl.add_column("Value")
@@ -108,7 +114,6 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     ####################
     # set up helper classes / vars
     ####################
-
     event_queue = Queue()
 
     DataHandlerClass = load_class(config["data_handler"][data_source]["name"])
@@ -179,7 +184,8 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     # metrics and results
     ####################
     portfolio.create_equity_curve()
-    portfolio.equity_curve.to_csv("equity_curve.csv")
+    output_file = output_path or "equity_curve.csv"
+    portfolio.equity_curve.to_csv(output_file)
 
     benchmark_data = data_handler.symbol_raw_data[benchmark_ticker]
     benchmark_returns = benchmark_data["close"].pct_change().fillna(0.0)

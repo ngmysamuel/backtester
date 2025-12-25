@@ -183,7 +183,8 @@ dat.to_csv("MSFT_1m.csv")
         Live - how to test?
 - Risk manager
 - Multi strategy backtesting
-- Use mypy for static analysis
+- Update all files to pass static type checking
+- If metrics_interval is daily, automatically assumes business days. To instead, leave it as days, and remove blank records in the csv file instead.
 
 ### Notes
 

@@ -217,3 +217,7 @@ scratch.py
 
 # Reports
 *.html
+
+# CSV files needed for tests
+!tests/test_data/*.csv
+tests/test_data/test_equity_curve.csv
