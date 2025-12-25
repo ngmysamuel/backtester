@@ -1,0 +1,11 @@
+timestamp,BTC-USD,margin,cash,total,commissions,borrow_costs,order,slippage,returns,equity_curve
+2025-12-25 14:13:00,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2025-12-25 14:14:00,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2025-12-25 14:15:00,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2025-12-25 14:16:00,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2025-12-25 14:17:00,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2025-12-25 14:18:00,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2025-12-25 14:19:00,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2025-12-25 14:20:00,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2025-12-25 14:21:00,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2025-12-25 14:22:00,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
