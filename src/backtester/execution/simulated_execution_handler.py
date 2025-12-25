@@ -54,7 +54,7 @@ class SimulatedExecutionHandler:
                 unit_cost = bar.close
             else:
                 if order.order_type.name == "MKT":
-                    slippage = self.slippage_model.calculate_slippage(order.ticker, pd.to_datetime(order.timestamp, unit="s"), order.quantity)
+                    slippage = self.slippage_model.calculate_slippage(order.ticker, pd.to_datetime(order.timestamp, unit="s"), order.quantity, order.direction)
                     if order.direction == DirectionType.BUY:
                         unit_cost = bar.open * (1 + slippage)
                     else:

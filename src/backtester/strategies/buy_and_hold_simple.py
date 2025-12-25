@@ -7,6 +7,7 @@ from backtester.util.util import BarTuple
 class BuyAndHoldSimple(Strategy):
     def __init__(self, events: queue.Queue, **kwargs):
         super().__init__(events, kwargs["symbol_list"], kwargs["interval"])
+        self.days_before_buying = kwargs["days_before_buying"]
         self.bought = {sym: False for sym in self.symbol_list}
         self.counter = 0
 
@@ -21,7 +22,7 @@ class BuyAndHoldSimple(Strategy):
             if not ohlcv_data:
                 continue
 
-            if not self.bought[ticker] and self.counter >= 5:
+            if not self.bought[ticker] and self.counter >= self.days_before_buying:
                 self.bought[ticker] = True
                 self.events.put(SignalEvent(timestamp, ticker, SignalType.LONG))
                 print("=== STRATEGY BUYING ===")

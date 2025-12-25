@@ -5,12 +5,12 @@ backtester_settings:
   cash_buffer: 0.95
   initial_capital: 100000.0
   initial_position_size: 1
-  start_date: "30/12/2022 00:00:00"
-  end_date: "15/01/2023 00:00:00"
+  start_date: "24/11/2025 00:00:00"
+  end_date: "19/12/2025 00:00:00" # exclusive
   borrow_cost: 0.01
   maintenance_margin: 0.3
   risk_per_trade: 0.01
-  base_interval: "1d"
+  base_interval: "1m"
   metrics_interval: "1d"
 
 risk_settings:
@@ -46,9 +46,9 @@ slippage:
     name: backtester.util.slippage.multi_factor_slippage.MultiFactorSlippage
     additional_parameters:
       periods_in_year: 252
-      short_window: 5
-      med_window: 21
-      long_window: 63
+      short_window: 2
+      med_window: 5
+      long_window: 21
       power_law_exponent: 0.6
       upper_lim_vol_surge: 5
       bidask_window: 21
@@ -63,9 +63,10 @@ strategies:
   buy_and_hold_simple:
     name: "backtester.strategies.buy_and_hold_simple.BuyAndHoldSimple"
     additional_parameters:
-      interval: "1d"
+      interval: "1m"
       symbol_list: ["BTC-USD"]
       rounding_list: [8]
+      days_before_buying: 22
   moving_average:
     name: "backtester.strategies.moving_average_crossover.MovingAverageCrossover"
     display_name: "Moving Average"
