@@ -155,9 +155,15 @@ class TestIntegration:
         # Check that equity_curve is not flat
         assert not (df["equity_curve"] == 1.0).all(), "YF equity curve is flat"
 
-        # Check that there is exactly 1 row with a value in the "order" column
+        # Check that there are at least 1 BUY and 1 SELL order (moving average strategy should have traded both ways)
         order_rows = df["order"].notna() & (df["order"] != "")
-        assert order_rows.sum() == 1, f"Expected 1 row with order, got {order_rows.sum()}"
+        assert order_rows.sum() >= 2, f"Expected at least 2 orders for moving average strategy, got {order_rows.sum()}"
+
+        # Check for both BUY and SELL orders
+        buy_orders = df["order"].str.contains("BUY", na=False).sum()
+        sell_orders = df["order"].str.contains("SELL", na=False).sum()
+        assert buy_orders >= 1, f"Expected at least 1 BUY order, got {buy_orders}"
+        assert sell_orders >= 1, f"Expected at least 1 SELL order, got {sell_orders}"
 
         # For YF test with ATR and multi-factor slippage
         if order_rows.any():

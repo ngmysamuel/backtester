@@ -5,7 +5,7 @@ backtester_settings:
   cash_buffer: 0.95
   initial_capital: 100000.0
   initial_position_size: 1
-  start_date: "01/01/2024 00:00:00"  # Recent date with available data
+  start_date: "01/01/2023 00:00:00"  # Recent date with available data
   end_date: "31/12/2024 00:00:00"    # Short period for fast testing
   borrow_cost: 0.01
   maintenance_margin: 0.3
