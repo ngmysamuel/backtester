@@ -1,20 +1,3 @@
-"""
-System Integration Tests for Live Data Handler
-
-These tests require:
-- Internet connection
-- Yahoo Finance websocket access
-- Extended execution time (minutes)
-- Run with: pytest tests/test_live_integration.py -m live_integration --tb=short
-
-Usage:
-    # Run only when network is available
-    LIVE_INTEGRATION=1 pytest tests/test_live_integration.py
-
-    # Skip live tests by default
-    pytest tests/ --ignore=tests/test_live_integration.py
-"""
-
 import ast
 import os
 import re
@@ -115,7 +98,7 @@ class TestIntegration:
         # Clean up only if all assertions pass
         os.remove(output_path)
 
-    @pytest.mark.skipif(not hasattr(pd, 'Timedelta'), reason="Requires pandas")
+    @pytest.mark.live_integration
     def test_e2e_backtest_yf(self):
         """End-to-end test: run backtest with Yahoo Finance data."""
         # Skip if yfinance not available or network issues
@@ -187,6 +170,7 @@ class TestIntegration:
         if os.path.exists(output_path):
             os.remove(output_path)
 
+    @pytest.mark.live_integration
     def test_live_data_collection(self):
         """Test that live data handler can collect real-time data."""
         runner = CliRunner()
@@ -227,6 +211,7 @@ class TestIntegration:
         # if os.path.exists(output_path):
         #     os.remove(output_path)
 
+    @pytest.mark.live_integration
     def test_live_data_structure(self):
         """Test that live data has proper structure."""
         runner = CliRunner()
@@ -237,6 +222,8 @@ class TestIntegration:
         result = runner.invoke(app, [
             "run",
             "--data-source", "live",
+            "--position-calc", "no_position_sizer",
+            "--slippage", "no_slippage",
             "--config-path", config_path,
             "--output-path", output_path
         ])
@@ -256,34 +243,3 @@ class TestIntegration:
         # Clean up
         if os.path.exists(output_path):
             os.remove(output_path)
-
-
-# Manual testing documentation
-LIVE_TESTING_README = """
-# Live Data Handler Testing
-
-## Prerequisites
-- Active internet connection
-- Yahoo Finance websocket access
-- Python environment with yfinance installed
-
-## Running Tests
-```bash
-# Run live integration tests
-LIVE_INTEGRATION=1 pytest tests/test_live_integration.py -v
-
-# Run with shorter timeout for CI
-LIVE_INTEGRATION=1 pytest tests/test_live_integration.py --timeout=900
-```
-
-## Manual Verification
-1. Check websocket connection logs
-2. Verify data collection rate (messages per interval)
-3. Confirm bar aggregation accuracy
-4. Validate threading behavior
-
-## Troubleshooting
-- Tests may fail during market closures
-- Network interruptions can cause failures
-- Rate limiting may occur with frequent testing
-"""

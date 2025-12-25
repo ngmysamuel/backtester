@@ -40,13 +40,21 @@ poetry run backtester dashboard
 ```
 
 ### Test
-Run the testcases
+Run the all testcases (including integration tests)
 ```
 poetry run pytest
 ```
-For a specific file
+For only unit tests
+```
+poetry run pytest -m "not integration and not live_integration"
+```
+For a specific unit test file
 ```
 poetry run pytest tests\execution\test_simulated_execution_handler.py
+```
+For integration tests
+```
+poetry run pytest -m "integration"
 ```
 Static type checking
 ```
