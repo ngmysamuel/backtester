@@ -1,7 +1,16 @@
-from typing import NamedTuple  # identical to collections.namedtuple
 import datetime
 import re
+from typing import NamedTuple, Optional, TypedDict  # identical to collections.namedtuple
 
+
+class BarDict(TypedDict):
+    Index: datetime.datetime
+    open: float
+    high: float
+    low: float
+    close: float
+    volume: int
+    raw_volume: Optional[int] 
 
 class BarTuple(NamedTuple):
     Index: datetime.datetime
@@ -10,7 +19,8 @@ class BarTuple(NamedTuple):
     low: float
     close: float
     volume: int
-    raw_volume: int
+    raw_volume: Optional[int]
+
 
 MONTHS_IN_YEAR = 12.0
 DAYS_IN_YEAR = 365.0
@@ -29,8 +39,8 @@ def get_annualization_factor(interval: str) -> float:
     """
     Calculates the annualization factor based on the data's frequency,
     1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo (to create enum)
-    Able to handle generic interval strings (e.g., "1m", "4h", "1d") to calculate 
-    annualization factors dynamically but stick to the well established ones to 
+    Able to handle generic interval strings (e.g., "1m", "4h", "1d") to calculate
+    annualization factors dynamically but stick to the well established ones to
     be sure
     """
     # separate numbers from letters (e.g., "15m" -> ["15", "m"])
@@ -62,7 +72,7 @@ def get_annualization_factor(interval: str) -> float:
         raise ValueError(f"Unsupported time unit: {unit}")
 
 
-def str_to_seconds(interval):
+def str_to_seconds(interval: str) -> int:
     match interval:
         case "1m":
             return 60
@@ -88,7 +98,7 @@ def str_to_seconds(interval):
             raise ValueError(f"{interval} is not supported")
 
 
-def str_to_pandas(interval):
+def str_to_pandas(interval: str) -> str:
     """
     Used to convert the interval-strings used in Yahoo to those used in Pandas
     Yahoo: 1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo

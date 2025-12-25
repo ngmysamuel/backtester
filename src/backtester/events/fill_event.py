@@ -1,5 +1,6 @@
 from abc import ABC
-
+from backtester.enums.direction_type import DirectionType
+from typing import Optional
 
 class FillEvent(ABC):
     """
@@ -9,7 +10,7 @@ class FillEvent(ABC):
     the commission of the trade from the brokerage.
     """
 
-    def __init__(self, timestamp, ticker, exchange, quantity, direction, fill_cost, unit_cost, slippage: float = 0.0, commission=None):
+    def __init__(self, timestamp: float, ticker: str, exchange: str, quantity: float, direction: DirectionType, fill_cost: float, unit_cost: float, slippage: float = 0.0, commission: Optional[float]=None):
         """
         Initialises the FillEvent object. Sets the ticker, exchange,
         quantity, direction, cost of fill and an optional
@@ -47,7 +48,7 @@ class FillEvent(ABC):
         else:
             self.commission = commission
 
-    def calculate_ib_commission(self):
+    def calculate_ib_commission(self) -> float:
         """
         Calculates the fees of trading based on an Interactive
         Brokers fee structure for API, in USD.

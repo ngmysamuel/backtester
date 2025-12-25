@@ -6,5 +6,5 @@ class NegativeCashException(Exception):
         self.current_cash = current_cash
         self.message = f"{message}: {current_cash}"  # Store the message for potential display
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.message

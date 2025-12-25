@@ -1,11 +1,15 @@
 import os
-from datetime import datetime
 import queue
+from datetime import datetime
+from typing import Any, Iterator
+
 import pandas as pd
 
 from backtester.data.data_handler import DataHandler
+from backtester.events.event import Event
 from backtester.events.market_event import MarketEvent
 from backtester.util.util import BarTuple
+
 
 class CSVDataHandler(DataHandler):
     """
@@ -13,7 +17,7 @@ class CSVDataHandler(DataHandler):
     historical data for each symbol from CSV files.
     """
 
-    def __init__(self, event_queue: queue.Queue, csv_dir: str, start_date: pd.Timestamp | datetime, end_date: pd.Timestamp | datetime, symbol_list: str, interval: str, exchange_closing_time: str):
+    def __init__(self, event_queue: queue.Queue[Event], csv_dir: str, start_date: pd.Timestamp | datetime, end_date: pd.Timestamp | datetime, symbol_list: str, interval: str, exchange_closing_time: str):
         """
         Initializes the CSVDataHandler
         args:
@@ -33,14 +37,14 @@ class CSVDataHandler(DataHandler):
         self.interval = interval
         self.exchange_closing_time = exchange_closing_time
 
-        self.symbol_raw_data = {}
-        self.symbol_data = {}
-        self.latest_symbol_data = {}
+        self.symbol_raw_data: dict[str, pd.DataFrame] = {}
+        self.symbol_data: dict[str, Any] = {} # str => pd.DataFrame | Iterator[Any]
+        self.latest_symbol_data: dict[str, list[BarTuple]] = {}
         self.continue_backtest = True
 
         self._load_from_csv()
 
-    def _load_from_csv(self):
+    def _load_from_csv(self) -> None:
         """
         Opens the CSV files from the data directory, converting them into
         pandas DataFrames within a symbol dictionary. Assumes the format
@@ -54,16 +58,17 @@ class CSVDataHandler(DataHandler):
               os.path.join(self.csv_dir, f"{symbol}_{self.interval}.csv"),
               header=0,
               parse_dates=True,
-              usecols=lambda x: x.lower() in ["open", "close", "high", "low", "volume", "date", "datetime"]
             )
 
-            index_col = "Date" if "Date" in df.columns else "Datetime"
+            df.columns = [str(col).lower() for col in df.columns]
+            index_col = "date" if "date" in df.columns else "datetime"
+            df = df[["open", "close", "high", "low", "volume", index_col]]
+
             df[index_col] = pd.to_datetime(df[index_col], utc=True).dt.tz_localize(None)
             df.set_index(index_col, inplace=True)
             df.sort_index(inplace=True)  # ensure data is sorted
-            df.columns = [col.lower() for col in df.columns]
 
-            df = df.loc[self.start_date : self.end_date]
+            df = df.loc[self.start_date : self.end_date] # type: ignore [misc]
 
             self.symbol_raw_data[symbol] = df
             self.symbol_data[symbol] = df
@@ -78,7 +83,7 @@ class CSVDataHandler(DataHandler):
         for symbol in self.symbol_list:
             self.symbol_data[symbol] = self.symbol_data[symbol].reindex(index=combined_index, method="pad").itertuples()
 
-    def _get_new_bar(self, symbol: str):
+    def _get_new_bar(self, symbol: str) -> Iterator[Any]:
         """
         Returns the latest bar from the data feed as a tuple of
         (datetime, open, high, low, close, volume).
@@ -86,7 +91,7 @@ class CSVDataHandler(DataHandler):
         for b in self.symbol_data[symbol]:
             yield b
 
-    def update_bars(self):
+    def update_bars(self) -> None:
         """
         TODO: to be made more memory efficient - there are 2 copies here, and another in bar_manager.py
         Pushes the latest bar to the latest_symbol_data structure for all
@@ -105,10 +110,11 @@ class CSVDataHandler(DataHandler):
                     self.latest_symbol_data[s].append(bar)
                     mkt_close = bar.Index + pd.Timedelta(self.interval) >= bar.Index.replace(hour=int(self.exchange_closing_time.split(":")[0]), minute=int(self.exchange_closing_time.split(":")[1]))
                     start_time = bar.Index.timestamp()
+        
+        if start_time is not None:
+            self.event_queue.put(MarketEvent(start_time, mkt_close))
 
-        self.event_queue.put(MarketEvent(start_time, mkt_close))
-
-    def get_latest_bars(self, symbol: str, n: int = 1) -> BarTuple:
+    def get_latest_bars(self, symbol: str, n: int = 1) -> list[BarTuple]:
         """
         Returns the last N bars from the latest_symbol_data
         """

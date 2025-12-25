@@ -1,15 +1,18 @@
 import queue
 from datetime import datetime
+from typing import Any, Iterator
 
 import pandas as pd
 import yfinance as yf
 
 from backtester.data.data_handler import DataHandler
+from backtester.events.event import Event
 from backtester.events.market_event import MarketEvent
+from backtester.util.util import BarTuple
 
 
 class YFDataHandler(DataHandler):
-    def __init__(self, event_queue: queue.Queue, start_date: pd.Timestamp | datetime, end_date: pd.Timestamp | datetime, symbol_list: str, interval: str, exchange_closing_time: str):
+    def __init__(self, event_queue: queue.Queue[Event], start_date: pd.Timestamp | datetime, end_date: pd.Timestamp | datetime, symbol_list: str, interval: str, exchange_closing_time: str):
         """
         Initializes the YFDataHandler
         args:
@@ -27,14 +30,14 @@ class YFDataHandler(DataHandler):
         self.interval = interval
         self.exchange_closing_time = exchange_closing_time
 
-        self.symbol_raw_data = {}
-        self.symbol_data = {}
-        self.latest_symbol_data = {}
+        self.symbol_raw_data: dict[str, pd.DataFrame] = {}
+        self.symbol_data: dict[str, Any] = {} # str => pd.DataFrame | Iterator[Any]
+        self.latest_symbol_data: dict[str, list[BarTuple]] = {}
         self.continue_backtest = True
 
         self._download_from_yf()
 
-    def _download_from_yf(self):
+    def _download_from_yf(self) -> None:
         """
         Handler method to pull data from yfinance
         """
@@ -44,7 +47,8 @@ class YFDataHandler(DataHandler):
 
         for symbol in self.symbol_list:
             df = yf.download(symbol, start=start, end=end, interval=self.interval, multi_level_index=False)
-            df = df[["Open", "High", "Low", "Close", "Volume"]]
+            df.columns = [str(col).lower() for col in df.columns]
+            df = df[["open", "high", "low", "close", "volume"]]
             df.index = df.index.tz_localize(None)
 
             self.symbol_raw_data[symbol] = df
@@ -61,12 +65,12 @@ class YFDataHandler(DataHandler):
 
         for symbol in self.symbol_list:
             tmp = self.symbol_data[symbol].reindex(index=combined_index)
-            price_cols = ["Open", "High", "Low", "Close"]
+            price_cols = ["open", "high", "low", "close"]
             tmp[price_cols] = tmp[price_cols].fillna(method="pad")
-            tmp["Volume"] = tmp["Volume"].fillna(0)
+            tmp["volume"] = tmp["volume"].fillna(0)
             self.symbol_data[symbol] = tmp.itertuples()
 
-    def _get_new_bar(self, symbol: str):
+    def _get_new_bar(self, symbol: str) -> Iterator[Any]:
         """
         Returns the latest bar from the data feed as a tuple of
         (datetime, open, high, low, close, volume).
@@ -74,7 +78,7 @@ class YFDataHandler(DataHandler):
         for b in self.symbol_data[symbol]:
             yield b
 
-    def update_bars(self):
+    def update_bars(self) -> None:
         """
         Pushes the latest bar to the latest_symbol_data structure for all
         symbols in the symbol list. This will also generate a MarketEvent.
@@ -93,9 +97,10 @@ class YFDataHandler(DataHandler):
                     mkt_close = bar.Index + pd.Timedelta(self.interval) >= bar.Index.replace(hour=int(self.exchange_closing_time.split(":")[0]), minute=int(self.exchange_closing_time.split(":")[1]))
                     start_time = bar.Index.timestamp()
 
-        self.event_queue.put(MarketEvent(start_time, mkt_close))
+        if start_time is not None:
+            self.event_queue.put(MarketEvent(start_time, mkt_close))
 
-    def get_latest_bars(self, symbol: str, n: int = 1):
+    def get_latest_bars(self, symbol: str, n: int = 1) -> list[BarTuple]:
         """
         Returns the last N bars from the latest_symbol_data
         """
