@@ -7,10 +7,8 @@ backtester_settings:
   initial_capital: 100000.0
   initial_position_size: 1 # used by portfolio to size a trade in the absence of any other signal
   # start_date: "24/11/2025 00:00:00"
-  start_date: "22/12/2025 00:00:00"
-  end_date: "25/12/2025 00:00:00" # exclusive
-  # start_date: "15/09/2020 00:00:00"
-  # end_date: "19/12/2025 00:00:00" # exclusive
+  start_date: "15/09/2020 00:00:00"
+  end_date: "19/12/2025 00:00:00" # exclusive
   borrow_cost: 0.01 # interest on short sold stock - 1%
   maintenance_margin: 0.3 # margin to hold on short positions - 30%
   risk_per_trade: 0.01 # percentage of total portfolio value willing to risk in a single trade
@@ -75,6 +73,7 @@ strategies:
       interval: "1m"
       symbol_list: ["BTC-USD"]
       rounding_list: [8]
+      days_before_buying: 5
   moving_average:
     name: "backtester.strategies.moving_average_crossover.MovingAverageCrossover"
     display_name: "Moving Average"

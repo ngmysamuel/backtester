@@ -2,9 +2,10 @@ import bidask
 import numpy as np
 import pandas as pd
 
+from backtester.enums.direction_type import DirectionType
 from backtester.util.slippage.slippage import Slippage
-from backtester.util.util import BarTuple
-from backtester.util.util import get_annualization_factor
+from backtester.util.util import BarTuple, get_annualization_factor
+
 
 class MultiFactorSlippage(Slippage):
     def __init__(self, config: dict[str,str]):
@@ -31,7 +32,7 @@ class MultiFactorSlippage(Slippage):
         self.random_noise = config["random_noise"]
 
         # Determine the maximum lookback needed for calculation
-        self.max_lookback = max(self.long_window, self.med_window, self.short_window, self.bidask_window) + 5  # Add buffer for diff/pct_change calculations
+        self.max_lookback = max(self.long_window, self.med_window, self.short_window, self.bidask_window)
 
 
     def on_interval(self, history: dict[str, list[BarTuple]]):
@@ -112,8 +113,12 @@ class MultiFactorSlippage(Slippage):
         to_roll_mean = df["turnover"].rolling(self.med_window).mean()
         df["turnover_vol"] = to_roll_std / to_roll_mean
 
-        # indicates the direction of market this stock is moving in
+        # indicates the strength of the direction this stock is moving in
         df["price_acceleration"] = df["returns"].diff()
+
+        # models the cost of chasing a moving target
+        # depending on the direction of trade, this either works with us or against us
+        df["momentum_cost_magnitude"] = self.momentum_cost_factor * abs(df["returns"])
 
         # Bid-ask spread estimation - https://github.com/eguidotti/bidask
         # Only run if we have enough data, otherwise 0
@@ -125,18 +130,15 @@ class MultiFactorSlippage(Slippage):
         # models the cost of a chaotic market
         df["volatility_cost"] = df["vol_med"] * np.exp(df["vol_surge"] - 1) * self.volatility_cost_factor
 
-        # models the cost of chasing a moving target
-        df["momentum_cost"] = self.momentum_cost_factor * abs(df["returns"]) * np.sign(df["price_acceleration"])
-
         # models the cost of trading in a blue chip MSFT vs a penny stock no one knows
         df["liquidity_cost"] = self.liquidity_cost_factor * np.power(np.clip(df["amihud_illiq"], 1e-8, None), self.liquidity_cost_exponent)
 
-        impact_cols = ["amihud_illiq", "turnover", "turnover_vol", "price_acceleration", "spread_cost", "volatility_cost", "momentum_cost", "liquidity_cost"]
+        impact_cols = ["amihud_illiq", "turnover", "turnover_vol", "price_acceleration", "spread_cost", "volatility_cost", "momentum_cost_magnitude", "liquidity_cost"]
         clean_col(impact_cols, 0)
 
         return df
 
-    def calculate_slippage(self, ticker, trade_date, trade_size):
+    def calculate_slippage(self, ticker, trade_date, trade_size, direction: DirectionType):
         """
         Calculates slippage.
         """
@@ -163,11 +165,19 @@ class MultiFactorSlippage(Slippage):
 
         market_impact = self.market_impact_factor * np.power(participation_rate / vol_ratio, self.power_law_exponent) * characteristics["vol_med"] * np.exp(-characteristics["turnover_vol"])
 
-        # 3. Noise
-        noise = np.random.normal(0, self.random_noise)
+        # 3. Momentum Cost
+        market_direction = np.sign(characteristics["price_acceleration"])
+        momentum_cost = characteristics["momentum_cost_magnitude"] * (market_direction * direction.value)
 
-        # 4. Final Combination
-        slippage = characteristics["spread_cost"] + market_impact * (1 + characteristics["volatility_cost"]) + characteristics["momentum_cost"] * characteristics["liquidity_cost"] + noise
+        # 4. Noise
+        # use lognormal to ensure we skew to worst scenario
+        rng = np.random.default_rng()
+        noise = rng.lognormal(sigma=self.random_noise)
+
+        # 5. Final Combination
+        slippage = noise * (characteristics["spread_cost"] + market_impact * (1 + characteristics["volatility_cost"]) + momentum_cost * characteristics["liquidity_cost"])
 
         # Cap at 5%
-        return float(np.clip(slippage, 0, 0.05))
+        clipped_slippage = np.clip(slippage, 0, 0.05)
+        converted_slippage = float(clipped_slippage)
+        return converted_slippage

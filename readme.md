@@ -22,7 +22,7 @@ There are 5 parameters
 2. data-source
     - Available options are in config.yaml under "data_handler"
     - Default is "yf"
-3. position_calc
+3. position-calc
     - Method used to calculate the position size of each trade
     - Available options are in config.yaml under "position_sizer"
     - Default is "atr"
@@ -40,13 +40,21 @@ poetry run backtester dashboard
 ```
 
 ### Test
-Run the testcases
+Run the all testcases (including integration tests)
 ```
 poetry run pytest
+```
+For only unit tests
+```
+poetry run pytest -m "not integration"
 ```
 For a specific file
 ```
 poetry run pytest tests\execution\test_simulated_execution_handler.py
+```
+For all integration tests. Tests requiring internet access are labelled "live_integration"
+```
+poetry run pytest -m "integration"
 ```
 Static type checking
 ```
@@ -141,14 +149,14 @@ dat.to_csv("MSFT_1m.csv")
         4. Composite Metrics
             - Amihud Illiquidity - a look at the product's inherent illiquidity. Price movement per dollar traded
             - Turnover (Coeff of Variance) - standardised metric to compare volatility across products (e.g. capitalization)
-            - Price acceleration - quantifies market sentiment, if it increases it means that a stampede is forming. Trading either with or against it is dangerous. 
             - Volatility Cost - a cost amplifier for the other factors
-            - Momentum Cost - the cost incurred when other traders are trying to make the same move as you 
+            - Price acceleration - quantifies market sentiment, if it increases it means that a stampede is forming.
+            - Momentum Cost - the cost incurred when other traders are trying to make the same move as you. If moving with market (taking liquidity), slippage is more. If moving against the market (increasing liquidity), slippage is less.
             - Liquidity Cost - distinguishes between different types of assets e.g. blue chips vs unknown penny stocks
         5. Combining the above
             - Participation rate - ratio of the current trade to the volume on that day
             - Market Impact - quanitifies the adverse price movement caused directly by the pressure of our own order. Scales along a concave relation (empircallly set to the 3/5 power relationship); doubling trade size does not double cost, it would be less than that. Normalized by the average volume in the medium term with a dampener provided by a negative exponential of the coefficient of variation
-            - Randome Noise - modelled with a normal distribution; no model is perfect
+            - Random Noise - modelled with a lognormal distribution and applied multiplicatively on final slippage - no model is perfect
             - Slippage - (Spread Cost) + (Market Impact) + (Momentum Cost*Liquidity Cost) + (Random Noise)
     3. Links
         - Educational: https://www.quantstart.com/articles/Successful-Backtesting-of-Algorithmic-Trading-Strategies-Part-II/
@@ -183,7 +191,8 @@ dat.to_csv("MSFT_1m.csv")
         Live - how to test?
 - Risk manager
 - Multi strategy backtesting
-- Use mypy for static analysis
+- Update all files to pass static type checking
+- If metrics_interval is daily, automatically assumes business days. To instead, leave it as days, and remove blank records in the csv file instead.
 
 ### Notes
 

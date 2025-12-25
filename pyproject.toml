@@ -36,3 +36,9 @@ line-length = 250
 
 [tool.mypy]
 strict = true
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: marks tests as integration tests",
+    "live_integration: marks tests as live system integration tests requiring network access"
+]

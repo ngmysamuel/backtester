@@ -1,0 +1,44 @@
+backtester_settings:
+  benchmark: "ETH-USD"
+  period: "10m"  # Short test duration
+  exchange_closing_time: "16:00"
+  cash_buffer: 0.95
+  initial_capital: 100000.0
+  initial_position_size: 1
+  start_date: "01/01/2024 00:00:00"
+  end_date: "01/02/2024 00:00:00"
+  borrow_cost: 0.01
+  maintenance_margin: 0.3
+  risk_per_trade: 0.01
+  base_interval: "1m"  # 1-minute bars for live testing
+  metrics_interval: "1m"
+
+risk_settings:
+  max_order_quantity: -1
+  max_notional_value: -1
+  max_daily_loss: 0.01
+  rate_limit: 50
+  participation_limit: 0.05
+
+data_handler:
+  live:
+    name: backtester.data.live_data_handler.LiveDataHandler
+
+position_sizer:
+  no_position_sizer:
+    name: backtester.util.position_sizer.no_position_sizer.NoPositionSizer
+    additional_parameters:
+      constant_position_size: 10
+
+slippage:
+  no_slippage:
+    name: backtester.util.slippage.no_slippage.NoSlippage
+
+strategies:
+  buy_and_hold_simple:
+    name: "backtester.strategies.buy_and_hold_simple.BuyAndHoldSimple"
+    additional_parameters:
+      interval: "1m"
+      symbol_list: ["BTC-USD"]
+      rounding_list: [8]
+      days_before_buying: 5

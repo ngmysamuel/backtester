@@ -7,3 +7,6 @@ class NoPositionSizer(PositionSizer):
 
     def get_position_size(self, *args, **kwargs):
         return self.constant_position_size
+
+    def on_interval(self, *args, **kwargs):
+        pass

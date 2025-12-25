@@ -15,31 +15,31 @@ from backtester.util.util import BarDict, BarTuple, str_to_seconds
 
 
 class LiveDataHandler(DataHandler):
-    def __init__(self, event_queue: queue.Queue[Event], symbol_list: list[str], interval: str, period: str, exchange_closing_time: str):
+    def __init__(self, event_queue: queue.Queue[Event], **kwargs):
         """
         Initializes the LiveDataHandler
         args:
             event_queue: the Event Queue
-            symbol_list: a list of symbol strings
-            interval: e.g. 5m means OHLC data for 5 minutes
-            period: how long should the live data test run
-            exchange_closing_time: 24h time format - HH:MM
+            symbol_list: list[str] - a list of symbol strings
+            interval: str - e.g. 5m means OHLC data for 5 minutes
+            period: str - how long should the live data test run
+            exchange_closing_time: str - 24h time format - HH:MM
         """
         self.event_queue = event_queue
-        self.interval = str_to_seconds(interval)
-        self.period = str_to_seconds(period)
-        self.symbol_list = symbol_list
-        self.exchange_closing_time = exchange_closing_time
+        self.interval = str_to_seconds(kwargs["base_interval"])
+        self.period = str_to_seconds(kwargs["period"])
+        self.symbol_list = kwargs["symbol_list"]
+        self.exchange_closing_time = kwargs["exchange_closing_time"]
 
         self.message_queue: queue.Queue[Any] = Queue()
-        self.symbol_bar_dict: dict[str, Optional[BarDict]] = {ticker: None for ticker in symbol_list}  # {string: BarDict}
-        self.symbol_raw_data: dict[str, list[Optional[BarTuple]] | pd.DataFrame] = {ticker: [] for ticker in symbol_list}  # {string: list[pd.DataFrame]}
-        self.latest_symbol_data: dict[str, list[BarTuple]] = {ticker: [] for ticker in symbol_list}  # {string: list[BarTuple]}
+        self.symbol_bar_dict: dict[str, Optional[BarDict]] = {ticker: None for ticker in self.symbol_list}  # {string: BarDict}
+        self.symbol_raw_data: dict[str, list[Optional[BarTuple]] | pd.DataFrame] = {ticker: [] for ticker in self.symbol_list}  # {string: list[pd.DataFrame]}
+        self.latest_symbol_data: dict[str, list[BarTuple]] = {ticker: [] for ticker in self.symbol_list}  # {string: list[BarTuple]}
         self.continue_backtest = True
-        self.day_vol: dict[str, int] = {ticker: 0 for ticker in symbol_list} # {string: int}
-        self.interval_vol: dict[str, int] = {ticker: 0 for ticker in symbol_list} # {string: int}
+        self.day_vol: dict[str, int] = {ticker: 0 for ticker in self.symbol_list} # {string: int}
+        self.interval_vol: dict[str, int] = {ticker: 0 for ticker in self.symbol_list} # {string: int}
 
-        message_listener = threading.Thread(target=self._start_listening, args=(symbol_list,))
+        message_listener = threading.Thread(target=self._start_listening, args=(self.symbol_list,))
         message_listener.daemon = True
         aggregator = threading.Thread(target=self._start_aggregating)
         aggregator.daemon = True
