@@ -12,11 +12,7 @@ runner = CliRunner()
 
 @pytest.mark.integration
 class TestIntegration:
-    """System integration tests for live data handler.
-
-    These tests verify the live data handler works with real Yahoo Finance websockets.
-    They are separate from unit/e2e tests due to network dependencies and execution time.
-    """
+    """System integration tests."""
 
     def test_e2e_backtest_csv(self):
         """End-to-end test: run backtest with CSV data and verify output CSV."""
