@@ -1,5 +1,7 @@
-from backtester.util.util import BarTuple
 from abc import ABC, abstractmethod
+
+from backtester.util.util import BarTuple
+
 
 class DataHandler(ABC):
     """
@@ -7,11 +9,11 @@ class DataHandler(ABC):
     """
 
     @abstractmethod
-    def get_latest_bars(self, symbol: str, start_date: str, end_date: str):
+    def get_latest_bars(self, symbol: str, n: int = None) -> list[BarTuple]:
         pass
 
     @abstractmethod
-    def update_bars(self) -> BarTuple:
+    def update_bars(self) -> None:
         """
         Note that the bars provided are NamedTuples.
         The time of each bar is found with the name "Index". The value is a pandas DateTime construct

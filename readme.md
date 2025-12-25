@@ -48,6 +48,10 @@ For a specific file
 ```
 poetry run pytest tests\execution\test_simulated_execution_handler.py
 ```
+Static type checking
+```
+poetry run mypy src\backtester\util\bar_aggregator.py
+```
 
 ### Pulling CSV data
 Identical to using data-source = "yf"

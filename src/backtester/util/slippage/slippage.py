@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from backtester.util.util import BarTuple
+import datetime
 
 
 class Slippage(ABC):
@@ -8,11 +9,11 @@ class Slippage(ABC):
     """
 
     @abstractmethod
-    def on_interval(self, history: dict[str, list[BarTuple]]):
+    def on_interval(self, history: dict[str, list[BarTuple]]) -> None:
         pass
 
     @abstractmethod
-    def calculate_slippage(self, ticker, trade_date, trade_size):
+    def calculate_slippage(self, ticker: str, trade_date: datetime.datetime, trade_size: float) -> float:
         """
         Calculates the slippage for a particular trade based on the specifics of that trading day
         """
