@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import ast
 import re
+import pytest
 from typer.testing import CliRunner
 from backtester.cli import app
 
@@ -13,7 +14,6 @@ def test_run_command():
 
 def test_e2e_backtest():
     """End-to-end test: run backtest with CSV data and verify output CSV."""
-    # Get absolute paths since CliRunner uses temp directory
     test_data_dir = os.path.abspath("tests/test_data")
     config_path = os.path.abspath("tests/test_data/test_config.yaml")
     output_path = os.path.join(test_data_dir, "test_equity_curve.csv")
@@ -90,4 +90,71 @@ def test_e2e_backtest():
         assert abs(order_quantity - position_quantity) < 1e-6, f"Order quantity {order_quantity} doesn't match position {position_quantity}"
 
     # Clean up only if all assertions pass
-    # os.remove(output_path)
+    os.remove(output_path)
+
+@pytest.mark.skipif(not hasattr(pd, 'Timedelta'), reason="Requires pandas")
+def test_e2e_backtest_yf():
+    """End-to-end test: run backtest with Yahoo Finance data."""
+    # Skip if yfinance not available or network issues
+    pytest.importorskip("yfinance")
+
+    config_path = os.path.abspath("tests/test_data/test_config_yf.yaml")
+    output_path = os.path.join(os.path.dirname(config_path), "test_equity_curve_yf.csv")
+
+    # Run the backtest with YF data
+    result = runner.invoke(app, [
+        "run",
+        "--data-source", "yf",
+        "--position-calc", "no_position_sizer",
+        "--slippage", "no_slippage",
+        "--config-path", config_path,
+        "--output-path", output_path
+    ])
+
+    # Assert successful execution
+    assert result.exit_code == 0, f"YF backtest failed: {result.output}"
+
+    # Assert output CSV exists
+    assert os.path.exists(output_path), "YF equity curve CSV not created"
+
+    # Load and validate CSV content
+    df = pd.read_csv(output_path, index_col=0, parse_dates=True)
+    assert not df.empty, "YF equity curve CSV is empty"
+    assert "equity_curve" in df.columns, "Missing 'equity_curve' column"
+    assert "returns" in df.columns, "Missing 'returns' column"
+
+    # Check that we have data (YF date range may vary due to market holidays)
+    assert len(df) > 0, "No data retrieved from YF"
+
+    # Check that equity_curve and returns columns have values
+    assert df["equity_curve"].notna().any(), "No equity_curve values"
+    assert df["returns"].notna().any(), "No returns values"
+
+    # Check that equity_curve is not flat
+    assert not (df["equity_curve"] == 1.0).all(), "YF equity curve is flat"
+
+    # Check that there is exactly 1 row with a value in the "order" column
+    order_rows = df["order"].notna() & (df["order"] != "")
+    assert order_rows.sum() == 1, f"Expected 1 row with order, got {order_rows.sum()}"
+
+    # For YF test, we use no_position_sizer with constant_position_size=100
+    if order_rows.any():
+        order_idx = order_rows.idxmax()
+
+        # Check order quantity matches constant_position_size
+        order_str = df.loc[order_idx, "order"]
+        match = re.search(r'BUY (\d+\.?\d*) AAPL', order_str)
+        assert match, f"Could not parse quantity from order: {order_str}"
+        order_quantity = float(match.group(1))
+        assert order_quantity == 100.0, f"No position sizer should use constant size 100, got {order_quantity}"
+
+        # Check slippage is 0.0
+        slippage_str = df.loc[order_idx, "slippage"]
+        slippage_match = re.search(r'(\d+\.?\d*)', slippage_str)
+        if slippage_match:
+            slippage_value = float(slippage_match.group(1))
+            assert slippage_value == 0.0, f"No slippage model should give 0.0, got {slippage_value}"
+
+    # Clean up
+    # if os.path.exists(output_path):
+    #     os.remove(output_path)

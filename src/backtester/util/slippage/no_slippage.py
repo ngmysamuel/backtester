@@ -5,5 +5,8 @@ class NoSlippage(Slippage):
     def __init__(self, *args, **kwargs):
         super().__init__()
 
-    def calculate_slippage(self, ticker, trade_date, trade_size):
+    def calculate_slippage(self, *args, **kwargs):
         return 0
+
+    def on_interval(self, *args, **kwargs):
+        pass

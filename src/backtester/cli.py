@@ -117,14 +117,16 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     event_queue = Queue()
 
     DataHandlerClass = load_class(config["data_handler"][data_source]["name"])
-    start_datetime = pd.to_datetime(start_timestamp, unit="s")
-    end_datetime = pd.to_datetime(end_timestamp, unit="s")
-    if data_source == "yf":
-        data_handler = DataHandlerClass(event_queue, start_datetime, end_datetime, symbol_list + [benchmark_ticker], base_interval, exchange_closing_time)
-    elif data_source == "live":
-        data_handler = DataHandlerClass(event_queue, symbol_list + [benchmark_ticker], base_interval, period, exchange_closing_time)
-    else:
-        data_handler = DataHandlerClass(event_queue, data_dir, start_datetime, end_datetime, symbol_list + [benchmark_ticker], base_interval, exchange_closing_time)
+    # start_datetime = pd.to_datetime(start_timestamp, unit="s")
+    # end_datetime = pd.to_datetime(end_timestamp, unit="s")
+    data_handler_settings = backtester_settings | {"symbol_list": symbol_list + [benchmark_ticker], "data_dir": data_dir}
+    data_handler = DataHandlerClass(event_queue, **data_handler_settings)
+    # if data_source == "yf":
+    #     data_handler = DataHandlerClass(event_queue, start_datetime, end_datetime, symbol_list + [benchmark_ticker], base_interval, exchange_closing_time)
+    # elif data_source == "live":
+    #     data_handler = DataHandlerClass(event_queue, symbol_list + [benchmark_ticker], base_interval, period, exchange_closing_time)
+    # else:
+    #     data_handler = DataHandlerClass(event_queue, data_dir, start_datetime, end_datetime, symbol_list + [benchmark_ticker], base_interval, exchange_closing_time)
 
     bar_manager = BarManager(data_handler, base_interval)
 

@@ -1,0 +1,44 @@
+backtester_settings:
+  benchmark: "SPY"
+  period: "10m"
+  exchange_closing_time: "16:00"
+  cash_buffer: 0.95
+  initial_capital: 100000.0
+  initial_position_size: 1
+  start_date: "01/01/2024 00:00:00"  # Recent date with available data
+  end_date: "31/12/2024 00:00:00"    # Short period for fast testing
+  borrow_cost: 0.01
+  maintenance_margin: 0.3
+  risk_per_trade: 0.01
+  base_interval: "1d"
+  metrics_interval: "1d"
+
+risk_settings:
+  max_order_quantity: -1
+  max_notional_value: -1
+  max_daily_loss: 0.01
+  rate_limit: 50
+  participation_limit: 0.05
+
+data_handler:
+  yf:
+    name: backtester.data.yf_data_handler.YFDataHandler
+
+position_sizer:
+  no_position_sizer:
+    name: backtester.util.position_sizer.no_position_sizer.NoPositionSizer
+    additional_parameters:
+      constant_position_size: 100
+
+slippage:
+  no_slippage:
+    name: backtester.util.slippage.no_slippage.NoSlippage
+
+strategies:
+  buy_and_hold_simple:
+    name: "backtester.strategies.buy_and_hold_simple.BuyAndHoldSimple"
+    additional_parameters:
+      interval: "1d"
+      symbol_list: ["AAPL"]
+      rounding_list: [0]
+      days_before_buying: 22

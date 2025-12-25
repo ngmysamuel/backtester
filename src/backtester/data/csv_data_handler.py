@@ -17,7 +17,7 @@ class CSVDataHandler(DataHandler):
     historical data for each symbol from CSV files.
     """
 
-    def __init__(self, event_queue: queue.Queue[Event], csv_dir: str, start_date: pd.Timestamp | datetime, end_date: pd.Timestamp | datetime, symbol_list: str, interval: str, exchange_closing_time: str):
+    def __init__(self, event_queue: queue.Queue[Event], **kwargs):
         """
         Initializes the CSVDataHandler
         args:
@@ -30,12 +30,12 @@ class CSVDataHandler(DataHandler):
             exchange_closing_time: 24h time format - HH:MM
         """
         self.event_queue = event_queue
-        self.csv_dir = csv_dir
-        self.start_date = start_date
-        self.end_date = end_date
-        self.symbol_list = symbol_list
-        self.interval = interval
-        self.exchange_closing_time = exchange_closing_time
+        self.csv_dir: str = kwargs["data_dir"]
+        self.start_date: pd.Timestamp | datetime = pd.to_datetime(kwargs["start_date"], dayfirst=True)
+        self.end_date: pd.Timestamp | datetime = pd.to_datetime(kwargs["end_date"], dayfirst=True)
+        self.symbol_list: str = kwargs["symbol_list"]
+        self.interval: str = kwargs["base_interval"]
+        self.exchange_closing_time: str = kwargs["exchange_closing_time"]
 
         self.symbol_raw_data: dict[str, pd.DataFrame] = {}
         self.symbol_data: dict[str, Any] = {} # str => pd.DataFrame | Iterator[Any]

@@ -7,7 +7,7 @@ from backtester.util.util import BarTuple
 class BuyAndHoldSimple(Strategy):
     def __init__(self, events: queue.Queue, **kwargs):
         super().__init__(events, kwargs["symbol_list"], kwargs["interval"])
-        self.days_before_buying = kwargs["days_before_buying"]
+        self.days_before_buying = kwargs.get("days_before_buying", 21)
         self.bought = {sym: False for sym in self.symbol_list}
         self.counter = 0
 

@@ -113,8 +113,12 @@ class MultiFactorSlippage(Slippage):
         to_roll_mean = df["turnover"].rolling(self.med_window).mean()
         df["turnover_vol"] = to_roll_std / to_roll_mean
 
-        # indicates the direction of market this stock is moving in
+        # indicates the strength of the direction this stock is moving in
         df["price_acceleration"] = df["returns"].diff()
+
+        # models the cost of chasing a moving target
+        # depending on the direction of trade, this either works with us or against us
+        df["momentum_cost_magnitude"] = self.momentum_cost_factor * abs(df["returns"])
 
         # Bid-ask spread estimation - https://github.com/eguidotti/bidask
         # Only run if we have enough data, otherwise 0
@@ -125,10 +129,6 @@ class MultiFactorSlippage(Slippage):
 
         # models the cost of a chaotic market
         df["volatility_cost"] = df["vol_med"] * np.exp(df["vol_surge"] - 1) * self.volatility_cost_factor
-
-        # models the cost of chasing a moving target
-        # depending on the direction of trade, this either works with us or against us
-        df["momentum_cost_magnitude"] = self.momentum_cost_factor * abs(df["returns"])
 
         # models the cost of trading in a blue chip MSFT vs a penny stock no one knows
         df["liquidity_cost"] = self.liquidity_cost_factor * np.power(np.clip(df["amihud_illiq"], 1e-8, None), self.liquidity_cost_exponent)
