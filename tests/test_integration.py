@@ -207,9 +207,6 @@ class TestIntegration:
                 assert abs(current_position - previous_position) < 1e-6, f"Position changed without order at {idx}: expected {previous_position}, got {current_position}"
             previous_position = current_position
 
-        # Clean up
-        # if os.path.exists(output_path):
-        #     os.remove(output_path)
 
     @pytest.mark.live_integration
     def test_live_data_collection(self):

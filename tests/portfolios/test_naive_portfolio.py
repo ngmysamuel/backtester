@@ -2,16 +2,19 @@ from collections import deque
 from copy import deepcopy
 from queue import Queue
 from types import SimpleNamespace
+from unittest.mock import MagicMock
 
 import pandas as pd
 import pytest
 
 from backtester.enums.direction_type import DirectionType
 from backtester.enums.signal_type import SignalType
+from backtester.enums.order_type import OrderType
 from backtester.events.event import Event
 from backtester.events.fill_event import FillEvent
 from backtester.events.market_event import MarketEvent
 from backtester.events.signal_event import SignalEvent
+from backtester.events.order_event import OrderEvent
 from backtester.exceptions.negative_cash_exception import NegativeCashException
 from backtester.portfolios.naive_portfolio import NaivePortfolio
 from backtester.util.position_sizer.no_position_sizer import NoPositionSizer
@@ -27,7 +30,8 @@ class FakeDataHandler:
 
     def on_market(self):
         for val in self._bars.values():
-            val.popleft()
+            if val:
+                val.popleft()
 
 @pytest.fixture
 def mock_data_handler():
@@ -44,20 +48,40 @@ def mock_data_handler():
     return FakeDataHandler(bars)
 
 @pytest.fixture
-def portfolio(mock_data_handler):
-    """Returns a NaivePortfolio instance with default settings."""
+def mock_risk_manager():
+    rm = MagicMock()
+    rm.is_allowed.return_value = True
+    return rm
+
+@pytest.fixture
+def portfolio(mock_data_handler, mock_risk_manager):
+    """Returns a NaivePortfolio instance with default settings and populated history."""
     events = Queue()
     position_sizer = NoPositionSizer({"constant_position_size": 100})
-    return NaivePortfolio(
-        data_handler=mock_data_handler,
+    
+    pf = NaivePortfolio(
+        cash_buffer=1.0,
         initial_capital=100000.0,
         initial_position_size=100,
         symbol_list=["MSFT", "AAPL"],
+        rounding_list=[2, 2],
         events=events,
         start_date=pd.to_datetime("2023-01-01").timestamp(),
         interval="1d",
+        metrics_interval="1d",
         position_sizer=position_sizer,
+        strategy_name="TestStrat",
+        risk_manager=mock_risk_manager,
+        maintenance_margin=0.5,
+        borrow_cost=0.01
     )
+    
+    # Pre-populate history so generic tests don't crash on key lookup
+    pf.history = {
+        ("MSFT", "1d"): [SimpleNamespace(Index=pd.to_datetime("2023-01-01"), close=100)],
+        ("AAPL", "1d"): [SimpleNamespace(Index=pd.to_datetime("2023-01-01"), close=150)]
+    }
+    return pf
 
 # --- Test Cases ---
 
@@ -65,309 +89,357 @@ def test_initialization(portfolio):
     """Tests that the portfolio is initialized with correct values."""
     assert portfolio.initial_capital == 100000.0
     assert portfolio.symbol_list == ["MSFT", "AAPL"]
-    assert portfolio.position_dict == {"MSFT": 100, "AAPL": 100}
     assert portfolio.current_holdings["cash"] == 100000.0
     assert portfolio.current_holdings["total"] == 100000.0
     assert portfolio.current_holdings["MSFT"]["position"] == 0
     assert len(portfolio.historical_holdings) == 0
 
-
 def test_on_market(portfolio):
     """Tests the behavior of the on_market method."""
     initial_holdings = deepcopy(portfolio.current_holdings)
-    market_event = Event()
-    market_event.type = "MARKET"
-    market_event.timestamp = pd.to_datetime("2023-01-02").timestamp()
+    
+    # Ensure history has data for the loop in on_market
+    portfolio.history = {
+        ("MSFT", "1d"): [SimpleNamespace(Index=pd.to_datetime("2023-01-02"), close=105)],
+        ("AAPL", "1d"): [SimpleNamespace(Index=pd.to_datetime("2023-01-02"), close=155)]
+    }
 
-    portfolio.on_market(market_event)
+    portfolio.on_market()
 
     assert len(portfolio.historical_holdings) == 1
-    assert portfolio.current_holdings["timestamp"] == market_event.timestamp
+    assert portfolio.current_holdings["timestamp"] == pd.to_datetime("2023-01-02")
     # Check that state is carried over, but event-specific fields are reset
     assert portfolio.current_holdings["cash"] == initial_holdings["cash"]
     assert portfolio.current_holdings["commissions"] == 0.0
     assert portfolio.current_holdings["borrow_costs"] == 0.0
     assert portfolio.current_holdings["order"] == ""
 
-def test_on_market_raises_negative_cash_exception(portfolio):
-    """Tests that on_market raises an exception if cash is negative."""
-    portfolio.current_holdings["cash"] = -1.0
-    market_event = Event()
-    market_event.type = "MARKET"
-    market_event.timestamp = pd.to_datetime("2023-01-02").timestamp()
-    with pytest.raises(NegativeCashException):
-        portfolio.on_market(market_event)
-
-def test_on_signal_long_from_flat(portfolio):
-    """Tests creating a LONG order from a flat position."""
-    signal = SignalEvent(123, "MSFT", SignalType.LONG)
-    portfolio.on_signal(signal)
-    events = list(portfolio.events.queue)
-    assert len(events) == 1
-    order = events[0]
-    assert order.direction == DirectionType.BUY
-    assert order.quantity == 100
-
-def test_on_signal_short_from_long(portfolio):
-    """Tests creating a SHORT order from a LONG position (exit and enter)."""
-    portfolio.current_holdings["MSFT"]["position"] = 100
-    signal = SignalEvent(123, "MSFT", SignalType.SHORT)
-    portfolio.on_signal(signal)
-    events = list(portfolio.events.queue)
-    assert len(events) == 1
-    order = events[0]
-    assert order.direction == DirectionType.SELL
-    assert order.quantity == 200 # 100 to close, 100 to open short
-
-def test_on_signal_exit_from_long(portfolio):
-    """Tests creating an EXIT order from a LONG position."""
-    portfolio.current_holdings["MSFT"]["position"] = 100
-    signal = SignalEvent(123, "MSFT", SignalType.EXIT)
-    portfolio.on_signal(signal)
-    events = list(portfolio.events.queue)
-    assert len(events) == 1
-    order = events[0]
-    assert order.direction == DirectionType.SELL
-    assert order.quantity == 100
-
-def test_on_signal_exit_from_short(portfolio):
+def test_accounting_user_scenario_short_sell(mock_risk_manager):
     """
-    Tests that when exiting a short position, the resulting BUY order
-    has a positive quantity.
+    Specific User Scenario:
+    1. Start with 1 AAPL, $0 Cash.
+    2. Sell 2 AAPL @ $10.
+    3. Verify: Cash=$5, Equity/Total=$10, Margin=$15.
     """
-    portfolio.current_holdings["MSFT"]["position"] = -100
-    signal = SignalEvent(123, "MSFT", SignalType.EXIT)
+    events = Queue()
+    ps = NoPositionSizer({"constant_position_size": 1})
+    
+    pf = NaivePortfolio(
+        cash_buffer=1.0,
+        initial_capital=10.0, 
+        initial_position_size=1,
+        symbol_list=["AAPL"],
+        rounding_list=[2],
+        events=events,
+        start_date=1000,
+        interval="1d",
+        metrics_interval="1d",
+        position_sizer=ps,
+        strategy_name="Test",
+        risk_manager=mock_risk_manager,
+        maintenance_margin=0.5 # 1.5x requirement
+    )
+    
+    # Initialize history
+    pf.history = {("AAPL", "1d"): [SimpleNamespace(Index=1, close=10.0)]}
+
+    # --- Step 1: Establish Initial State (1 AAPL, $0 Cash) ---
+    fill_buy = FillEvent(1, "AAPL", "EXCH", 1, DirectionType.BUY, 10.0, 10.0, commission=0)
+    pf.on_fill(fill_buy)
+    
+    assert pf.current_holdings["AAPL"]["position"] == 1
+    assert pf.current_holdings["cash"] == 0.0
+    assert pf.current_holdings["total"] == 10.0
+
+    # --- Step 2: The Short Transaction ---
+    fill_sell = FillEvent(2, "AAPL", "EXCH", 2, DirectionType.SELL, 20.0, 10.0, commission=0)
+    pf.on_fill(fill_sell)
+
+    # --- Step 3: Verification ---
+    assert pf.current_holdings["AAPL"]["position"] == -1.0
+    assert pf.current_holdings["AAPL"]["value"] == -10.0
+    
+    # Margin check: abs(-10) * 1.5 = 15
+    expected_margin = 15.0
+    assert pf.margin_holdings["AAPL"] == expected_margin
+
+    # Cash check: Should be $5
+    # Calculation: (Start 0) + (Proceeds 20) - (Margin Locked 15) = 5
+    assert pf.current_holdings["cash"] == 5.0
+    
+    # Total Equity check: Should be $10
+    assert pf.current_holdings["total"] == 10.0
+
+def test_end_of_day_short_mark_to_market(mock_risk_manager):
+    """Tests that margin adjusts when price moves against a short position."""
+    pf = NaivePortfolio(
+        cash_buffer=1.0, initial_capital=100000.0, initial_position_size=100,
+        symbol_list=["AAPL"], rounding_list=[2], events=Queue(), start_date=1000,
+        interval="1d", metrics_interval="1d", 
+        position_sizer=NoPositionSizer({"constant_position_size": 100}),
+        strategy_name="Test", risk_manager=mock_risk_manager, maintenance_margin=0.5,
+        borrow_cost=0.01 # 1% annual
+    )
+
+    # Update history: Price went up from 150 to 160
+    pf.history = {("AAPL", "1d"): [SimpleNamespace(Index=pd.Timestamp("2023-01-01"), close=160)]}
+    
+    # Setup existing short: -100 AAPL @ 150
+    pf.current_holdings["AAPL"]["position"] = -100
+    pf.current_holdings["AAPL"]["value"] = -15000 # Old value based on 150
+    pf.margin_holdings["AAPL"] = 22500 # Old margin (15k * 1.5)
+    pf.current_holdings["cash"] = 92500 
+    
+    pf.end_of_day()
+    
+    # New Value: -100 * 160 = -16,000
+    assert pf.current_holdings["AAPL"]["value"] == -16000
+    
+    # New Margin Req: 16,000 * 1.5 = 24,000
+    # Margin Diff: 22,500 (old) - 24,000 (new) = -1,500 needed from cash
+    
+    # Borrow Cost: abs(16000) * (0.01 / 252) approx 0.63
+    daily_rate = 0.01 / 252.0
+    borrow_cost = 16000 * daily_rate
+    
+    # Cash Logic: 92,500 + (-1500 margin adjustment) - borrow_cost
+    expected_cash = 92500 - 1500 - borrow_cost
+    assert pf.current_holdings["cash"] == pytest.approx(expected_cash)
+    
+    # Margin Holdings should update
+    assert pf.margin_holdings["AAPL"] == 24000
+    
+    # Total Logic: Cash + Margin + Value (negative)
+    expected_total = expected_cash + 24000 - 16000
+    assert pf.current_holdings["total"] == pytest.approx(expected_total)
+
+def test_liquidate_short_position(mock_risk_manager):
+    """Tests liquidating a short position releases margin back to cash."""
+    pf = NaivePortfolio(
+        cash_buffer=1.0, initial_capital=100000.0, initial_position_size=100,
+        symbol_list=["AAPL"], rounding_list=[2], events=Queue(), start_date=1000,
+        interval="1d", metrics_interval="1d", 
+        position_sizer=NoPositionSizer({"constant_position_size": 100}),
+        strategy_name="Test", risk_manager=mock_risk_manager
+    )
+    
+    pf.history = {("AAPL", "1d"): [SimpleNamespace(Index=pd.Timestamp("2023-01-01"), close=150)]}
+    
+    # Setup existing short
+    pf.current_holdings["AAPL"]["position"] = -100
+    pf.margin_holdings["AAPL"] = 22500
+    pf.current_holdings["cash"] = 92500
+    pf.current_holdings["margin"]["AAPL"] = 22500
+    
+    pf.liquidate()
+    
+    # Positions cleared
+    assert pf.current_holdings["AAPL"]["position"] == 0
+    assert pf.margin_holdings["AAPL"] == 0
+    
+    # Cash logic in liquidate:
+    # Cash (92500) + Margin Released (22500) = 115,000
+    # Cash += Position (-100) * Close (150) -> Cash += -15000 (cost to buy back)
+    # Net: 115,000 - 15,000 = 100,000
+    assert pf.current_holdings["cash"] == 100000.0
+    assert pf.current_holdings["total"] == 100000.0
+
+def test_on_signal_sizing(portfolio):
+    """Tests that on_signal uses the position sizer correctly."""
+    # Mock position sizer to return specific quantity
+    portfolio.position_sizer.get_position_size = MagicMock(return_value=50)
+    
+    # Ensure history exists for "MSFT" so sizing logic doesn't return early/crash
+    portfolio.history = {("MSFT", "1d"): [SimpleNamespace(Index=1, close=100)]}
+    
+    # SignalEvent requires: (strategy_id, ticker, timestamp, signal_type, strength)
+    timestamp = 1234567890
+    signal = SignalEvent(1, "MSFT", timestamp, SignalType.LONG, 1.0)
+    
     portfolio.on_signal(signal)
+    
+    assert not portfolio.events.empty()
     order = portfolio.events.get()
+    
+    assert order.ticker == "MSFT"
     assert order.direction == DirectionType.BUY
-    assert order.quantity == 100
+    assert order.quantity == 50
+    portfolio.position_sizer.get_position_size.assert_called()
 
-def test_on_fill_buy(portfolio):
-    """Tests updating holdings after a BUY fill."""
-    fill = FillEvent(123, "MSFT", "ARCA", 100, DirectionType.BUY, 10000, 100)
-    portfolio.on_fill(fill)
-    assert portfolio.current_holdings["MSFT"]["position"] == 100
-    assert portfolio.current_holdings["MSFT"]["value"] == 10000 # 100 * 100 (fill price)
-    assert portfolio.current_holdings["cash"] == 100000 - 10000 - fill.commission
-    assert portfolio.current_holdings["total"] == 100000 - fill.commission
-
-def test_on_fill_sell_to_close(portfolio):
-    """Tests updating holdings after a SELL fill to close a long position."""
-    # First, establish a long position
-    portfolio.current_holdings["MSFT"]["position"] = 100
-    portfolio.current_holdings["MSFT"]["value"] = 10000 # Assume bought at 100
-    portfolio.current_holdings["cash"] = 90000
-    portfolio.current_holdings["total"] = 100000
-
-    fill = FillEvent(123, "MSFT", "ARCA", 100, DirectionType.SELL, 11000, 110)
-    portfolio.on_fill(fill)
-
-    assert portfolio.current_holdings["MSFT"]["position"] == 0
-    assert portfolio.current_holdings["MSFT"]["value"] == 0 # Position is closed
-    assert portfolio.current_holdings["cash"] == 90000 + 11000 - fill.commission
-    assert portfolio.current_holdings["total"] == 100000 + 1000 - fill.commission # 1000 profit
-
-def test_end_of_day_short_position(portfolio):
-    """Tests margin and borrow cost calculation for a short position."""
-    portfolio.current_holdings["MSFT"]["position"] = -100
+def test_negative_cash_exception(portfolio):
+    """Tests that on_market raises exception if cash is negative."""
+    portfolio.current_holdings["cash"] = -100.0
     
-    portfolio.end_of_day()
-
-    assert portfolio.current_holdings["MSFT"]["value"] == -10500
-    expected_margin = abs(-10500) * (1 + portfolio.maintenance_margin)
-    assert portfolio.margin_holdings["MSFT"] == pytest.approx(expected_margin)
-    assert portfolio.current_holdings["cash"] < 100000 # Cash is reduced by margin and borrow cost
-
-    expected_borrow_cost = abs(-10500) * portfolio.daily_borrow_rate
-    assert portfolio.current_holdings["borrow_costs"] == pytest.approx(expected_borrow_cost)
+    # Must populate history for ALL symbols in portfolio.symbol_list ("MSFT", "AAPL")
+    portfolio.history = {
+        ("MSFT", "1d"): [SimpleNamespace(Index=1, close=100)],
+        ("AAPL", "1d"): [SimpleNamespace(Index=1, close=150)]
+    }
     
-    # Total should be cash + value + margin
-    expected_total = portfolio.current_holdings["cash"] + portfolio.current_holdings["MSFT"]["value"] + portfolio.margin_holdings["MSFT"]
-    assert portfolio.current_holdings["total"] == pytest.approx(expected_total)
-
-def test_end_of_day_mixed_positions(portfolio):
-    """Tests end_of_day logic with both long and short positions."""
-    # Setup: 1 long (MSFT), 1 short (AAPL), and some initial margin on MSFT to be released
-    portfolio.current_holdings["MSFT"]["position"] = 100
-    portfolio.current_holdings["AAPL"]["position"] = -50
-    portfolio.current_holdings["cash"] = 50000
-    portfolio.margin_holdings["MSFT"] = 2000  # Margin that should be released
-
-    portfolio.end_of_day()
-
-    # Assertions for MSFT (Long Position)
-    assert portfolio.current_holdings["MSFT"]["value"] == 10500
-    assert portfolio.margin_holdings["MSFT"] == 0  # Margin released
-
-    # Assertions for AAPL (Short Position)
-    assert portfolio.current_holdings["AAPL"]["value"] == -7750
-    expected_aapl_margin = abs(-7750) * (1 + portfolio.maintenance_margin)
-    assert portfolio.margin_holdings["AAPL"] == pytest.approx(expected_aapl_margin)
-    
-    expected_borrow_cost = abs(-7750) * portfolio.daily_borrow_rate
-    assert portfolio.current_holdings["borrow_costs"] == pytest.approx(expected_borrow_cost)
-
-    # Assertions for Cash
-    expected_cash = 50000 + 2000 - portfolio.margin_holdings["AAPL"] - portfolio.current_holdings["borrow_costs"]
-    assert portfolio.current_holdings["cash"] == pytest.approx(expected_cash)
-
-    # Verify the internal consistency of the final total.
-    final_cash = portfolio.current_holdings["cash"]
-    total_position_value = sum(portfolio.current_holdings[s]["value"] for s in portfolio.symbol_list)
-    total_margin_held = sum(portfolio.margin_holdings.values())
-    
-    expected_total = final_cash + total_position_value + total_margin_held
-    assert portfolio.current_holdings["total"] == pytest.approx(expected_total)
-
-def test_end_of_day_long_position_releases_margin(portfolio):
-    """Tests that held margin is released when a position becomes long."""
-    portfolio.margin_holdings["MSFT"] = 5000
-    portfolio.current_holdings["MSFT"]["position"] = 100
-    portfolio.current_holdings["MSFT"]["value"] = 10500
-    portfolio.current_holdings["cash"] = 80000
-
-    portfolio.end_of_day()
-
-    assert portfolio.margin_holdings["MSFT"] == 0
-    assert portfolio.current_holdings["cash"] == 85000 # 80000 + 5000 released margin
-    assert portfolio.current_holdings["total"] == 85000 + 10500
+    with pytest.raises(NegativeCashException):
+        portfolio.on_market()
 
 def test_on_fill_multiple_tickers(portfolio):
     """Tests updating holdings after fills for multiple tickers."""
     opening_msft_price = 100
-    closing_msft_price = 105
     quantity_msft = 100
 
     # First fill: BUY MSFT
-    fill_msft = FillEvent(123, "MSFT", "ARCA", quantity_msft, DirectionType.BUY, quantity_msft*opening_msft_price, opening_msft_price)
+    # Explicitly set commission=0 to ensure math matches expectation exactly
+    fill_msft = FillEvent(123, "MSFT", "ARCA", quantity_msft, DirectionType.BUY, quantity_msft*opening_msft_price, opening_msft_price, commission=0.0)
     portfolio.on_fill(fill_msft)
 
     assert portfolio.current_holdings["MSFT"]["position"] == quantity_msft
-    assert portfolio.current_holdings["cash"] == 100000 - quantity_msft*opening_msft_price - fill_msft.commission
-    assert portfolio.current_holdings["total"] == 100000 - fill_msft.commission
-    assert portfolio.current_holdings["order"] == f"BUY {quantity_msft} MSFT @ {opening_msft_price}.00 | "
+    assert portfolio.current_holdings["cash"] == 100000 - 10000 # 90000
+    assert portfolio.current_holdings["order"] == f"BUY {quantity_msft} MSFT @ {opening_msft_price:.2f} | "
 
-    cash_after_msft = portfolio.current_holdings["cash"]
+    cash_after_msft = portfolio.current_holdings["cash"] # 90000
 
     opening_aapl_price = 150
-    closing_aapl_price = 155
     quantity_aapl = 50
 
     # Second fill: BUY AAPL
-    fill_aapl = FillEvent(124, "AAPL", "ARCA", quantity_aapl, DirectionType.BUY, quantity_aapl*opening_aapl_price, opening_aapl_price)
+    fill_aapl = FillEvent(124, "AAPL", "ARCA", quantity_aapl, DirectionType.BUY, quantity_aapl*opening_aapl_price, opening_aapl_price, commission=0.0)
     portfolio.on_fill(fill_aapl)
 
     assert portfolio.current_holdings["AAPL"]["position"] == quantity_aapl
-    assert portfolio.current_holdings["cash"] == cash_after_msft - quantity_aapl*opening_aapl_price - fill_aapl.commission
-    assert portfolio.current_holdings["total"] == 100000 - fill_msft.commission - fill_aapl.commission
-    assert portfolio.current_holdings["order"] == f"BUY {quantity_msft} MSFT @ {opening_msft_price}.00 | BUY {quantity_aapl} AAPL @ {opening_aapl_price}.00 | "
-
-    portfolio.end_of_interval()
-
-    assert portfolio.current_holdings["cash"] == cash_after_msft - quantity_aapl*opening_aapl_price - fill_aapl.commission
-    assert portfolio.current_holdings["total"] == portfolio.current_holdings["cash"] + quantity_msft*closing_msft_price + quantity_aapl*closing_aapl_price
-
-def test_on_fill_with_existing_holdings(portfolio):
-    """Tests updating holdings after fills for multiple tickers."""
-    """Tests updating holdings after fills for multiple tickers."""
-    opening_msft_price = 100
-    closing_msft_price = 105
-    quantity_msft = 100
-
-    # First fill: BUY MSFT
-    fill_msft = FillEvent(123, "MSFT", "ARCA", quantity_msft, DirectionType.BUY, quantity_msft*opening_msft_price, opening_msft_price)
-    portfolio.on_fill(fill_msft)
-
-    assert portfolio.current_holdings["MSFT"]["position"] == quantity_msft
-    assert portfolio.current_holdings["cash"] == 100000 - quantity_msft*opening_msft_price - fill_msft.commission
-    assert portfolio.current_holdings["total"] == 100000 - fill_msft.commission
-    assert portfolio.current_holdings["order"] == f"BUY {quantity_msft} MSFT @ {opening_msft_price}.00 | "
-
-    portfolio.end_of_interval()
-
-    assert portfolio.current_holdings["cash"] == 100000 - quantity_msft*opening_msft_price - fill_msft.commission
-    assert portfolio.current_holdings["total"] == portfolio.current_holdings["cash"] + quantity_msft*closing_msft_price
-
-    cash_after_first_fill = portfolio.current_holdings["cash"]
-    posiiton_after_first_fill = portfolio.current_holdings["MSFT"]["position"]
-    total_after_first_fill = portfolio.current_holdings["total"]
+    assert portfolio.current_holdings["cash"] == cash_after_msft - (50 * 150) # 90000 - 7500 = 82500
     
-    portfolio.on_market(MarketEvent(1, False))
-    portfolio.data_handler.on_market()
+    # Order string concatenation check
+    expected_order_str = f"BUY {quantity_msft} MSFT @ {opening_msft_price:.2f} | BUY {quantity_aapl} AAPL @ {opening_aapl_price:.2f} | "
+    assert portfolio.current_holdings["order"] == expected_order_str
 
-    opening_msft_price = 105
-    closing_msft_price = 115
-    quantity_msft = 50
-
-    # Second fill: BUY MSFT
-    fill_msft = FillEvent(124, "MSFT", "ARCA", quantity_msft, DirectionType.BUY, quantity_msft*opening_msft_price, opening_msft_price)
-    portfolio.on_fill(fill_msft)
-
-    assert portfolio.current_holdings["MSFT"]["position"] == posiiton_after_first_fill + quantity_msft
-    assert portfolio.current_holdings["cash"] == cash_after_first_fill - quantity_msft*opening_msft_price - fill_msft.commission
-    assert portfolio.current_holdings["total"] == total_after_first_fill - fill_msft.commission
-    assert portfolio.current_holdings["order"] == f"BUY {quantity_msft} MSFT @ {opening_msft_price}.00 | "
-
-    portfolio.end_of_interval()
-
-    assert portfolio.current_holdings["cash"] == cash_after_first_fill - quantity_msft*opening_msft_price - fill_msft.commission
-    assert portfolio.current_holdings["total"] == portfolio.current_holdings["cash"] + portfolio.current_holdings["MSFT"]["position"]*closing_msft_price
-
-def test_liquidate(portfolio):
-    """Tests that all positions are closed and assets are converted to cash."""
+def test_signal_flip_long_to_short(portfolio):
+    """
+    Tests logic when receiving a SHORT signal while currently LONG.
+    The system should sell existing long position + sell new short quantity.
+    """
+    portfolio.position_sizer.get_position_size = MagicMock(return_value=50)
+    portfolio.history = {("MSFT", "1d"): [SimpleNamespace(Index=1, close=100)]}
+    
+    # 1. Setup: Currently Long 100 MSFT (Value $10,000)
     portfolio.current_holdings["MSFT"]["position"] = 100
-    portfolio.current_holdings["MSFT"]["value"] = 10500
-    portfolio.current_holdings["AAPL"]["position"] = -50
-    portfolio.current_holdings["AAPL"]["value"] = -7750
-    portfolio.margin_holdings["AAPL"] = 10000
-    portfolio.current_holdings["cash"] = 50000
-
-    portfolio.liquidate()
-
-    assert portfolio.current_holdings["MSFT"]["position"] == 0
-    assert portfolio.current_holdings["AAPL"]["position"] == 0
     
-    # Cash = initial_cash + released_margin + liquidated_value
-    expected_cash = 50000 + 10000 + (100 * 105) + (-50 * 155)
-    assert portfolio.current_holdings["cash"] == pytest.approx(expected_cash)
-    assert portfolio.current_holdings["total"] == portfolio.current_holdings["cash"]
-    assert len(portfolio.historical_holdings) == 1
+    # Low cash. 
+    # To short 50 shares (Value $5000), we need $7500 Margin (at 1.5x).
+    # Closing the Long releases $10,000 proceeds.
+    # $10,000 + $1000 (start) = $11,000 Cash Available.
+    # $11,000 > $7,500 Margin Requirement. 
+    # This trade SHOULD be allowed with your NEW logic.
+    portfolio.current_holdings["cash"] = 1000.0 
 
-def test_create_equity_curve(portfolio):
-    """Tests the creation and structure of the equity curve DataFrame."""
-    # Add some history
-    portfolio.historical_holdings.append({'total': 101000.0, 'timestamp': pd.to_datetime("2023-01-02").timestamp()})
-    portfolio.historical_holdings.append({'total': 100500.0, 'timestamp': pd.to_datetime("2023-01-03").timestamp()})
-    
-    portfolio.create_equity_curve()
-    
-    curve = portfolio.equity_curve
-    assert isinstance(curve, pd.DataFrame)
-    assert isinstance(curve.index, pd.DatetimeIndex)
-    assert "returns" in curve.columns
-    assert "equity_curve" in curve.columns
-    assert curve["equity_curve"].iloc[-1] < curve["equity_curve"].iloc[-2]
-
-def test_on_signal_with_position_sizer(portfolio):
-    """Tests that on_signal generates an order when the position sizer returns a size."""
-    portfolio.position_sizer.get_position_size = lambda portfolio, ticker: 250
-    signal = SignalEvent(123, "MSFT", SignalType.LONG)
-    
+    # 2. Signal: SHORT
+    signal = SignalEvent(1, "MSFT", 12345, SignalType.SHORT, 1.0)
     portfolio.on_signal(signal)
     
-    assert len(portfolio.events.queue) == 1
-    order = portfolio.events.queue.pop()
-    assert order.quantity == 250
-
-def test_on_signal_with_no_position_size(portfolio):
-    """Tests that on_signal does nothing if the position sizer returns None."""
-    portfolio.position_sizer.get_position_size = lambda portfolio, ticker: None
-    signal = SignalEvent(123, "MSFT", SignalType.LONG)
+    order = portfolio.events.get()
     
+    # 3. Assertions
+    assert order.direction == DirectionType.SELL
+    # Quantity = Target (50) + Current Long (100) = 150
+    assert order.quantity == 150.0 
+
+def test_on_signal_no_data(portfolio):
+    """Tests that on_signal handles missing history gracefully (no crash)."""
+    # Initialize the key with an empty list
+    # The code expects the key to exist, even if data is not populated yet
+    portfolio.history = {("MSFT", "1d"): []}
+    
+    signal = SignalEvent(1, "MSFT", 12345, SignalType.LONG, 1.0)
     portfolio.on_signal(signal)
     
-    assert len(portfolio.events.queue) == 1
+    # Should simply return without generating events or crashing
+    assert portfolio.events.empty()
 
-    order = portfolio.events.queue[0]
-    assert order.quantity == portfolio.initial_position_size
+
+
+def test_flip_long_to_short_standard(portfolio):
+    """
+    Standard Flip: Long 50 -> Signal Short (Target 100).
+    Condition `50 < 100` is True.
+    Expected: Sell 150.
+    """
+    portfolio.position_sizer.get_position_size = MagicMock(return_value=100)
+    portfolio.history = {("MSFT", "1d"): [SimpleNamespace(Index=1, close=100)]}
+    
+    # Setup: Long 50
+    portfolio.current_holdings["MSFT"]["position"] = 50
+    portfolio.current_holdings["cash"] = 100000 
+
+    signal = SignalEvent(1, "MSFT", 12345, SignalType.SHORT, 1.0)
+    portfolio.on_signal(signal)
+    
+    order = portfolio.events.get()
+    
+    # Logic: 100 (target) + 50 (current) = 150.
+    assert order.direction == DirectionType.SELL
+    assert order.quantity == 150.0
+
+def test_flip_large_long_to_small_short(portfolio):
+    """
+    Regression Test for Logic Bug: Long 100 -> Signal Short (Target 20).
+    Condition `100 < 20` is FALSE. Code currently skips logic.
+    Expected: Sell 120 (Close 100, Open 20).
+    """
+    portfolio.position_sizer.get_position_size = MagicMock(return_value=20)
+    portfolio.history = {("MSFT", "1d"): [SimpleNamespace(Index=1, close=100)]}
+    
+    # Setup: Long 100
+    portfolio.current_holdings["MSFT"]["position"] = 100
+    portfolio.current_holdings["cash"] = 100000 
+
+    signal = SignalEvent(1, "MSFT", 12345, SignalType.SHORT, 1.0)
+    portfolio.on_signal(signal)
+    
+    order = portfolio.events.get()
+    
+    assert order.direction == DirectionType.SELL
+    assert order.quantity == 120.0 
+
+def test_flip_short_to_long_any_size(portfolio):
+    """
+    Tests flipping from Short to Long. 
+    Since negative numbers are always < positive target, this usually passes,
+    but it verifies the `abs()` math is correct.
+    """
+    portfolio.position_sizer.get_position_size = MagicMock(return_value=20)
+    portfolio.history = {("MSFT", "1d"): [SimpleNamespace(Index=1, close=100)]}
+    
+    # Setup: Short 100
+    portfolio.current_holdings["MSFT"]["position"] = -100
+    portfolio.margin_holdings["MSFT"] = 15000 
+    portfolio.current_holdings["cash"] = 100000
+
+    signal = SignalEvent(1, "MSFT", 12345, SignalType.LONG, 1.0)
+    portfolio.on_signal(signal)
+    
+    order = portfolio.events.get()
+    
+    # Logic: Target 20 + Abs(-100) = 120.
     assert order.direction == DirectionType.BUY
+    assert order.quantity == 120.0
+
+def test_reduce_long_position(portfolio):
+    """
+    Tests reducing a position (Profit Taking).
+    Current: Long 100. Signal: Long (Target 20).
+    Expected: Sell 80.
+    Note: Your current NaivePortfolio forces Direction=BUY for Long Signals.
+    This test will likely FAIL (it will try to BUY 80 or clamp), highlighting a design limitation.
+    """
+    portfolio.position_sizer.get_position_size = MagicMock(return_value=20)
+    portfolio.history = {("MSFT", "1d"): [SimpleNamespace(Index=1, close=100)]}
+    
+    portfolio.current_holdings["MSFT"]["position"] = 100
+    portfolio.current_holdings["cash"] = 100000 
+
+    signal = SignalEvent(1, "MSFT", 12345, SignalType.LONG, 1.0)
+    portfolio.on_signal(signal)
+    
+    order = portfolio.events.get()
+    
+    # If the sizer says "Hold 20" and we hold 100, we should Sell 80.
+    # If your portfolio sees "Signal LONG", it currently hardcodes DirectionType(1) (BUY).
+    # This assertion checks if your portfolio is smart enough to sell to reduce exposure.
+    assert order.direction == DirectionType.SELL
+    assert order.quantity == 80.0

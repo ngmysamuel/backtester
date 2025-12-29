@@ -1,729 +1,729 @@
 timestamp,AAPL,margin,cash,total,commissions,borrow_costs,order,slippage,returns,equity_curve
-2023-01-03,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-01-04,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-01-05,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-01-06,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-03,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-04,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-05,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-06,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-01-07,,,,,,,,,0.0,1.0
 2023-01-08,,,,,,,,,0.0,1.0
-2023-01-09,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-01-10,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-01-11,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-01-12,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-01-13,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-09,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-10,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-11,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-12,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-13,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-01-14,,,,,,,,,0.0,1.0
 2023-01-15,,,,,,,,,0.0,1.0
 2023-01-16,,,,,,,,,0.0,1.0
-2023-01-17,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-01-18,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-01-19,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-01-20,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-17,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-18,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-19,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-20,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-01-21,,,,,,,,,0.0,1.0
 2023-01-22,,,,,,,,,0.0,1.0
-2023-01-23,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-01-24,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-01-25,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-01-26,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-01-27,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-23,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-24,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-25,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-26,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-27,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-01-28,,,,,,,,,0.0,1.0
 2023-01-29,,,,,,,,,0.0,1.0
-2023-01-30,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-01-31,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-02-01,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-02-02,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-02-03,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-30,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-01-31,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-01,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-02,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-03,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-02-04,,,,,,,,,0.0,1.0
 2023-02-05,,,,,,,,,0.0,1.0
-2023-02-06,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-02-07,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-02-08,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-02-09,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-02-10,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-06,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-07,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-08,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-09,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-10,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-02-11,,,,,,,,,0.0,1.0
 2023-02-12,,,,,,,,,0.0,1.0
-2023-02-13,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-02-14,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-02-15,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-02-16,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-02-17,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-13,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-14,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-15,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-16,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-17,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-02-18,,,,,,,,,0.0,1.0
 2023-02-19,,,,,,,,,0.0,1.0
 2023-02-20,,,,,,,,,0.0,1.0
-2023-02-21,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-02-22,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-02-23,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-02-24,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-21,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-22,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-23,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-24,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-02-25,,,,,,,,,0.0,1.0
 2023-02-26,,,,,,,,,0.0,1.0
-2023-02-27,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-02-28,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-01,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-02,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-03,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-27,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-02-28,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-01,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-02,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-03,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-03-04,,,,,,,,,0.0,1.0
 2023-03-05,,,,,,,,,0.0,1.0
-2023-03-06,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-07,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-08,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-09,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-10,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-06,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-07,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-08,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-09,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-10,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-03-11,,,,,,,,,0.0,1.0
 2023-03-12,,,,,,,,,0.0,1.0
-2023-03-13,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-14,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-15,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-16,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-17,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-13,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-14,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-15,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-16,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-17,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-03-18,,,,,,,,,0.0,1.0
 2023-03-19,,,,,,,,,0.0,1.0
-2023-03-20,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-21,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-22,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-23,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-24,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-20,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-21,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-22,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-23,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-24,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-03-25,,,,,,,,,0.0,1.0
 2023-03-26,,,,,,,,,0.0,1.0
-2023-03-27,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-28,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-29,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-30,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-03-31,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-27,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-28,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-29,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-30,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-03-31,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-04-01,,,,,,,,,0.0,1.0
 2023-04-02,,,,,,,,,0.0,1.0
-2023-04-03,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-04-04,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-04-05,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-04-06,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-03,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-04,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-05,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-06,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-04-07,,,,,,,,,0.0,1.0
 2023-04-08,,,,,,,,,0.0,1.0
 2023-04-09,,,,,,,,,0.0,1.0
-2023-04-10,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-04-11,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-04-12,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-04-13,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-04-14,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-10,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-11,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-12,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-13,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-14,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-04-15,,,,,,,,,0.0,1.0
 2023-04-16,,,,,,,,,0.0,1.0
-2023-04-17,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-04-18,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-04-19,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-04-20,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-04-21,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-17,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-18,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-19,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-20,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-21,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-04-22,,,,,,,,,0.0,1.0
 2023-04-23,,,,,,,,,0.0,1.0
-2023-04-24,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-04-25,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-04-26,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-04-27,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-04-28,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-24,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-25,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-26,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-27,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-04-28,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-04-29,,,,,,,,,0.0,1.0
 2023-04-30,,,,,,,,,0.0,1.0
-2023-05-01,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-05-02,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-05-03,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-05-04,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-05-05,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-01,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-02,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-03,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-04,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-05,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-05-06,,,,,,,,,0.0,1.0
 2023-05-07,,,,,,,,,0.0,1.0
-2023-05-08,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-05-09,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-05-10,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-05-11,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-05-12,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-08,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-09,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-10,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-11,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-12,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-05-13,,,,,,,,,0.0,1.0
 2023-05-14,,,,,,,,,0.0,1.0
-2023-05-15,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-05-16,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-05-17,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-05-18,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-05-19,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-15,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-16,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-17,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-18,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-19,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-05-20,,,,,,,,,0.0,1.0
 2023-05-21,,,,,,,,,0.0,1.0
-2023-05-22,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-05-23,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-05-24,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-05-25,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-05-26,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-22,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-23,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-24,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-25,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-26,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-05-27,,,,,,,,,0.0,1.0
 2023-05-28,,,,,,,,,0.0,1.0
 2023-05-29,,,,,,,,,0.0,1.0
-2023-05-30,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-05-31,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-06-01,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-06-02,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-30,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-05-31,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-01,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-02,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-06-03,,,,,,,,,0.0,1.0
 2023-06-04,,,,,,,,,0.0,1.0
-2023-06-05,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-06-06,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-06-07,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-06-08,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-06-09,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-05,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-06,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-07,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-08,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-09,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-06-10,,,,,,,,,0.0,1.0
 2023-06-11,,,,,,,,,0.0,1.0
-2023-06-12,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-06-13,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-06-14,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-06-15,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-06-16,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-12,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-13,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-14,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-15,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-16,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-06-17,,,,,,,,,0.0,1.0
 2023-06-18,,,,,,,,,0.0,1.0
 2023-06-19,,,,,,,,,0.0,1.0
-2023-06-20,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-06-21,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-06-22,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-06-23,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-20,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-21,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-22,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-23,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-06-24,,,,,,,,,0.0,1.0
 2023-06-25,,,,,,,,,0.0,1.0
-2023-06-26,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-06-27,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-06-28,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-06-29,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-06-30,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-26,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-27,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-28,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-29,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-06-30,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-07-01,,,,,,,,,0.0,1.0
 2023-07-02,,,,,,,,,0.0,1.0
-2023-07-03,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-03,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-07-04,,,,,,,,,0.0,1.0
-2023-07-05,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-07-06,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-07-07,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-05,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-06,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-07,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-07-08,,,,,,,,,0.0,1.0
 2023-07-09,,,,,,,,,0.0,1.0
-2023-07-10,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-07-11,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-07-12,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-07-13,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-07-14,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-10,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-11,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-12,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-13,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-14,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-07-15,,,,,,,,,0.0,1.0
 2023-07-16,,,,,,,,,0.0,1.0
-2023-07-17,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-07-18,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-07-19,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-07-20,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-07-21,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-17,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-18,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-19,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-20,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-21,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-07-22,,,,,,,,,0.0,1.0
 2023-07-23,,,,,,,,,0.0,1.0
-2023-07-24,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-07-25,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-07-26,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-07-27,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-07-28,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-24,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-25,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-26,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-27,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-28,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-07-29,,,,,,,,,0.0,1.0
 2023-07-30,,,,,,,,,0.0,1.0
-2023-07-31,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-01,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-02,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-03,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-04,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-07-31,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-01,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-02,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-03,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-04,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-08-05,,,,,,,,,0.0,1.0
 2023-08-06,,,,,,,,,0.0,1.0
-2023-08-07,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-08,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-09,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-10,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-11,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-07,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-08,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-09,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-10,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-11,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-08-12,,,,,,,,,0.0,1.0
 2023-08-13,,,,,,,,,0.0,1.0
-2023-08-14,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-15,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-16,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-17,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-18,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-14,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-15,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-16,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-17,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-18,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-08-19,,,,,,,,,0.0,1.0
 2023-08-20,,,,,,,,,0.0,1.0
-2023-08-21,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-22,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-23,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-24,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-25,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-21,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-22,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-23,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-24,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-25,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-08-26,,,,,,,,,0.0,1.0
 2023-08-27,,,,,,,,,0.0,1.0
-2023-08-28,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-29,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-30,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-08-31,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-09-01,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-28,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-29,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-30,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-08-31,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-01,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-09-02,,,,,,,,,0.0,1.0
 2023-09-03,,,,,,,,,0.0,1.0
 2023-09-04,,,,,,,,,0.0,1.0
-2023-09-05,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-09-06,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-09-07,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-09-08,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-05,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-06,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-07,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-08,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-09-09,,,,,,,,,0.0,1.0
 2023-09-10,,,,,,,,,0.0,1.0
-2023-09-11,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-09-12,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-09-13,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-09-14,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-09-15,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-11,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-12,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-13,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-14,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-15,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-09-16,,,,,,,,,0.0,1.0
 2023-09-17,,,,,,,,,0.0,1.0
-2023-09-18,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-09-19,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-09-20,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-09-21,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-09-22,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-18,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-19,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-20,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-21,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-22,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-09-23,,,,,,,,,0.0,1.0
 2023-09-24,,,,,,,,,0.0,1.0
-2023-09-25,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-09-26,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-09-27,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-09-28,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-09-29,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-25,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-26,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-27,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-28,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-09-29,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-09-30,,,,,,,,,0.0,1.0
 2023-10-01,,,,,,,,,0.0,1.0
-2023-10-02,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-10-03,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-10-04,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-10-05,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-10-06,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-10-02,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-10-03,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-10-04,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-10-05,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-10-06,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-10-07,,,,,,,,,0.0,1.0
 2023-10-08,,,,,,,,,0.0,1.0
-2023-10-09,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-10-10,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-10-11,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-10-12,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-10-13,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
+2023-10-09,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-10-10,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-10-11,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-10-12,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-10-13,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
 2023-10-14,,,,,,,,,0.0,1.0
 2023-10-15,,,,,,,,,0.0,1.0
-2023-10-16,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-10-17,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-10-18,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-10-19,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {'AAPL': 0})",100000.0,100000.0,,,,,0.0,1.0
-2023-10-20,"{'position': 156.0, 'value': 26681.81524658203}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,99560.06419829736,2.028,,BUY 156.0 AAPL @ 173.84 | ,0.002323608882790762 | ,-0.0043993580170264,0.9956006419829736
-2023-10-21,,,,,,,,,0.0,0.9956006419829736
-2023-10-22,,,,,,,,,0.0,0.9956006419829736
-2023-10-23,"{'position': 156.0, 'value': 26700.3369140625}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,99578.58586577783,,,,,0.0001860351098565971,0.9957858586577782
-2023-10-24,"{'position': 156.0, 'value': 26768.246520996094}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,99646.49547271142,,,,,0.0006819699872533391,0.9964649547271142
-2023-10-25,"{'position': 156.0, 'value': 26407.096618652344}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,99285.34557036767,,,,,-0.0036243111273557282,0.9928534557036767
-2023-10-26,"{'position': 156.0, 'value': 25757.333862304688}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,98635.58281402002,,,,,-0.006544397389312007,0.9863558281402002
-2023-10-27,"{'position': 156.0, 'value': 25962.607543945312}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,98840.85649566064,,,,,0.0020811321410010297,0.9884085649566065
-2023-10-28,,,,,,,,,0.0,0.9884085649566065
-2023-10-29,,,,,,,,,0.0,0.9884085649566065
-2023-10-30,"{'position': 156.0, 'value': 26282.0771484375}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,99160.32610015283,,,,,0.0032321614342365468,0.9916032610015283
-2023-10-31,"{'position': 156.0, 'value': 26356.16619873047}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,99234.4151504458,,,,,0.0007471642460932237,0.9923441515044581
-2023-11-01,"{'position': 156.0, 'value': 26850.04083251953}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,99728.28978423486,,,,,0.004976848334726558,0.9972828978423487
-2023-11-02,"{'position': 156.0, 'value': 27405.659912109375}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,100283.9088638247,,,,,0.00557132866503518,1.0028390886382472
-2023-11-03,"{'position': 156.0, 'value': 27263.661254882812}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,100141.91020659814,,,,,-0.0014159665178127279,1.0014191020659817
-2023-11-04,,,,,,,,,0.0,1.0014191020659817
-2023-11-05,,,,,,,,,0.0,1.0014191020659817
-2023-11-06,"{'position': 156.0, 'value': 27661.8544921875}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,100540.10344390283,,,,,0.003976289612243278,1.0054010344390287
-2023-11-07,"{'position': 156.0, 'value': 28061.59259033203}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,100939.84154204736,,,,,0.003975906970968834,1.009398415420474
-2023-11-08,"{'position': 156.0, 'value': 28226.728454589844}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101104.97740630517,,,,,0.0016359829947725224,1.0110497740630522
-2023-11-09,"{'position': 156.0, 'value': 28152.646545410156}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101030.89549712549,,,,,-0.000732722671822339,1.0103089549712554
-2023-11-10,"{'position': 156.0, 'value': 28806.353576660156}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101684.60252837549,,,,,0.006470367584424652,1.0168460252837555
-2023-11-11,,,,,,,,,0.0,1.0168460252837555
-2023-11-12,,,,,,,,,0.0,1.0168460252837555
-2023-11-13,"{'position': 156.0, 'value': 28559.09014892578}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101437.33910064111,,,,,-0.0024316702980214933,1.0143733910064117
-2023-11-14,"{'position': 156.0, 'value': 28967.076232910156}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101845.32518462549,,,,,0.004022050337692651,1.0184532518462555
-2023-11-15,"{'position': 156.0, 'value': 29055.15948486328}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101933.40843657861,,,,,0.0008648728038664899,1.0193340843657868
-2023-11-16,"{'position': 156.0, 'value': 29317.885803222656}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102196.13475493799,,,,,0.0025774309168014042,1.0219613475493805
-2023-11-17,"{'position': 156.0, 'value': 29314.79132080078}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102193.04027251611,,,,,-3.0279838168945084e-05,1.021930402725162
-2023-11-18,,,,,,,,,0.0,1.021930402725162
-2023-11-19,,,,,,,,,0.0,1.021930402725162
-2023-11-20,"{'position': 156.0, 'value': 29586.784423828125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102465.03337554345,,,,,0.0026615619058012463,1.0246503337554353
-2023-11-21,"{'position': 156.0, 'value': 29461.60546875}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102339.85442046533,,,,,-0.0012216748577960068,1.023398544204654
-2023-11-22,"{'position': 156.0, 'value': 29565.144470214844}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102443.39342193017,,,,,0.0010117173026205073,1.0244339342193025
-2023-11-23,,,,,,,,,0.0,1.0244339342193025
-2023-11-24,"{'position': 156.0, 'value': 29358.066467285156}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102236.31541900049,,,,,-0.002021389530477591,1.0223631541900056
-2023-11-25,,,,,,,,,0.0,1.0223631541900056
-2023-11-26,,,,,,,,,0.0,1.0223631541900056
-2023-11-27,"{'position': 156.0, 'value': 29330.244689941406}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102208.49364165674,,,,,-0.00027213204260856383,1.022084936416568
-2023-11-28,"{'position': 156.0, 'value': 29424.514526367188}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102302.76347808252,,,,,0.0009223287915414158,1.0230276347808258
-2023-11-29,"{'position': 156.0, 'value': 29265.339111328125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102143.58806304345,,,,,-0.0015559248804961623,1.0214358806304351
-2023-11-30,"{'position': 156.0, 'value': 29354.969604492188}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102233.21855620752,,,,,0.0008774950524426117,1.0223321855620757
-2023-12-01,"{'position': 156.0, 'value': 29554.330444335938}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102432.57939605127,,,,,0.0019500593120242993,1.0243257939605133
-2023-12-02,,,,,,,,,0.0,1.0243257939605133
-2023-12-03,,,,,,,,,0.0,1.0243257939605133
-2023-12-04,"{'position': 156.0, 'value': 29274.613037109375}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102152.8619888247,,,,,-0.0027307464956539684,1.0215286198882476
-2023-12-05,"{'position': 156.0, 'value': 29891.231506347656}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102769.48045806299,,,,,0.006036232928116503,1.0276948045806304
-2023-12-06,"{'position': 156.0, 'value': 29721.239685058594}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102599.48863677392,,,,,-0.0016541080146691423,1.0259948863677397
-2023-12-07,"{'position': 156.0, 'value': 30022.587524414062}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102900.83647612939,,,,,0.002937128082795004,1.0290083647612944
-2023-12-08,"{'position': 156.0, 'value': 30245.130798339844}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,103123.37975005517,,,,,0.0021626964517185154,1.0312337975005523
-2023-12-09,,,,,,,,,0.0,1.0312337975005523
-2023-12-10,,,,,,,,,0.0,1.0312337975005523
-2023-12-11,"{'position': 156.0, 'value': 29854.140563964844}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102732.38951568017,,,,,-0.0037914800244392977,1.0273238951568022
-2023-12-12,"{'position': 156.0, 'value': 30090.585205078125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102968.83415679345,,,,,0.0023015588581942747,1.029688341567935
-2023-12-13,"{'position': 156.0, 'value': 30592.84112548828}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,103471.09007720361,,,,,0.004877746985513687,1.0347109007720365
-2023-12-14,"{'position': 156.0, 'value': 30616.023559570312}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,103494.27251128564,,,,,0.00022404745194748443,1.034942725112857
-2023-12-15,"{'position': 156.0, 'value': 30532.577270507812}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,103410.82622222314,,,,,-0.000806288957230894,1.034108262222232
-2023-12-16,,,,,,,,,0.0,1.034108262222232
-2023-12-17,,,,,,,,,0.0,1.034108262222232
-2023-12-18,"{'position': 156.0, 'value': 30272.945434570312}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,103151.19438628564,,,,,-0.0025106833145261964,1.0315119438628568
-2023-12-19,"{'position': 156.0, 'value': 30435.20819091797}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,103313.4571426333,,,,,0.0015730574649481799,1.0331345714263336
-2023-12-20,"{'position': 156.0, 'value': 30109.13067626953}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102987.37962798486,,,,,-0.0031561959464608824,1.0298737962798492
-2023-12-21,"{'position': 156.0, 'value': 30085.950622558594}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102964.19957427392,,,,,-0.0002250766433194995,1.0296419957427398
-2023-12-22,"{'position': 156.0, 'value': 29919.050903320312}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102797.29985503564,,,,,-0.0016209490281899885,1.027972998550357
-2023-12-23,,,,,,,,,0.0,1.027972998550357
-2023-12-24,,,,,,,,,0.0,1.027972998550357
-2023-12-25,,,,,,,,,0.0,1.027972998550357
-2023-12-26,"{'position': 156.0, 'value': 29834.0478515625}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102712.29680327783,,,,,-0.000826899654734925,1.027122968032779
-2023-12-27,"{'position': 156.0, 'value': 29849.49884033203}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102727.74779204736,,,,,0.00015042978543378105,1.0272774779204743
-2023-12-28,"{'position': 156.0, 'value': 29915.954040527344}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102794.20299224267,,,,,0.0006469060368172741,1.0279420299224276
-2023-12-29,"{'position': 156.0, 'value': 29753.691284179688}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102631.94023589502,,,,,-0.0015785204965294009,1.026319402358951
-2023-12-30,,,,,,,,,0.0,1.026319402358951
-2023-12-31,,,,,,,,,0.0,1.026319402358951
-2024-01-01,,,,,,,,,0.0,1.026319402358951
-2024-01-02,"{'position': 156.0, 'value': 28688.903686523438}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101567.15263823877,,,,,-0.010374816993704683,1.0156715263823886
-2024-01-03,"{'position': 156.0, 'value': 28474.09423828125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101352.34318999658,,,,,-0.002114949987889192,1.0135234318999666
-2024-01-04,"{'position': 156.0, 'value': 28112.470642089844}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,100990.71959380517,,,,,-0.0035679845656207965,1.0099071959380526
-2024-01-05,"{'position': 156.0, 'value': 27999.648193359375}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,100877.8971450747,,,,,-0.0011171565979948284,1.008778971450748
-2024-01-06,,,,,,,,,0.0,1.008778971450748
-2024-01-07,,,,,,,,,0.0,1.008778971450748
-2024-01-08,"{'position': 156.0, 'value': 28676.5400390625}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101554.78899077783,,,,,0.0067100114580072034,1.0155478899077792
-2024-01-09,"{'position': 156.0, 'value': 28611.63446044922}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101489.88341216455,,,,,-0.0006391188368199963,1.0148988341216463
-2024-01-10,"{'position': 156.0, 'value': 28773.901977539062}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101652.15092925439,,,,,0.001598854108747494,1.0165215092925448
-2024-01-11,"{'position': 156.0, 'value': 28681.17462158203}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101559.42357329736,,,,,-0.0009122025959054092,1.0155942357329744
-2024-01-12,"{'position': 156.0, 'value': 28732.174072265625}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101610.42302398095,,,,,0.0005021636485242897,1.0161042302398102
-2024-01-13,,,,,,,,,0.0,1.0161042302398102
-2024-01-14,,,,,,,,,0.0,1.0161042302398102
-2024-01-15,,,,,,,,,0.0,1.0161042302398102
-2024-01-16,"{'position': 156.0, 'value': 28378.27716064453}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101256.52611235986,,,,,-0.0034828800145588756,1.0125652611235993
-2024-01-17,"{'position': 156.0, 'value': 28231.463012695312}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101109.71196441064,,,,,-0.0014499228206417136,1.0110971196441072
-2024-01-18,"{'position': 156.0, 'value': 29150.981323242188}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102029.23027495752,,,,,0.009094262981092616,1.020292302749576
-2024-01-19,"{'position': 156.0, 'value': 29603.782653808594}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102482.03160552392,,,,,0.00443795693985094,1.02482031605524
-2024-01-20,,,,,,,,,0.0,1.02482031605524
-2024-01-21,,,,,,,,,0.0,1.02482031605524
-2024-01-22,"{'position': 156.0, 'value': 29963.861389160156}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102842.11034087549,,,,,0.003513579207109929,1.0284211034087556
-2024-01-23,"{'position': 156.0, 'value': 30163.219848632812}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,103041.46880034814,,,,,0.0019384905542279007,1.0304146880034821
-2024-01-24,"{'position': 156.0, 'value': 30058.13360595703}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102936.38255767236,,,,,-0.0010198441840866268,1.0293638255767243
-2024-01-25,"{'position': 156.0, 'value': 30007.134155273438}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102885.38310698877,,,,,-0.0004954463078690186,1.0288538310698885
-2024-01-26,"{'position': 156.0, 'value': 29736.68829345703}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102614.93724517236,,,,,-0.002628613060955187,1.0261493724517243
-2024-01-27,,,,,,,,,0.0,1.0261493724517243
-2024-01-28,,,,,,,,,0.0,1.0261493724517243
-2024-01-29,"{'position': 156.0, 'value': 29630.05242919922}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102508.30138091455,,,,,-0.0010391846169824914,1.0250830138091462
-2024-01-30,"{'position': 156.0, 'value': 29059.798828125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101938.04777984033,,,,,-0.005562999224376863,1.0193804777984041
-2024-01-31,"{'position': 156.0, 'value': 28497.271911621094}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101375.52086333642,,,,,-0.0055183214585275975,1.013755208633365
-2024-02-01,"{'position': 156.0, 'value': 28877.443359375}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101755.69231109033,,,,,0.0037501306480725027,1.017556923110904
-2024-02-02,"{'position': 156.0, 'value': 28721.36004638672}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101599.60899810205,,,,,-0.001533902521257513,1.0159960899810212
-2024-02-03,,,,,,,,,0.0,1.0159960899810212
-2024-02-04,,,,,,,,,0.0,1.0159960899810212
-2024-02-05,"{'position': 156.0, 'value': 29004.164794921875}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101882.4137466372,,,,,0.002783522016708062,1.0188241374663727
-2024-02-06,"{'position': 156.0, 'value': 29254.52508544922}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102132.77403716455,,,,,0.0024573454958569663,1.021327740371646
-2024-02-07,"{'position': 156.0, 'value': 29271.523315429688}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102149.77226714502,,,,,0.00016643266709159832,1.0214977226714508
-2024-02-08,"{'position': 156.0, 'value': 29103.07159423828}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101981.32054595361,,,,,-0.0016490660473610363,1.0198132054595366
-2024-02-09,"{'position': 156.0, 'value': 29222.221069335938}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,102100.47002105127,,,,,0.001168346070238968,1.021004700210513
-2024-02-10,,,,,,,,,0.0,1.021004700210513
-2024-02-11,,,,,,,,,0.0,1.021004700210513
-2024-02-12,"{'position': 156.0, 'value': 28959.16387939453}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101837.41283110986,,,,,-0.0025764542502808574,1.0183741283110987
-2024-02-13,"{'position': 156.0, 'value': 28632.667419433594}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101510.91637114892,,,,,-0.003206056113212674,1.0151091637114893
-2024-02-14,"{'position': 156.0, 'value': 28494.951049804688}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101373.20000152002,,,,,-0.0013566656134339494,1.0137320000152001
-2024-02-15,"{'position': 156.0, 'value': 28450.083435058594}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101328.33238677392,,,,,-0.00044259838641202975,1.0132833238677392
-2024-02-16,"{'position': 156.0, 'value': 28210.23486328125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101088.48381499658,,,,,-0.0023670435121919686,1.0108848381499658
-2024-02-17,,,,,,,,,0.0,1.0108848381499658
-2024-02-18,,,,,,,,,0.0,1.0108848381499658
-2024-02-19,,,,,,,,,0.0,1.0108848381499658
-2024-02-20,"{'position': 156.0, 'value': 28094.182250976562}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,100972.43120269189,,,,,-0.0011480300022806977,1.009724312026919
-2024-02-21,"{'position': 156.0, 'value': 28211.779724121094}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101090.02867583642,,,,,0.0011646493180743622,1.0109002867583643
-2024-02-22,"{'position': 156.0, 'value': 28528.992736816406}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101407.24168853174,,,,,0.0031379258355195283,1.0140724168853175
-2024-02-23,"{'position': 156.0, 'value': 28242.73406982422}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101120.98302153955,,,,,-0.0028228621765634676,1.0112098302153956
-2024-02-24,,,,,,,,,0.0,1.0112098302153956
-2024-02-25,,,,,,,,,0.0,1.0112098302153956
-2024-02-26,"{'position': 156.0, 'value': 28032.287841796875}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,100910.5367935122,,,,,-0.002081133131216828,1.009105367935122
-2024-02-27,"{'position': 156.0, 'value': 28259.751342773438}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,101138.00029448877,,,,,0.0022541105042579446,1.0113800029448876
-2024-02-28,"{'position': 156.0, 'value': 28072.518493652344}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,100950.76744536767,,,,,-0.00185126113405365,1.0095076744536766
-2024-02-29,"{'position': 156.0, 'value': 27968.84619140625}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,100847.09514312158,,,,,-0.001026959030323349,1.0084709514312158
-2024-03-01,"{'position': 156.0, 'value': 27800.1826171875}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,100678.43156890283,,,,,-0.0016724683440746402,1.0067843156890282
-2024-03-02,,,,,,,,,0.0,1.0067843156890282
-2024-03-03,,,,,,,,,0.0,1.0067843156890282
-2024-03-04,"{'position': 156.0, 'value': 27094.57635498047}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,99972.8253066958,,,,,-0.0070085146461993375,0.9997282530669578
-2024-03-05,"{'position': 156.0, 'value': 26323.981201171875}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,99202.2301528872,,,,,-0.007708046175993966,0.9920223015288719
-2024-03-06,"{'position': 156.0, 'value': 26169.245178222656}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,99047.49412993799,,,,,-0.0015598038744768505,0.9904749412993797
-2024-03-07,"{'position': 156.0, 'value': 26150.675903320312}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,99028.92485503564,,,,,-0.00018747849267120031,0.9902892485503564
-2024-03-08,"{'position': 156.0, 'value': 26418.372436523438}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,99296.62138823877,,,,,0.002703215586708607,0.9929662138823877
-2024-03-09,,,,,,,,,0.0,0.9929662138823877
-2024-03-10,,,,,,,,,0.0,0.9929662138823877
-2024-03-11,"{'position': 156.0, 'value': 26730.93896484375}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,99609.18791655908,,,,,0.003147806279311549,0.9960918791655909
-2024-03-12,"{'position': 156.0, 'value': 26805.21844482422}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,99683.46739653955,,,,,0.0007457091211575673,0.9968346739653957
-2024-03-13,"{'position': 156.0, 'value': 26480.266845703125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,99358.51579741845,,,,,-0.0032598344300007742,0.9935851579741847
-2024-03-14,"{'position': 156.0, 'value': 26769.624755859375}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,99647.8737075747,,,,,0.0029122607944971346,0.9964787370757471
-2024-03-15,"{'position': 156.0, 'value': 26710.827209472656}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.24895171533,99589.07616118799,,,,,-0.0005900531963106692,0.99589076161188
-2024-03-16,,,,,,,,,0.0,0.99589076161188
-2024-03-17,,,,,,,,,0.0,0.99589076161188
-2024-03-18,"{'position': -153.0, 'value': -26364.099655151367}","defaultdict(<class 'int'>, {'AAPL': 39546.14948272705})",87101.98627642819,100284.03610400387,4.0169999999999995,1.0461944307599749,SELL 309.0 AAPL @ 174.03 | ,0.0006916447792872457 | ,0.006978274822944108,1.0028403610400387
-2024-03-19,"{'position': -153.0, 'value': -26722.24983215332}","defaultdict(<class 'int'>, {'AAPL': 40083.37474822998})",86563.70060418588,99924.82552026254,,1.0604067393711636,,,-0.0035819318577164916,0.9992482552026255
-2024-03-20,"{'position': -153.0, 'value': -27115.31854248047}","defaultdict(<class 'int'>, {'AAPL': 40672.9778137207})",85973.0215339911,99530.68080523133,,1.0760047040666854,,,-0.003944412341768788,0.9953068080523133
-2024-03-21,"{'position': -153.0, 'value': -26007.455291748047}","defaultdict(<class 'int'>, {'AAPL': 39011.18293762207})",87633.78436821308,100637.5120140871,,1.0320418766566686,,,0.011120502742482996,1.006375120140871
-2024-03-22,"{'position': -153.0, 'value': -26145.55824279785}","defaultdict(<class 'int'>, {'AAPL': 39218.33736419678})",87425.59241948588,100498.37154088481,,1.0375221524919782,,,-0.0013825905511536396,1.0049837154088481
-2024-03-23,,,,,,,,,0.0,1.0049837154088481
-2024-03-24,,,,,,,,,0.0,1.0049837154088481
-2024-03-25,"{'position': -153.0, 'value': -25928.5343170166}","defaultdict(<class 'int'>, {'AAPL': 38892.8014755249})",87750.09939806581,100714.36655657411,,1.0289100919451033,,,0.002149238961562938,1.007143665565741
-2024-03-26,"{'position': -153.0, 'value': -25755.53384399414}","defaultdict(<class 'int'>, {'AAPL': 38633.30076599121})",88008.5780626057,100886.34498460277,,1.0220449938092913,,,0.0017075858579922443,1.0088634498460276
-2024-03-27,"{'position': -153.0, 'value': -26301.87336730957}","defaultdict(<class 'int'>, {'AAPL': 39452.810050964355})",87188.02505249892,100338.96173615371,,1.0437251336233957,,,-0.005425741695098574,1.003389617361537
-2024-03-28,"{'position': -153.0, 'value': -26024.14764404297}","defaultdict(<class 'int'>, {'AAPL': 39036.22146606445})",87603.58093312723,100615.65475514872,,1.0327042715890067,,,0.002757583038606626,1.0061565475514873
-2024-03-29,,,,,,,,,0.0,1.0061565475514873
-2024-03-30,,,,,,,,,0.0,1.0061565475514873
-2024-03-31,,,,,,,,,0.0,1.0061565475514873
-2024-04-01,"{'position': -153.0, 'value': -25804.091079711914}","defaultdict(<class 'int'>, {'AAPL': 38706.13661956787})",87932.64180775557,100834.68734761153,,1.0239718682425363,,,0.0021769235910240603,1.0083468734761154
-2024-04-02,"{'position': -153.0, 'value': -25623.496170043945}","defaultdict(<class 'int'>, {'AAPL': 38435.24425506592})",88202.51736685395,101014.26545187592,,1.0168054035731724,,,0.0017809159624340154,1.0101426545187595
-2024-04-03,"{'position': -153.0, 'value': -25746.421920776367}","defaultdict(<class 'int'>, {'AAPL': 38619.63288116455})",88017.10705734577,100890.31801773395,,1.0216834095546177,,,-0.0012270290100858672,1.0089031801773398
-2024-04-04,"{'position': -153.0, 'value': -25620.461196899414}","defaultdict(<class 'int'>, {'AAPL': 38430.69179534912})",88205.03145819307,101015.26205664278,,1.0166849681309291,,,0.0012384145611163966,1.0101526205664282
-2024-04-05,"{'position': -153.0, 'value': -25735.799514770508}","defaultdict(<class 'int'>, {'AAPL': 38603.69927215576})",88031.00271950093,100898.90247688619,,1.021261885506766,,,-0.0011519009839457972,1.0089890247688622
-2024-04-06,,,,,,,,,0.0,1.0089890247688622
-2024-04-07,,,,,,,,,0.0,1.0089890247688622
-2024-04-08,"{'position': -153.0, 'value': -25564.309524536133}","defaultdict(<class 'int'>, {'AAPL': 38346.4642868042})",88287.22324812533,101069.3780103934,,1.0144567271641323,,,0.0016895677685520027,1.0106937801039344
-2024-04-09,"{'position': -153.0, 'value': -25749.46156311035}","defaultdict(<class 'int'>, {'AAPL': 38624.19234466553})",88008.47338623372,100883.20416778889,,1.0218040302821567,,,-0.001842040054756855,1.0088320416778893
-2024-04-10,"{'position': -153.0, 'value': -25462.630920410156}","defaultdict(<class 'int'>, {'AAPL': 38193.946380615234})",88437.70892842209,101169.02438862716,,1.010421861921038,,,0.0028331794494045326,1.0116902438862718
-2024-04-11,"{'position': -153.0, 'value': -26564.419555664062}","defaultdict(<class 'int'>, {'AAPL': 39846.629333496094})",86783.97183190807,100066.1816097401,,1.0541436331612724,,,-0.010900992527620335,1.0006618160974012
-2024-04-12,"{'position': -153.0, 'value': -26793.583374023438}","defaultdict(<class 'int'>, {'AAPL': 40190.375061035156})",86439.16286693353,99835.95455394525,,1.0632374354771206,,,-0.0023007478859614627,0.9983595455394528
-2024-04-13,,,,,,,,,0.0,0.9983595455394528
-2024-04-14,,,,,,,,,0.0,0.9983595455394528
-2024-04-15,"{'position': -153.0, 'value': -26207.782196044922}","defaultdict(<class 'int'>, {'AAPL': 39311.67329406738})",87316.82464254432,100420.71574056678,,1.0399913569859096,,,0.005857220369496874,1.0042071574056681
-2024-04-16,"{'position': -153.0, 'value': -25705.449783325195}","defaultdict(<class 'int'>, {'AAPL': 38558.17467498779})",88069.30320409282,100922.02809575542,,1.0200575310843332,,,0.00499212091341561,1.0092202809575546
-2024-04-17,"{'position': -153.0, 'value': -25496.020294189453}","defaultdict(<class 'int'>, {'AAPL': 38244.03044128418})",88382.43569095936,101130.44583805409,,1.01174683707101,,,0.002065136286212077,1.011304458380541
-2024-04-18,"{'position': -153.0, 'value': -25350.325241088867}","defaultdict(<class 'int'>, {'AAPL': 38025.4878616333})",88599.9723053229,101275.13492586733,,1.0059652873447964,,,0.001430717392910008,1.0127513492586735
-2024-04-19,"{'position': -153.0, 'value': -25040.727630615234}","defaultdict(<class 'int'>, {'AAPL': 37561.09144592285})",89063.37504136546,101583.73885667308,,0.9936796678815569,,,0.0030471836056467083,1.0158373885667311
-2024-04-20,,,,,,,,,0.0,1.0158373885667311
-2024-04-21,,,,,,,,,0.0,1.0158373885667311
-2024-04-22,"{'position': -153.0, 'value': -25168.210510253906}","defaultdict(<class 'int'>, {'AAPL': 37752.31576538086})",88871.15198339515,101455.2572385221,,0.998738512311663,,,-0.001264785285490011,1.0145525723852213
-2024-04-23,"{'position': -153.0, 'value': -25329.08042907715}","defaultdict(<class 'int'>, {'AAPL': 37993.62064361572})",88628.84198292103,101293.3821974596,,1.0051222392490933,,,-0.0015955313255174852,1.0129338219745965
-2024-04-24,"{'position': -153.0, 'value': -25650.810928344727}","defaultdict(<class 'int'>, {'AAPL': 38476.21639251709})",88145.22834469711,100970.63380886948,,1.017889322553362,,,-0.0031862731956266988,1.009706338088695
-2024-04-25,"{'position': -153.0, 'value': -25782.846267700195}","defaultdict(<class 'int'>, {'AAPL': 38674.26940155029})",87946.15220684376,100837.57534069386,,1.0231288201468332,,,-0.00131779373027896,1.0083757534069389
-2024-04-26,"{'position': -153.0, 'value': -25693.307556152344}","defaultdict(<class 'int'>, {'AAPL': 38539.961334228516})",88079.44069846887,100926.09447654504,,1.019575696672712,,,0.0008778387972152579,1.0092609447654506
-2024-04-27,,,,,,,,,0.0,1.0092609447654506
-2024-04-28,,,,,,,,,0.0,1.0092609447654506
-2024-04-29,"{'position': -153.0, 'value': -26330.705612182617}","defaultdict(<class 'int'>, {'AAPL': 39496.058418273926})",87122.29874515314,100287.65155124445,,1.0448692703247071,,,-0.0063258459431319025,1.0028765155124446
-2024-04-30,"{'position': -153.0, 'value': -25849.622680664062}","defaultdict(<class 'int'>, {'AAPL': 38774.434020996094})",87842.89736375316,100767.70870408519,,1.0257786778041296,,,0.00478680221757366,1.007677087040852
-2024-05-01,"{'position': -153.0, 'value': -25693.307556152344}","defaultdict(<class 'int'>, {'AAPL': 38539.961334228516})",88076.35047482407,100923.00425290024,,1.019575696672712,,,0.0015411241439564627,1.0092300425290024
-2024-05-02,"{'position': -153.0, 'value': -26259.37907409668}","defaultdict(<class 'int'>, {'AAPL': 39389.06861114502})",87226.20115905542,100355.89069610376,,1.0420388521466937,,,-0.0056192694717585034,1.0035589069610376
-2024-05-03,"{'position': -153.0, 'value': -27830.11541748047}","defaultdict(<class 'int'>, {'AAPL': 41745.1731262207})",84868.9922743203,98784.04998306054,,1.1043696594238281,,,-0.01566266516235748,0.9878404998306054
-2024-05-04,,,,,,,,,0.0,0.9878404998306054
-2024-05-05,,,,,,,,,0.0,0.9878404998306054
-2024-05-06,"{'position': -153.0, 'value': -27576.671813964844}","defaultdict(<class 'int'>, {'AAPL': 41365.007720947266})",85248.06336722018,99036.3992742026,,1.0943123735700335,,,0.0025545550236636405,0.990363992742026
-2024-05-07,"{'position': -153.0, 'value': -27681.38539123535}","defaultdict(<class 'int'>, {'AAPL': 41522.07808685303})",85089.89453364017,98930.58722925784,,1.0984676742553712,,,-0.0010684157109932535,0.9893058722925784
-2024-05-08,"{'position': -153.0, 'value': -27732.98927307129}","defaultdict(<class 'int'>, {'AAPL': 41599.48390960693})",85011.38819543892,98877.88283197457,,1.1005154473440988,,,-0.0005327411749931343,0.9887788283197456
-2024-05-09,"{'position': -153.0, 'value': -28010.71499633789}","defaultdict(<class 'int'>, {'AAPL': 42016.072494506836})",84593.68807422963,98599.04557239858,,1.1115363093784878,,,-0.002820016484877841,0.9859904557239857
-2024-05-10,"{'position': -153.0, 'value': -27817.71405029297}","defaultdict(<class 'int'>, {'AAPL': 41726.57107543945})",84882.08561575534,98790.94264090182,,1.1038775416782924,,,0.0019462365724660646,0.9879094264090182
-2024-05-11,,,,,,,,,0.0,0.9879094264090182
-2024-05-12,,,,,,,,,0.0,0.9879094264090182
-2024-05-13,"{'position': -153.0, 'value': -28308.567260742188}","defaultdict(<class 'int'>, {'AAPL': 42462.85089111328})",84144.68244423783,98298.96607460892,,1.1233558436802455,,,-0.004979976434491551,0.9829896607460893
-2024-05-14,"{'position': -153.0, 'value': -28483.33268737793}","defaultdict(<class 'int'>, {'AAPL': 42724.999031066895})",83881.40401330455,98123.07035699351,,1.1302909796578544,,,-0.0017893953989496225,0.9812307035699351
-2024-05-15,"{'position': -153.0, 'value': -28831.33905029297}","defaultdict(<class 'int'>, {'AAPL': 43247.00857543945})",83358.25036817603,97773.91989332251,,1.1441007559640066,,,-0.0035582912601563876,0.9777391989332251
-2024-05-16,"{'position': -153.0, 'value': -28849.572235107422}","defaultdict(<class 'int'>, {'AAPL': 43274.35835266113})",83329.7557666593,97754.54188421302,,1.1448242950439453,,,-0.00019819200386606006,0.9775454188421302
-2024-05-17,"{'position': -153.0, 'value': -28854.134033203125}","defaultdict(<class 'int'>, {'AAPL': 43281.20104980469})",83321.76806419698,97748.83508079854,,1.1450053187779017,,,-5.8378908074030456e-05,0.9774883508079855
-2024-05-18,,,,,,,,,0.0,0.9774883508079855
-2024-05-19,,,,,,,,,0.0,0.9774883508079855
-2024-05-20,"{'position': -153.0, 'value': -29031.936767578125}","defaultdict(<class 'int'>, {'AAPL': 43547.90515136719})",83053.91190165163,97569.8802854407,,1.1520609828404018,,,-0.001830761412245141,0.975698802854407
-2024-05-21,"{'position': -153.0, 'value': -29231.01466369629}","defaultdict(<class 'int'>, {'AAPL': 43846.52199554443})",82754.13509657503,97369.64242842318,,1.1599608993530273,,,-0.0020522507195019912,0.9736964242842319
-2024-05-22,"{'position': -153.0, 'value': -29010.659271240234}","defaultdict(<class 'int'>, {'AAPL': 43515.98890686035})",83083.51696862136,97588.84660424148,,1.1512166377476283,,,0.0022512578905631297,0.9758884660424149
-2024-05-23,"{'position': -153.0, 'value': -28399.751861572266}","defaultdict(<class 'int'>, {'AAPL': 42599.6277923584})",83998.75110884309,98198.62703962922,,1.1269742802211216,,,0.006248464415822275,0.9819862703962923
-2024-05-24,"{'position': -153.0, 'value': -28870.849731445312}","defaultdict(<class 'int'>, {'AAPL': 43306.27459716797})",83290.95863539338,97726.38350111604,,1.1456686401367187,,,-0.004809064574014865,0.9772638350111604
-2024-05-25,,,,,,,,,0.0,0.9772638350111604
-2024-05-26,,,,,,,,,0.0,0.9772638350111604
-2024-05-27,,,,,,,,,0.0,0.9772638350111604
-2024-05-28,"{'position': -153.0, 'value': -28872.37188720703}","defaultdict(<class 'int'>, {'AAPL': 43308.55783081055})",83287.52967270766,97723.71561631118,,1.1457290431431362,,,-2.7299534775426793e-05,0.9772371561631118
-2024-05-29,"{'position': -153.0, 'value': -28917.961853027344}","defaultdict(<class 'int'>, {'AAPL': 43376.942779541016})",83217.99718580842,97676.97811232209,,1.1475381687709263,,,-0.0004782616347969171,0.976769781123221
-2024-05-30,"{'position': -153.0, 'value': -29069.927627563477}","defaultdict(<class 'int'>, {'AAPL': 43604.891441345215})",82988.89495544757,97523.85876922931,,1.1535685566493443,,,-0.0015676093389856982,0.9752385876922932
-2024-05-31,"{'position': -153.0, 'value': -29215.816452026367}","defaultdict(<class 'int'>, {'AAPL': 43823.72467803955})",82768.90236095752,97376.8105869707,,1.159357795715332,,,-0.0015078175137281935,0.9737681058697072
-2024-06-01,,,,,,,,,0.0,0.9737681058697072
-2024-06-02,,,,,,,,,0.0,0.9737681058697072
-2024-06-03,"{'position': -153.0, 'value': -29486.323608398438}","defaultdict(<class 'int'>, {'AAPL': 44229.485412597656})",82361.97153419274,97105.13333839196,,1.1700922066824777,,,-0.0027899583786029636,0.9710513333839197
-2024-06-04,"{'position': -153.0, 'value': -29534.953216552734}","defaultdict(<class 'int'>, {'AAPL': 44302.4298248291})",82287.85510000825,97055.33170828462,,1.1720219530378069,,,-0.000512863001112307,0.9705533170828463
-2024-06-05,"{'position': -153.0, 'value': -29765.940353393555}","defaultdict(<class 'int'>, {'AAPL': 44648.91053009033})",81940.19320663776,96823.16338333454,,1.181188109261649,,,-0.002392123347204622,0.9682316338333455
-2024-06-06,"{'position': -153.0, 'value': -29554.703887939453}","defaultdict(<class 'int'>, {'AAPL': 44332.05583190918})",82255.87509910908,97033.2270430788,,1.1728057098388671,,,0.0021695599730882087,0.9703322704307882
-2024-06-07,"{'position': -153.0, 'value': -29920.9481048584}","defaultdict(<class 'int'>, {'AAPL': 44881.4221572876})",81705.32143452016,96665.79548694936,,1.1873392105102538,,,-0.003786657079500433,0.9666579548694937
-2024-06-08,,,,,,,,,0.0,0.9666579548694937
-2024-06-09,,,,,,,,,0.0,0.9666579548694937
-2024-06-10,"{'position': -153.0, 'value': -29348.029220581055}","defaultdict(<class 'int'>, {'AAPL': 44022.04383087158})",82563.53515660203,97237.54976689255,,1.1646043341500418,,,0.005914752752646413,0.9723754976689256
-2024-06-11,"{'position': -153.0, 'value': -31480.139877319336}","defaultdict(<class 'int'>, {'AAPL': 47220.209815979004})",79364.11995959471,95104.18989825438,,1.2492118998936244,,,-0.0219396711841513,0.9510418989825439
-2024-06-12,"{'position': -153.0, 'value': -32379.787628173828}","defaultdict(<class 'int'>, {'AAPL': 48569.68144226074})",78013.3634211055,94203.25723519242,,1.2849122074672155,,,-0.009473112215411472,0.9420325723519242
-2024-06-13,"{'position': -153.0, 'value': -32557.592697143555}","defaultdict(<class 'int'>, {'AAPL': 48836.38904571533})",77745.36384968674,94024.16019825851,,1.2919679641723634,,,-0.0019011766916590123,0.9402416019825851
-2024-06-14,"{'position': -153.0, 'value': -32291.647338867188}","defaultdict(<class 'int'>, {'AAPL': 48437.47100830078})",78143.00047252435,94288.82414195794,,1.281414576939174,,,0.00281485038676621,0.9428882414195795
-2024-06-15,,,,,,,,,0.0,0.9428882414195795
-2024-06-16,,,,,,,,,0.0,0.9428882414195795
-2024-06-17,"{'position': 104.0, 'value': 22381.662963867188}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94415.78296386512,3.3409999999999997,,BUY 257.0 AAPL @ 212.23 | ,0.0014111017861611881 | ,0.001346488547953717,0.9441578296386511
-2024-06-18,"{'position': 104.0, 'value': 22135.8134765625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94169.93347656043,,,,,-0.0026039024365108743,0.9416993347656042
-2024-06-19,,,,,,,,,0.0,0.9416993347656042
-2024-06-20,"{'position': 104.0, 'value': 21659.609130859375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,93693.7291308573,,,,,-0.005056861867929974,0.936937291308573
-2024-06-21,"{'position': 104.0, 'value': 21433.38818359375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,93467.50818359168,,,,,-0.0024144726585668685,0.9346750818359167
-2024-06-22,,,,,,,,,0.0,0.9346750818359167
-2024-06-23,,,,,,,,,0.0,0.9346750818359167
-2024-06-24,"{'position': 104.0, 'value': 21500.530517578125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,93534.65051757605,,,,,0.0007183494594986684,0.9353465051757605
-2024-06-25,"{'position': 104.0, 'value': 21596.59912109375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,93630.71912109168,,,,,0.0010270910618046525,0.9363071912109167
-2024-06-26,"{'position': 104.0, 'value': 22028.384155273438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94062.50415527137,,,,,0.004611574472916935,0.9406250415527134
-2024-06-27,"{'position': 104.0, 'value': 22116.188110351562}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94150.30811034949,,,,,0.0009334639330160766,0.9415030811034947
-2024-06-28,"{'position': 104.0, 'value': 21756.707641601562}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,93790.82764159949,,,,,-0.003818154990302025,0.9379082764159946
-2024-06-29,,,,,,,,,0.0,0.9379082764159946
-2024-06-30,,,,,,,,,0.0,0.9379082764159946
-2024-07-01,"{'position': 104.0, 'value': 22389.92919921875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94424.04919921668,,,,,0.0067514230713145995,0.9442404919921664
-2024-07-02,"{'position': 104.0, 'value': 22753.538818359375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94787.6588183573,,,,,0.0038508157850070113,0.9478765881835727
-2024-07-03,"{'position': 104.0, 'value': 22885.760498046875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94919.8804980448,,,,,0.0013949250496931853,0.9491988049804476
-2024-07-04,,,,,,,,,0.0,0.9491988049804476
-2024-07-05,"{'position': 104.0, 'value': 23380.560302734375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95414.6803027323,,,,,0.005212815293184958,0.9541468030273226
-2024-07-06,,,,,,,,,0.0,0.9541468030273226
-2024-07-07,,,,,,,,,0.0,0.9541468030273226
-2024-07-08,"{'position': 104.0, 'value': 23533.443603515625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95567.56360351355,,,,,0.0016023037576207155,0.9556756360351351
-2024-07-09,"{'position': 104.0, 'value': 23622.277465820312}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95656.39746581824,,,,,0.0009295398873327976,0.9565639746581819
-2024-07-10,"{'position': 104.0, 'value': 24066.462646484375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,96100.5826464823,,,,,0.0046435491240697235,0.9610058264648226
-2024-07-11,"{'position': 104.0, 'value': 23507.6181640625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95541.73816406043,,,,,-0.0058152038940040285,0.9554173816406037
-2024-07-12,"{'position': 104.0, 'value': 23814.4130859375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95848.53308593543,,,,,0.003211108859545675,0.9584853308593538
-2024-07-13,,,,,,,,,0.0,0.9584853308593538
-2024-07-14,,,,,,,,,0.0,0.9584853308593538
-2024-07-15,"{'position': 104.0, 'value': 24213.1474609375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,96247.26746093543,,,,,0.004160046712895493,0.9624726746093538
-2024-07-16,"{'position': 104.0, 'value': 24256.53369140625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,96290.65369140418,,,,,0.0004507788284624503,0.9629065369140414
-2024-07-17,"{'position': 104.0, 'value': 23642.939086914062}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95677.05908691199,,,,,-0.006372317363829039,0.9567705908691195
-2024-07-18,"{'position': 104.0, 'value': 23157.435424804688}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95191.55542480262,,,,,-0.0050743999318410005,0.9519155542480258
-2024-07-19,"{'position': 104.0, 'value': 23170.865478515625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95204.98547851355,,,,,0.00014108450745453638,0.9520498547851352
-2024-07-20,,,,,,,,,0.0,0.9520498547851352
-2024-07-21,,,,,,,,,0.0,0.9520498547851352
-2024-07-22,"{'position': 104.0, 'value': 23134.71240234375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95168.83240234168,,,,,-0.00037973931711832165,0.9516883240234164
-2024-07-23,"{'position': 104.0, 'value': 23243.173217773438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95277.29321777137,,,,,0.001139667396266475,0.9527729321777134
-2024-07-24,"{'position': 104.0, 'value': 22574.831665039062}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94608.95166503699,,,,,-0.007014699202324892,0.9460895166503697
-2024-07-25,"{'position': 104.0, 'value': 22466.369262695312}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94500.48926269324,,,,,-0.0011464285401635577,0.9450048926269321
-2024-07-26,"{'position': 104.0, 'value': 22514.922485351562}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94549.04248534949,,,,,0.0005137880558616637,0.9454904248534947
-2024-07-27,,,,,,,,,0.0,0.9454904248534947
-2024-07-28,,,,,,,,,0.0,0.9454904248534947
-2024-07-29,"{'position': 104.0, 'value': 22543.843994140625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94577.96399413855,,,,,0.00030588896543859434,0.9457796399413851
-2024-07-30,"{'position': 104.0, 'value': 22601.691772460938}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94635.81177245887,,,,,0.0006116411886800677,0.9463581177245883
-2024-07-31,"{'position': 104.0, 'value': 22940.509033203125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94974.62903320105,,,,,0.0035802224802259364,0.9497462903320102
-2024-08-01,"{'position': 104.0, 'value': 22556.240966796875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94590.3609667948,,,,,-0.004046007552942599,0.9459036096679476
-2024-08-02,"{'position': 104.0, 'value': 22711.187255859375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94745.3072558573,,,,,0.0016380769401747042,0.9474530725585727
-2024-08-03,,,,,,,,,0.0,0.9474530725585727
-2024-08-04,,,,,,,,,0.0,0.9474530725585727
-2024-08-05,"{'position': 104.0, 'value': 21617.257568359375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,93651.3775683573,,,,,-0.01154600390440308,0.9365137756835727
-2024-08-06,"{'position': 104.0, 'value': 21406.528076171875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,93440.6480761698,,,,,-0.002250148344413727,0.9344064807616977
-2024-08-07,"{'position': 104.0, 'value': 21674.072265625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,93708.19226562293,,,,,0.0028632527166874144,0.937081922656229
-2024-08-08,"{'position': 104.0, 'value': 22034.582641601562}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94068.70264159949,,,,,0.00384715964805582,0.9406870264159947
-2024-08-09,"{'position': 104.0, 'value': 22337.248413085938}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94371.36841308387,,,,,0.003217497031265726,0.9437136841308383
-2024-08-10,,,,,,,,,0.0,0.9437136841308383
-2024-08-11,,,,,,,,,0.0,0.9437136841308383
-2024-08-12,"{'position': 104.0, 'value': 22496.511108398438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94530.63110839637,,,,,0.001687616678560433,0.9453063110839632
-2024-08-13,"{'position': 104.0, 'value': 22883.296020507812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94917.41602050574,,,,,0.0040916357753484345,0.9491741602050571
-2024-08-14,"{'position': 104.0, 'value': 22929.832275390625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94963.95227538855,,,,,0.0004902815187548537,0.9496395227538853
-2024-08-15,"{'position': 104.0, 'value': 23240.086669921875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95274.2066699198,,,,,0.003267075422803911,0.9527420666991978
-2024-08-16,"{'position': 104.0, 'value': 23377.632446289062}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95411.75244628699,,,,,0.001443683250428096,0.9541175244628697
-2024-08-17,,,,,,,,,0.0,0.9541175244628697
-2024-08-18,,,,,,,,,0.0,0.9541175244628697
-2024-08-19,"{'position': 104.0, 'value': 23361.085693359375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95395.2056933573,,,,,-0.00017342468307557368,0.9539520569335729
-2024-08-20,"{'position': 104.0, 'value': 23425.203369140625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95459.32336913855,,,,,0.0006721268151290705,0.9545932336913855
-2024-08-21,"{'position': 104.0, 'value': 23413.828369140625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95447.94836913855,,,,,-0.00011916070215600705,0.9544794836913855
-2024-08-22,"{'position': 104.0, 'value': 23220.4375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95254.55749999793,,,,,-0.0020261396126891595,0.9525455749999793
-2024-08-23,"{'position': 104.0, 'value': 23459.33154296875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95493.45154296668,,,,,0.002507953941928154,0.9549345154296667
-2024-08-24,,,,,,,,,0.0,0.9549345154296667
-2024-08-25,,,,,,,,,0.0,0.9549345154296667
-2024-08-26,"{'position': 104.0, 'value': 23494.495971679688}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95528.61597167762,,,,,0.0003682391634478588,0.955286159716776
-2024-08-27,"{'position': 104.0, 'value': 23582.401489257812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95616.52148925574,,,,,0.0009202008914710458,0.9561652148925573
-2024-08-28,"{'position': 104.0, 'value': 23423.13720703125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95457.25720702918,,,,,-0.0016656565177856075,0.9545725720702917
-2024-08-29,"{'position': 104.0, 'value': 23764.415771484375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95798.5357714823,,,,,0.003575197679448916,0.957985357714823
-2024-08-30,"{'position': 104.0, 'value': 23682.715087890625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95716.83508788855,,,,,-0.0008528385422157392,0.9571683508788854
-2024-08-31,,,,,,,,,0.0,0.9571683508788854
-2024-09-01,,,,,,,,,0.0,0.9571683508788854
-2024-09-02,,,,,,,,,0.0,0.9571683508788854
-2024-09-03,"{'position': 104.0, 'value': 23038.421630859375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95072.5416308573,,,,,-0.0067312448895708865,0.9507254163085729
-2024-09-04,"{'position': 104.0, 'value': 22839.860595703125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94873.98059570105,,,,,-0.002088521372734631,0.9487398059570104
-2024-09-05,"{'position': 104.0, 'value': 22998.090209960938}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95032.21020995887,,,,,0.0016677872401296145,0.9503221020995885
-2024-09-06,"{'position': 104.0, 'value': 22836.756591796875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94870.8765917948,,,,,-0.0016976730080003888,0.9487087659179478
-2024-09-07,,,,,,,,,0.0,0.9487087659179478
-2024-09-08,,,,,,,,,0.0,0.9487087659179478
-2024-09-09,"{'position': 104.0, 'value': 22846.063842773438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94880.18384277137,,,,,9.810440580837465e-05,0.9488018384277134
-2024-09-10,"{'position': 104.0, 'value': 22763.328491210938}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94797.44849120887,,,,,-0.0008719982214580035,0.9479744849120884
-2024-09-11,"{'position': 104.0, 'value': 23027.046630859375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95061.1666308573,,,,,0.00278191179030407,0.9506116663085727
-2024-09-12,"{'position': 104.0, 'value': 23038.421630859375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95072.5416308573,,,,,0.0001196597980348546,0.9507254163085728
-2024-09-13,"{'position': 104.0, 'value': 23010.498291015625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95044.61829101355,,,,,-0.0002937056206214761,0.9504461829101353
-2024-09-14,,,,,,,,,0.0,0.9504461829101353
-2024-09-15,,,,,,,,,0.0,0.9504461829101353
-2024-09-16,"{'position': 104.0, 'value': 22371.375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94405.49499999793,,,,,-0.006724455340109015,0.944054949999979
-2024-09-17,"{'position': 104.0, 'value': 22419.982177734375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94454.1021777323,,,,,0.0005148765729618976,0.9445410217773227
-2024-09-18,"{'position': 104.0, 'value': 22823.313842773438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94857.43384277137,,,,,0.004270133914143104,0.9485743384277134
-2024-09-19,"{'position': 104.0, 'value': 23669.272338867188}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95703.39233886512,,,,,0.008918209799939847,0.9570339233886509
-2024-09-20,"{'position': 104.0, 'value': 23599.979736328125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95634.09973632605,,,,,-0.000724034967263365,0.9563409973632603
-2024-09-21,,,,,,,,,0.0,0.9563409973632603
-2024-09-22,,,,,,,,,0.0,0.9563409973632603
-2024-09-23,"{'position': 104.0, 'value': 23421.069458007812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95455.18945800574,,,,,-0.0018707791343630653,0.9545518945800572
-2024-09-24,"{'position': 104.0, 'value': 23514.141967773438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95548.26196777137,,,,,0.0009750387621050294,0.9554826196777135
-2024-09-25,"{'position': 104.0, 'value': 23410.724365234375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95444.8443652323,,,,,-0.0010823598505009802,0.9544484436523228
-2024-09-26,"{'position': 104.0, 'value': 23529.654052734375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95563.7740527323,,,,,0.0012460566968384157,0.9556377405273229
-2024-09-27,"{'position': 104.0, 'value': 23557.577392578125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95591.69739257605,,,,,0.00029219586732032177,0.9559169739257602
-2024-09-28,,,,,,,,,0.0,0.9559169739257602
-2024-09-29,,,,,,,,,0.0,0.9559169739257602
-2024-09-30,"{'position': 104.0, 'value': 24096.385498046875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,96130.5054980448,,,,,0.005636557568969414,0.9613050549804478
-2024-10-01,"{'position': 104.0, 'value': 23394.180786132812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95428.30078613074,,,,,-0.007304702167912236,0.9542830078613072
-2024-10-02,"{'position': 104.0, 'value': 23453.128295898438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95487.24829589637,,,,,0.0006177151775732526,0.9548724829589633
-2024-10-03,"{'position': 104.0, 'value': 23338.330932617188}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95372.45093261512,,,,,-0.0012022271594371858,0.9537245093261508
-2024-10-04,"{'position': 104.0, 'value': 23455.196044921875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95489.3160449198,,,,,0.001225355028227737,0.9548931604491977
-2024-10-05,,,,,,,,,0.0,0.9548931604491977
-2024-10-06,,,,,,,,,0.0,0.9548931604491977
-2024-10-07,"{'position': 104.0, 'value': 22926.729858398438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94960.84985839637,,,,,-0.005534296488989843,0.9496084985839632
-2024-10-08,"{'position': 104.0, 'value': 23348.676025390625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95382.79602538855,,,,,0.004443369742598069,0.9538279602538852
-2024-10-09,"{'position': 104.0, 'value': 23738.55859375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95772.67859374793,,,,,0.0040875565050073615,0.9577267859374788
-2024-10-10,"{'position': 104.0, 'value': 23686.8505859375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95720.97058593543,,,,,-0.0005399035358699678,0.9572097058593538
-2024-10-11,"{'position': 104.0, 'value': 23532.758056640625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95566.87805663855,,,,,-0.001609809515654037,0.955668780566385
-2024-10-12,,,,,,,,,0.0,0.955668780566385
-2024-10-13,,,,,,,,,0.0,0.955668780566385
-2024-10-14,"{'position': 104.0, 'value': 23920.57763671875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95954.69763671668,,,,,0.004058096151767998,0.9595469763671663
-2024-10-15,"{'position': 104.0, 'value': 24184.292602539062}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,96218.41260253699,,,,,0.0027483278288129576,0.9621841260253695
-2024-10-16,"{'position': 104.0, 'value': 23970.217895507812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,96004.33789550574,,,,,-0.0022248829640908463,0.960043378955057
-2024-10-17,"{'position': 104.0, 'value': 24008.481567382812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,96042.60156738074,,,,,0.0003985619057822465,0.9604260156738069
-2024-10-18,"{'position': 104.0, 'value': 24303.223876953125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,96337.34387695105,,,,,0.003068870529954637,0.96337343876951
-2024-10-19,,,,,,,,,0.0,0.96337343876951
-2024-10-20,,,,,,,,,0.0,0.96337343876951
-2024-10-21,"{'position': 104.0, 'value': 24456.280151367188}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,96490.40015136512,,,,,0.001588753314701652,0.9649040015136505
-2024-10-22,"{'position': 104.0, 'value': 24392.1640625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,96426.28406249793,,,,,-0.0006644815314954533,0.9642628406249787
-2024-10-23,"{'position': 104.0, 'value': 23864.729370117188}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95898.84937011512,,,,,-0.0054698228549485695,0.9589884937011506
-2024-10-24,"{'position': 104.0, 'value': 23845.083374023438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95879.20337402137,,,,,-0.00020486164560673537,0.958792033740213
-2024-10-25,"{'position': 104.0, 'value': 23931.954223632812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95966.07422363074,,,,,0.0009060447579074538,0.9596607422363068
-2024-10-26,,,,,,,,,0.0,0.9596607422363068
-2024-10-27,,,,,,,,,0.0,0.9596607422363068
-2024-10-28,"{'position': 104.0, 'value': 24137.753173828125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,96171.87317382605,,,,,0.002144496915813532,0.96171873173826
-2024-10-29,"{'position': 104.0, 'value': 24165.678100585938}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,96199.79810058387,,,,,0.0002903648003957926,0.961997981005838
-2024-10-30,"{'position': 104.0, 'value': 23796.476196289062}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95830.59619628699,,,,,-0.0038378656877309236,0.9583059619628693
-2024-10-31,"{'position': 104.0, 'value': 23363.153442382812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95397.27344238074,,,,,-0.00452175788428455,0.9539727344238068
-2024-11-01,"{'position': 104.0, 'value': 23052.899047851562}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95087.01904784949,,,,,-0.003252235450090124,0.9508701904784943
-2024-11-02,,,,,,,,,0.0,0.9508701904784943
-2024-11-03,,,,,,,,,0.0,0.9508701904784943
-2024-11-04,"{'position': 104.0, 'value': 22959.82177734375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,94993.94177734168,,,,,-0.0009788641124712782,0.9499394177734162
-2024-11-05,"{'position': 104.0, 'value': 23108.745727539062}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95142.86572753699,,,,,0.0015677205031072727,0.9514286572753693
-2024-11-06,"{'position': 104.0, 'value': 23033.248291015625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95067.36829101355,,,,,-0.0007935165284976842,0.9506736829101349
-2024-11-07,"{'position': 104.0, 'value': 23525.5185546875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95559.63855468543,,,,,0.00517812023748232,0.9555963855468537
-2024-11-08,"{'position': 104.0, 'value': 23497.566650390625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95531.68665038855,,,,,-0.0002925074301205477,0.9553168665038849
-2024-11-09,,,,,,,,,0.0,0.9553168665038849
-2024-11-10,,,,,,,,,0.0,0.9553168665038849
-2024-11-11,"{'position': 104.0, 'value': 23214.924560546875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95249.0445605448,,,,,-0.002958621372174841,0.9524904456054474
-2024-11-12,"{'position': 104.0, 'value': 23214.924560546875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95249.0445605448,,,,,0.0,0.9524904456054474
-2024-11-13,"{'position': 104.0, 'value': 23307.067138671875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95341.1871386698,,,,,0.0009673858520065082,0.9534118713866975
-2024-11-14,"{'position': 104.0, 'value': 23628.015747070312}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95662.13574706824,,,,,0.0033663164685755476,0.956621357470682
-2024-11-15,"{'position': 104.0, 'value': 23294.643188476562}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95328.76318847449,,,,,-0.0034848956276199994,0.9532876318847445
-2024-11-16,,,,,,,,,0.0,0.9532876318847445
-2024-11-17,,,,,,,,,0.0,0.9532876318847445
-2024-11-18,"{'position': 104.0, 'value': 23607.309692382812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95641.42969238074,,,,,0.0032798758050398558,0.9564142969238071
-2024-11-19,"{'position': 104.0, 'value': 23634.228515625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95668.34851562293,,,,,0.0002814556759425102,0.9566834851562288
-2024-11-20,"{'position': 104.0, 'value': 23708.770629882812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95742.89062988074,,,,,0.0007791721652394834,0.9574289062988068
-2024-11-21,"{'position': 104.0, 'value': 23659.076416015625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95693.19641601355,,,,,-0.0005190381608519701,0.956931964160135
-2024-11-22,"{'position': 104.0, 'value': 23798.843872070312}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,95832.96387206824,,,,,0.0014605788215817928,0.958329638720682
-2024-11-23,,,,,,,,,0.0,0.958329638720682
-2024-11-24,,,,,,,,,0.0,0.958329638720682
-2024-11-25,"{'position': 104.0, 'value': 24109.439453125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,96143.55945312293,,,,,0.003241009862423816,0.9614355945312287
-2024-11-26,"{'position': 104.0, 'value': 24336.172973632812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,96370.29297363074,,,,,0.002358280906152199,0.9637029297363068
-2024-11-27,"{'position': 104.0, 'value': 24322.712768554688}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,96356.83276855262,,,,,-0.000139671725204904,0.9635683276855255
-2024-11-28,,,,,,,,,0.0,0.9635683276855255
-2024-11-29,"{'position': 104.0, 'value': 24571.190185546875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,96605.3101855448,,,,,0.002578721299287823,0.9660531018554472
-2024-11-30,,,,,,,,,0.0,0.9660531018554472
-2024-12-01,,,,,,,,,0.0,0.9660531018554472
-2024-12-02,"{'position': 104.0, 'value': 24805.171142578125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,96839.29114257605,,,,,0.0024220299751831487,0.9683929114257598
-2024-12-03,"{'position': 104.0, 'value': 25121.9794921875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,97156.09949218543,,,,,0.0032714856322413333,0.9715609949218535
-2024-12-04,"{'position': 104.0, 'value': 25159.251342773438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,97193.37134277137,,,,,0.00038362851926687647,0.9719337134277128
-2024-12-05,"{'position': 104.0, 'value': 25162.35693359375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,97196.47693359168,,,,,3.1952701891269086e-05,0.971964769335916
-2024-12-06,"{'position': 104.0, 'value': 25141.649291992188}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,97175.76929199012,,,,,-0.00021304930234977704,0.9717576929199004
-2024-12-07,,,,,,,,,0.0,0.9717576929199004
-2024-12-08,,,,,,,,,0.0,0.9717576929199004
-2024-12-09,"{'position': 104.0, 'value': 25546.4599609375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,97580.57996093543,,,,,0.004165757285943927,0.9758057996093535
-2024-12-10,"{'position': 104.0, 'value': 25652.062744140625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,97686.18274413855,,,,,0.0010822110633632587,0.9768618274413848
-2024-12-11,"{'position': 104.0, 'value': 25519.541137695312}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,97553.66113769324,,,,,-0.0013566054351045187,0.9755366113769317
-2024-12-12,"{'position': 104.0, 'value': 25671.732543945312}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,97705.85254394324,,,,,0.0015600788783844965,0.9770585254394316
-2024-12-13,"{'position': 104.0, 'value': 25689.3330078125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,97723.45300781043,,,,,0.0001801372528762446,0.9772345300781036
-2024-12-14,,,,,,,,,0.0,0.9772345300781036
-2024-12-15,,,,,,,,,0.0,0.9772345300781036
-2024-12-16,"{'position': 104.0, 'value': 25990.610229492188}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,98024.73022949012,,,,,0.0030829571858825844,0.9802473022949004
-2024-12-17,"{'position': 104.0, 'value': 26243.227905273438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,98277.34790527137,,,,,0.00257708106097132,0.9827734790527128
-2024-12-18,"{'position': 104.0, 'value': 25681.050903320312}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,97715.17090331824,,,,,-0.005720311078143858,0.9771517090331816
-2024-12-19,"{'position': 104.0, 'value': 25861.19580078125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,97895.31580077918,,,,,0.0018435714310849338,0.978953158007791
-2024-12-20,"{'position': 104.0, 'value': 26347.797607421875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,98381.9176074198,,,,,0.004970634219423564,0.9838191760741973
-2024-12-21,,,,,,,,,0.0,0.9838191760741973
-2024-12-22,,,,,,,,,0.0,0.9838191760741973
-2024-12-23,"{'position': 104.0, 'value': 26428.550903320312}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,98462.67090331824,,,,,0.0008208144124683958,0.9846267090331818
-2024-12-24,"{'position': 104.0, 'value': 26731.900634765625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,98766.02063476355,,,,,0.003080860275902708,0.987660206347635
-2024-12-25,,,,,,,,,0.0,0.987660206347635
-2024-12-26,"{'position': 104.0, 'value': 26816.794189453125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,98850.91418945105,,,,,0.0008595421192623132,0.9885091418945101
-2024-12-27,"{'position': 104.0, 'value': 26461.680908203125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,98495.80090820105,,,,,-0.003592412717290716,0.9849580090820101
-2024-12-28,,,,,,,,,0.0,0.9849580090820101
-2024-12-29,,,,,,,,,0.0,0.9849580090820101
-2024-12-30,"{'position': 104.0, 'value': 26110.707885742188}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.11999999793,98144.82788574012,,,,,-0.0035633297990850243,0.9814482788574007
+2023-10-16,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-10-17,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-10-18,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-10-19,"{'position': 0, 'value': 0.0}","defaultdict(<class 'int'>, {})",100000.0,100000.0,,,,,0.0,1.0
+2023-10-20,"{'position': 156.0, 'value': 26681.81524658203}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,99560.03011452247,2.028,,BUY 156.0 AAPL @ 173.84 | ,0.0023248685922724528 | ,-0.0043996988547753135,0.9956003011452247
+2023-10-21,,,,,,,,,0.0,0.9956003011452247
+2023-10-22,,,,,,,,,0.0,0.9956003011452247
+2023-10-23,"{'position': 156.0, 'value': 26700.334533691406}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,99578.54940163184,,,,,0.00018601126464168338,0.9957854940163183
+2023-10-24,"{'position': 156.0, 'value': 26768.241760253906}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,99646.45662819434,,,,,0.0006819463325240527,0.9964645662819435
+2023-10-25,"{'position': 156.0, 'value': 26407.096618652344}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,99285.31148659278,,,,,-0.003624264763864904,0.9928531148659279
+2023-10-26,"{'position': 156.0, 'value': 25757.33624267578}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,98635.55111061622,,,,,-0.006544375660888169,0.9863555111061623
+2023-10-27,"{'position': 156.0, 'value': 25962.602783203125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,98840.81765114356,,,,,0.0020810604109378072,0.9884081765114356
+2023-10-28,,,,,,,,,0.0,0.9884081765114356
+2023-10-29,,,,,,,,,0.0,0.9884081765114356
+2023-10-30,"{'position': 156.0, 'value': 26282.079528808594}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,99160.29439674903,,,,,0.0032322349531046513,0.9916029439674904
+2023-10-31,"{'position': 156.0, 'value': 26356.163818359375}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,99234.37868629981,,,,,0.0007471164744061731,0.9923437868629982
+2023-11-01,"{'position': 156.0, 'value': 26850.043212890625}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,99728.25808083106,,,,,0.004976898138219887,0.9972825808083107
+2023-11-02,"{'position': 156.0, 'value': 27405.659912109375}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,100283.87478004981,,,,,0.0055713065675770945,1.0028387478004983
+2023-11-03,"{'position': 156.0, 'value': 27263.666015625}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,100141.88088356543,,,,,-0.0014159195264025204,1.0014188088356546
+2023-11-04,,,,,,,,,0.0,1.0014188088356546
+2023-11-05,,,,,,,,,0.0,1.0014188088356546
+2023-11-06,"{'position': 156.0, 'value': 27661.8544921875}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,100540.06936012793,,,,,0.003976243236588184,1.0054006936012796
+2023-11-07,"{'position': 156.0, 'value': 28061.590209960938}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,100939.80507790137,,,,,0.003975884642983596,1.009398050779014
+2023-11-08,"{'position': 156.0, 'value': 28226.728454589844}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101104.94332253028,,,,,0.0016360071678507282,1.0110494332253028
+2023-11-09,"{'position': 156.0, 'value': 28152.646545410156}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101030.86141335059,,,,,-0.0007327229188326401,1.0103086141335058
+2023-11-10,"{'position': 156.0, 'value': 28806.35595703125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101684.57082497168,,,,,0.006470393328099622,1.0168457082497169
+2023-11-11,,,,,,,,,0.0,1.0168457082497169
+2023-11-12,,,,,,,,,0.0,1.0168457082497169
+2023-11-13,"{'position': 156.0, 'value': 28559.092529296875}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101437.30739723731,,,,,-0.0024316710561721466,1.014373073972373
+2023-11-14,"{'position': 156.0, 'value': 28967.076232910156}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101845.29110085059,,,,,0.004022028128325417,1.0184529110085059
+2023-11-15,"{'position': 156.0, 'value': 29055.15948486328}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101933.37435280372,,,,,0.0008648730933067394,1.019333743528037
+2023-11-16,"{'position': 156.0, 'value': 29317.885803222656}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102196.10067116309,,,,,0.0025774317786249057,1.0219610067116307
+2023-11-17,"{'position': 156.0, 'value': 29314.79132080078}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102193.00618874122,,,,,-3.027984826775576e-05,1.0219300618874119
+2023-11-18,,,,,,,,,0.0,1.0219300618874119
+2023-11-19,,,,,,,,,0.0,1.0219300618874119
+2023-11-20,"{'position': 156.0, 'value': 29586.78204345703}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102464.99691139747,,,,,0.002661539500598664,1.0246499691139745
+2023-11-21,"{'position': 156.0, 'value': 29461.610229492188}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102339.82509743262,,,,,-0.0012216055993549135,1.023398250974326
+2023-11-22,"{'position': 156.0, 'value': 29565.14923095703}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102443.36409889747,,,,,0.0010117175925039579,1.0244336409889745
+2023-11-23,,,,,,,,,0.0,1.0244336409889745
+2023-11-24,"{'position': 156.0, 'value': 29358.066467285156}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102236.28133522559,,,,,-0.002021436581016167,1.0223628133522558
+2023-11-25,,,,,,,,,0.0,1.0223628133522558
+2023-11-26,,,,,,,,,0.0,1.0223628133522558
+2023-11-27,"{'position': 156.0, 'value': 29330.244689941406}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102208.45955788184,,,,,-0.00027213213333265873,1.0220845955788183
+2023-11-28,"{'position': 156.0, 'value': 29424.51690673828}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102302.73177467872,,,,,0.0009223523884878126,1.023027317746787
+2023-11-29,"{'position': 156.0, 'value': 29265.34149169922}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102143.55635963965,,,,,-0.0015559253626740155,1.0214355635963963
+2023-11-30,"{'position': 156.0, 'value': 29354.969604492188}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102233.18447243262,,,,,0.00087747202062749,1.022331844724326
+2023-12-01,"{'position': 156.0, 'value': 29554.335205078125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102432.55007301856,,,,,0.0019501065296434472,1.0243255007301852
+2023-12-02,,,,,,,,,0.0,1.0243255007301852
+2023-12-03,,,,,,,,,0.0,1.0243255007301852
+2023-12-04,"{'position': 156.0, 'value': 29274.61065673828}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102152.82552467872,,,,,-0.002730816992649765,1.0215282552467868
+2023-12-05,"{'position': 156.0, 'value': 29891.229125976562}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102769.443993917,,,,,0.006036235082790942,1.0276944399391696
+2023-12-06,"{'position': 156.0, 'value': 29721.2373046875}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102599.45217262793,,,,,-0.0016541086015715578,1.025994521726279
+2023-12-07,"{'position': 156.0, 'value': 30022.589904785156}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102900.80477272559,,,,,0.0029371755279026246,1.0290080477272554
+2023-12-08,"{'position': 156.0, 'value': 30245.130798339844}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,103123.34566628028,,,,,0.0021626739853610744,1.0312334566628023
+2023-12-09,,,,,,,,,0.0,1.0312334566628023
+2023-12-10,,,,,,,,,0.0,1.0312334566628023
+2023-12-11,"{'position': 156.0, 'value': 29854.13818359375}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102732.35305153418,,,,,-0.003791504360335596,1.0273235305153414
+2023-12-12,"{'position': 156.0, 'value': 30090.58758544922}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102968.80245338965,,,,,0.002301606016333224,1.0296880245338962
+2023-12-13,"{'position': 156.0, 'value': 30592.84112548828}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,103471.05599342872,,,,,0.004877725369938357,1.034710559934287
+2023-12-14,"{'position': 156.0, 'value': 30616.023559570312}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,103494.23842751075,,,,,0.00022404752574956,1.034942384275107
+2023-12-15,"{'position': 156.0, 'value': 30532.572509765625}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,103410.78737770606,,,,,-0.0008063352228360188,1.0341078737770601
+2023-12-16,,,,,,,,,0.0,1.0341078737770601
+2023-12-17,,,,,,,,,0.0,1.0341078737770601
+2023-12-18,"{'position': 156.0, 'value': 30272.945434570312}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,103151.16030251075,,,,,-0.0025106382204308497,1.031511603025107
+2023-12-19,"{'position': 156.0, 'value': 30435.210571289062}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,103313.4254392295,,,,,0.001573081061258863,1.0331342543922946
+2023-12-20,"{'position': 156.0, 'value': 30109.128295898438}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102987.34316383887,,,,,-0.003156242995567271,1.0298734316383882
+2023-12-21,"{'position': 156.0, 'value': 30085.950622558594}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102964.16549049903,,,,,-0.00022505360977198574,1.0296416549049896
+2023-12-22,"{'position': 156.0, 'value': 29919.04852294922}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102797.26339088965,,,,,-0.001620972683207711,1.027972633908896
+2023-12-23,,,,,,,,,0.0,1.027972633908896
+2023-12-24,,,,,,,,,0.0,1.027972633908896
+2023-12-25,,,,,,,,,0.0,1.027972633908896
+2023-12-26,"{'position': 156.0, 'value': 29834.0478515625}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102712.26271950293,,,,,-0.0008268767920747155,1.0271226271950287
+2023-12-27,"{'position': 156.0, 'value': 29849.49884033203}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102727.71370827247,,,,,0.00015042983535207277,1.027277137082724
+2023-12-28,"{'position': 156.0, 'value': 29915.954040527344}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102794.16890846778,,,,,0.0006469062514524726,1.027941689084677
+2023-12-29,"{'position': 156.0, 'value': 29753.688903808594}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102631.90377174903,,,,,-0.0015785441765985286,1.0263190377174896
+2023-12-30,,,,,,,,,0.0,1.0263190377174896
+2023-12-31,,,,,,,,,0.0,1.0263190377174896
+2024-01-01,,,,,,,,,0.0,1.0263190377174896
+2024-01-02,"{'position': 156.0, 'value': 28688.903686523438}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101567.11855446387,,,,,-0.01037479748649317,1.015671185544638
+2024-01-03,"{'position': 156.0, 'value': 28474.09423828125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101352.30910622168,,,,,-0.002114950697621687,1.0135230910622162
+2024-01-04,"{'position': 156.0, 'value': 28112.46826171875}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,100990.68312965918,,,,,-0.00356800925160472,1.009906831296591
+2024-01-05,"{'position': 156.0, 'value': 27999.65057373047}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,100877.8654416709,,,,,-0.0011171098609505936,1.0087786544167083
+2024-01-06,,,,,,,,,0.0,1.0087786544167083
+2024-01-07,,,,,,,,,0.0,1.0087786544167083
+2024-01-08,"{'position': 156.0, 'value': 28676.537658691406}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101554.75252663184,,,,,0.006709966373667164,1.0155475252663178
+2024-01-09,"{'position': 156.0, 'value': 28611.632080078125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101489.84694801856,,,,,-0.0006391190663013191,1.014898469480185
+2024-01-10,"{'position': 156.0, 'value': 28773.901977539062}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101652.1168454795,,,,,0.0015988781374756122,1.0165211684547943
+2024-01-11,"{'position': 156.0, 'value': 28681.17462158203}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101559.38948952247,,,,,-0.0009122029017653022,1.0155938948952241
+2024-01-12,"{'position': 156.0, 'value': 28732.174072265625}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101610.38894020606,,,,,0.0005021638170525922,1.01610388940206
+2024-01-13,,,,,,,,,0.0,1.01610388940206
+2024-01-14,,,,,,,,,0.0,1.01610388940206
+2024-01-15,,,,,,,,,0.0,1.01610388940206
+2024-01-16,"{'position': 156.0, 'value': 28378.27716064453}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101256.49202858497,,,,,-0.0034828811828419015,1.012564920285849
+2024-01-17,"{'position': 156.0, 'value': 28231.465393066406}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101109.68026100684,,,,,-0.0014498998003671382,1.011096802610068
+2024-01-18,"{'position': 156.0, 'value': 29150.981323242188}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102029.19619118262,,,,,0.009094242290175636,1.0202919619118258
+2024-01-19,"{'position': 156.0, 'value': 29603.785034179688}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102481.99990212012,,,,,0.0044379817526840615,1.0248199990212008
+2024-01-20,,,,,,,,,0.0,1.0248199990212008
+2024-01-21,,,,,,,,,0.0,1.0248199990212008
+2024-01-22,"{'position': 156.0, 'value': 29963.861389160156}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102842.07625710059,,,,,0.0035135570668447524,1.0284207625710056
+2024-01-23,"{'position': 156.0, 'value': 30163.21746826172}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,103041.43233620215,,,,,0.0019384680507925633,1.030414323362021
+2024-01-24,"{'position': 156.0, 'value': 30058.131225585938}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102936.34609352637,,,,,-0.0010198445449876026,1.0293634609352633
+2024-01-25,"{'position': 156.0, 'value': 30007.131774902344}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102885.34664284278,,,,,-0.0004954464833758498,1.0288534664284275
+2024-01-26,"{'position': 156.0, 'value': 29736.690673828125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102614.90554176856,,,,,-0.002628567720270536,1.0261490554176853
+2024-01-27,,,,,,,,,0.0,1.0261490554176853
+2024-01-28,,,,,,,,,0.0,1.0261490554176853
+2024-01-29,"{'position': 156.0, 'value': 29630.05242919922}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102508.26729713965,,,,,-0.0010392081351718874,1.0250826729713962
+2024-01-30,"{'position': 156.0, 'value': 29059.798828125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101938.01369606543,,,,,-0.005563001074061935,1.019380136960654
+2024-01-31,"{'position': 156.0, 'value': 28497.271911621094}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101375.48677956153,,,,,-0.005518323303621675,1.013754867795615
+2024-02-01,"{'position': 156.0, 'value': 28877.443359375}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101755.65822731543,,,,,0.0037501319089157104,1.0175565822731538
+2024-02-02,"{'position': 156.0, 'value': 28721.352905273438}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101599.56777321387,,,,,-0.0015339732140778883,1.0159956777321382
+2024-02-03,,,,,,,,,0.0,1.0159956777321382
+2024-02-04,,,,,,,,,0.0,1.0159956777321382
+2024-02-05,"{'position': 156.0, 'value': 29004.16717529297}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101882.3820432334,,,,,0.002783616861941951,1.0188238204323334
+2024-02-06,"{'position': 156.0, 'value': 29254.522705078125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102132.73757301856,,,,,0.002457299532699464,1.0213273757301848
+2024-02-07,"{'position': 156.0, 'value': 29271.520935058594}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102149.73580299903,,,,,0.00016643272651251095,1.0214973580299895
+2024-02-08,"{'position': 156.0, 'value': 29103.07635498047}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101981.2912229209,,,,,-0.001648996727734886,1.0198129122292083
+2024-02-09,"{'position': 156.0, 'value': 29222.218688964844}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,102100.43355690528,,,,,0.001168276382419453,1.0210043355690521
+2024-02-10,,,,,,,,,0.0,1.0210043355690521
+2024-02-11,,,,,,,,,0.0,1.0210043355690521
+2024-02-12,"{'position': 156.0, 'value': 28959.16387939453}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101837.37874733497,,,,,-0.0025764318564200916,1.018373787473349
+2024-02-13,"{'position': 156.0, 'value': 28632.669799804688}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101510.88466774512,,,,,-0.0032060338120043497,1.0151088466774505
+2024-02-14,"{'position': 156.0, 'value': 28494.951049804688}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101373.16591774512,,,,,-0.0013566894865586487,1.0137316591774506
+2024-02-15,"{'position': 156.0, 'value': 28450.0810546875}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101328.29592262793,,,,,-0.00044262201649691857,1.0132829592262786
+2024-02-16,"{'position': 156.0, 'value': 28210.23486328125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101088.44973122168,,,,,-0.002367020872327652,1.0108844973122162
+2024-02-17,,,,,,,,,0.0,1.0108844973122162
+2024-02-18,,,,,,,,,0.0,1.0108844973122162
+2024-02-19,,,,,,,,,0.0,1.0108844973122162
+2024-02-20,"{'position': 156.0, 'value': 28094.184631347656}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,100972.39949928809,,,,,-0.0011480068419503775,1.0097239949928802
+2024-02-21,"{'position': 156.0, 'value': 28211.779724121094}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101089.99459206153,,,,,0.0011646261092792543,1.0108999459206147
+2024-02-22,"{'position': 156.0, 'value': 28528.992736816406}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101407.20760475684,,,,,0.0031379268935110005,1.0140720760475679
+2024-02-23,"{'position': 156.0, 'value': 28242.731689453125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101120.94655739356,,,,,-0.0028228865987416363,1.011209465573935
+2024-02-24,,,,,,,,,0.0,1.011209465573935
+2024-02-25,,,,,,,,,0.0,1.011209465573935
+2024-02-26,"{'position': 156.0, 'value': 28032.287841796875}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,100910.50270973731,,,,,-0.002081110341830228,1.0091050270973725
+2024-02-27,"{'position': 156.0, 'value': 28259.751342773438}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,101137.96621071387,,,,,0.0022541112656118134,1.0113796621071383
+2024-02-28,"{'position': 156.0, 'value': 28072.51611328125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,100950.73098122168,,,,,-0.0018512852938143975,1.0095073098122163
+2024-02-29,"{'position': 156.0, 'value': 27968.841430664062}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,100847.0562986045,,,,,-0.0010269829808015052,1.0084705629860444
+2024-03-01,"{'position': 156.0, 'value': 27800.177856445312}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,100678.39272438575,,,,,-0.001672468988280107,1.0067839272438568
+2024-03-02,,,,,,,,,0.0,1.0067839272438568
+2024-03-03,,,,,,,,,0.0,1.0067839272438568
+2024-03-04,"{'position': 156.0, 'value': 27094.57635498047}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,99972.7912229209,,,,,-0.007008470063645911,0.9997279122292083
+2024-03-05,"{'position': 156.0, 'value': 26323.98358154297}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,99202.1984494834,,,,,-0.007708024993712703,0.9920219844948334
+2024-03-06,"{'position': 156.0, 'value': 26169.242797851562}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,99047.457665792,,,,,-0.0015598523632538441,0.9904745766579194
+2024-03-07,"{'position': 156.0, 'value': 26150.678283691406}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,99028.89315163184,,,,,-0.0001874304964272211,0.9902889315163178
+2024-03-08,"{'position': 156.0, 'value': 26418.372436523438}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,99296.58730446387,,,,,0.0027031924149867326,0.992965873044638
+2024-03-09,,,,,,,,,0.0,0.992965873044638
+2024-03-10,,,,,,,,,0.0,0.992965873044638
+2024-03-11,"{'position': 156.0, 'value': 26730.943725585938}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,99609.15859352637,,,,,0.003147855304473701,0.9960915859352629
+2024-03-12,"{'position': 156.0, 'value': 26805.216064453125}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,99683.43093239356,,,,,0.0007456376493477634,0.9968343093239348
+2024-03-13,"{'position': 156.0, 'value': 26480.26922607422}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,99358.48409401465,,,,,-0.003259787863835517,0.9935848409401458
+2024-03-14,"{'position': 156.0, 'value': 26769.62713623047}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,99647.8420041709,,,,,0.0029122617237442583,0.9964784200417083
+2024-03-15,"{'position': 156.0, 'value': 26710.824829101562}","defaultdict(<class 'int'>, {'AAPL': 0})",72878.21486794043,99589.039697042,,,,,-0.0005901011597064798,0.9958903969704191
+2024-03-16,,,,,,,,,0.0,0.9958903969704191
+2024-03-17,,,,,,,,,0.0,0.9958903969704191
+2024-03-18,"{'position': -153.0, 'value': -26364.094985961914}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",87101.8714702624,100283.91896324336,4.0169999999999995,1.046194245474679,SELL 309.0 AAPL @ 174.03 | ,0.0006930980307187875 | ,0.006977467282697436,1.002839189632433
+2024-03-19,"{'position': -153.0, 'value': -26722.252166748047}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",86563.57529225119,99924.70137562521,,1.0604068320138114,,,-0.003582005882217354,0.9992470137562515
+2024-03-20,"{'position': -153.0, 'value': -27115.313873291016}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",85972.90672791796,99530.56366456347,,1.0760045187813896,,,-0.003944347149761773,0.995305636645634
+2024-03-21,"{'position': -153.0, 'value': -26007.450622558594}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",87633.66956232522,100637.39487360451,,1.0320416913713728,,,0.011120515832415911,1.0063739487360446
+2024-03-22,"{'position': -153.0, 'value': -26145.55824279785}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",87425.47060981384,100498.24973121277,,1.0375221524919782,,,-0.0013826385566370059,1.004982497312127
+2024-03-23,,,,,,,,,0.0,1.004982497312127
+2024-03-24,,,,,,,,,0.0,1.004982497312127
+2024-03-25,"{'position': -153.0, 'value': -25928.538986206055}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",87749.9705844243,100714.24007752733,,1.028910277230399,,,0.0021491951043151047,1.0071424007752727
+2024-03-26,"{'position': -153.0, 'value': -25755.531509399414}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",88008.45975473309,100886.2255094328,,1.0220449011666435,,,0.0017076575444849862,1.0088622550943274
+2024-03-27,"{'position': -153.0, 'value': -26301.87336730957}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",87187.90324273423,100338.83992638902,,1.0437251336233957,,,-0.005425771261435508,1.0033883992638895
+2024-03-28,"{'position': -153.0, 'value': -26024.145309448242}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",87603.46262534728,100615.5352800714,,1.032704178946359,,,0.002757609654301163,1.0061553528007134
+2024-03-29,,,,,,,,,0.0,1.0061553528007134
+2024-03-30,,,,,,,,,0.0,1.0061553528007134
+2024-03-31,,,,,,,,,0.0,1.0061553528007134
+2024-04-01,"{'position': -153.0, 'value': -25804.09341430664}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",87932.5164960988,100834.56320325212,,1.023971960885184,,,0.0021768797688253017,1.0083456320325206
+2024-04-02,"{'position': -153.0, 'value': -25623.496170043945}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",88202.39555708927,101014.14364211124,,1.0168054035731724,,,0.0017809413077651826,1.0101414364211119
+2024-04-03,"{'position': -153.0, 'value': -25746.421920776367}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",88016.98524758109,100890.19620796927,,1.0216834095546177,,,-0.0012270304897213924,1.0089019620796922
+2024-04-04,"{'position': -153.0, 'value': -25620.46353149414}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",88204.90614644365,101015.13791219072,,1.016685060773577,,,0.0012383929154413664,1.0101513791219066
+2024-04-05,"{'position': -153.0, 'value': -25735.801849365234}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",88030.87740765886,100898.77833234148,,1.021261978149414,,,-0.0011519024005134382,1.008987783323414
+2024-04-06,,,,,,,,,0.0,1.008987783323414
+2024-04-07,,,,,,,,,0.0,1.008987783323414
+2024-04-08,"{'position': -153.0, 'value': -25564.307189941406}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",88287.10494016008,101069.25853513078,,1.0144566345214843,,,0.0016896161242683227,1.010692585351307
+2024-04-09,"{'position': -153.0, 'value': -25749.4568939209}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",88008.35858034584,100883.08702730629,,1.021803844996861,,,-0.0018420191314629797,1.008830870273062
+2024-04-10,"{'position': -153.0, 'value': -25462.630920410156}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",88437.58711875003,101168.90257895511,,1.010421861921038,,,0.0028331364559794903,1.0116890257895501
+2024-04-11,"{'position': -153.0, 'value': -26564.419555664062}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",86783.85002223602,100066.05980006805,,1.0541436331612724,,,-0.010901005652664608,1.0006605980006795
+2024-04-12,"{'position': -153.0, 'value': -26793.583374023438}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",86439.04105726148,99835.8327442732,,1.0632374354771206,,,-0.0023007506866448146,0.998358327442731
+2024-04-13,,,,,,,,,0.0,0.998358327442731
+2024-04-14,,,,,,,,,0.0,0.998358327442731
+2024-04-15,"{'position': -153.0, 'value': -26207.779861450195}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",87316.706334857,100420.59626558209,,1.0399912643432616,,,0.005857250901154298,1.0042059626558197
+2024-04-16,"{'position': -153.0, 'value': -25705.449783325195}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",88069.1813945134,100921.906286176,,1.0200575310843332,,,0.0049921036046041145,1.0092190628617588
+2024-04-17,"{'position': -153.0, 'value': -25496.017959594727}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",88382.31738336469,101130.32636316205,,1.011746744428362,,,0.0020651619123706055,1.0113032636316193
+2024-04-18,"{'position': -153.0, 'value': -25350.327575683594}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",88599.8469938514,101275.0107816932,,1.0059653799874442,,,0.0014306729122142148,1.0127501078169308
+2024-04-19,"{'position': -153.0, 'value': -25040.734634399414}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",89063.24272583186,101583.61004303157,,0.9936799458095006,,,0.0030471412341153137,1.0158361004303145
+2024-04-20,,,,,,,,,0.0,1.0158361004303145
+2024-04-21,,,,,,,,,0.0,1.0158361004303145
+2024-04-22,"{'position': -153.0, 'value': -25168.20817565918}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",88871.03367552254,101455.13776335213,,0.9987384196690151,,,-0.0012646949603879465,1.0145513776335202
+2024-04-23,"{'position': -153.0, 'value': -25329.078094482422}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",88628.72367514107,101293.26272238228,,1.0051221466064453,,,-0.001595533203527233,1.0129326272238217
+2024-04-24,"{'position': -153.0, 'value': -25650.81559753418}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",88145.09953105559,100970.50732982268,,1.0178895078386578,,,-0.0031863460992878068,1.0097050732982258
+2024-04-25,"{'position': -153.0, 'value': -25782.846267700195}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",87946.03039698642,100837.45353083652,,1.0231288201468332,,,-0.0013177491378897344,1.0083745353083642
+2024-04-26,"{'position': -153.0, 'value': -25693.307556152344}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",88079.31888861152,100925.9726666877,,1.019575696672712,,,0.0008778398576290147,1.009259726666876
+2024-04-27,,,,,,,,,0.0,1.009259726666876
+2024-04-28,,,,,,,,,0.0,1.009259726666876
+2024-04-29,"{'position': -153.0, 'value': -26330.705612182617}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",87122.17693529579,100287.5297413871,,1.0448692703247071,,,-0.0063258535779395775,1.00287529741387
+2024-04-30,"{'position': -153.0, 'value': -25849.620346069336}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",87842.77905588056,100767.58922891523,,1.0257785851614816,,,0.0047868313115904115,1.007675892289151
+2024-05-01,"{'position': -153.0, 'value': -25693.307556152344}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",88076.22866505937,100922.88244313555,,1.019575696672712,,,0.0015411028030802854,1.0092288244313543
+2024-05-02,"{'position': -153.0, 'value': -26259.381408691406}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",87226.075847306,100355.7665516517,,1.0420389447893414,,,-0.005619299387365273,1.003557665516516
+2024-05-03,"{'position': -153.0, 'value': -27830.11541748047}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",84868.87046446298,98783.92817320321,,1.1043696594238281,,,-0.0156626612745715,0.9878392817320311
+2024-05-04,,,,,,,,,0.0,0.9878392817320311
+2024-05-05,,,,,,,,,0.0,0.9878392817320311
+2024-05-06,"{'position': -153.0, 'value': -27576.669479370117}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",85247.94505934758,99036.27979903264,,1.0943122809273855,,,0.0025545818079533156,0.9903627979903253
+2024-05-07,"{'position': -153.0, 'value': -27681.387725830078}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",85089.76922189073,98930.46308480577,,1.098467766898019,,,-0.0010684641470942724,0.9893046308480568
+2024-05-08,"{'position': -153.0, 'value': -27732.986938476562}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",85011.2698875663,98877.76335680459,,1.1005153547014508,,,-0.0005326946458950044,0.9887776335680448
+2024-05-09,"{'position': -153.0, 'value': -28010.71499633789}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",84593.56626446493,98598.92376263387,,1.1115363093784878,,,-0.00282004350325471,0.9859892376263377
+2024-05-10,"{'position': -153.0, 'value': -27817.71405029297}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",84881.96380599063,98790.82083113711,,1.1038775416782924,,,0.0019462389768596378,0.9879082083113703
+2024-05-11,,,,,,,,,0.0,0.9879082083113703
+2024-05-12,,,,,,,,,0.0,0.9879082083113703
+2024-05-13,"{'position': -153.0, 'value': -28308.567260742188}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",84144.56063447312,98298.84426484421,,1.1233558436802455,,,-0.004979982574836894,0.9829884426484413
+2024-05-14,"{'position': -153.0, 'value': -28483.33268737793}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",83881.28220353984,98122.9485472288,,1.1302909796578544,,,-0.0017893976163290137,0.9812294854722873
+2024-05-15,"{'position': -153.0, 'value': -28831.341384887695}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",83358.1250564266,97773.79574887044,,1.1441008486066546,,,-0.003558319470906568,0.9777379574887036
+2024-05-16,"{'position': -153.0, 'value': -28849.57456970215}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",83329.63045481723,97754.41773966831,,1.1448243876865931,,,-0.00019819225646000582,0.9775441773966823
+2024-05-17,"{'position': -153.0, 'value': -28854.134033203125}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",83321.646254247,97748.71327084856,,1.1450053187779017,,,-5.835509997043076e-05,0.9774871327084849
+2024-05-18,,,,,,,,,0.0,0.9774871327084849
+2024-05-19,,,,,,,,,0.0,0.9774871327084849
+2024-05-20,"{'position': -153.0, 'value': -29031.936767578125}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",83053.79009170165,97569.75847549071,,1.1520609828404018,,,-0.001830763693655868,0.9756975847549064
+2024-05-21,"{'position': -153.0, 'value': -29231.016998291016}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",82754.00978464032,97369.51828378583,,1.1599609919956753,,,-0.0020522772100044495,0.9736951828378575
+2024-05-22,"{'position': -153.0, 'value': -29010.66160583496}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",83083.39165659402,97588.7224595115,,1.1512167303902763,,,0.002251260759930984,0.9758872245951142
+2024-05-23,"{'position': -153.0, 'value': -28399.74952697754}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",83998.63280069258,98198.50756418135,,1.1269741875784738,,,0.006248520211163067,0.9819850756418126
+2024-05-24,"{'position': -153.0, 'value': -28870.849731445312}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",83290.83682535078,97726.26169107344,,1.1456686401367187,,,-0.004809094199311081,0.9772626169107335
+2024-05-25,,,,,,,,,0.0,0.9772626169107335
+2024-05-26,,,,,,,,,0.0,0.9772626169107335
+2024-05-27,,,,,,,,,0.0,0.9772626169107335
+2024-05-28,"{'position': -153.0, 'value': -28872.37188720703}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",83287.40786266506,97723.59380626857,,1.1457290431431362,,,-2.7299568802652274e-05,0.9772359380626848
+2024-05-29,"{'position': -153.0, 'value': -28917.96418762207}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",83217.87187378109,97676.85396759212,,1.1475382614135743,,,-0.0004782861216617862,0.9767685396759203
+2024-05-30,"{'position': -153.0, 'value': -29069.927627563477}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",82988.77314531233,97523.73695909407,,1.1535685566493443,,,-0.0015675874301690484,0.9752373695909397
+2024-05-31,"{'position': -153.0, 'value': -29215.816452026367}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",82768.78055082228,97376.68877683546,,1.159357795715332,,,-0.001507819397038479,0.9737668877683536
+2024-06-01,,,,,,,,,0.0,0.9737668877683536
+2024-06-02,,,,,,,,,0.0,0.9737668877683536
+2024-06-03,"{'position': -153.0, 'value': -29486.318939208984}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",82361.85672802696,97105.01619763146,,1.170092021397182,,,-0.0027899139169398346,0.9710501619763136
+2024-06-04,"{'position': -153.0, 'value': -29534.950881958008}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",82287.73679204303,97055.21223302203,,1.172021860395159,,,-0.000512887660798711,0.9705521223302193
+2024-06-05,"{'position': -153.0, 'value': -29765.938018798828}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",81940.07489876518,96823.04390816459,,1.1811880166190012,,,-0.002392126290961305,0.9682304390816449
+2024-06-06,"{'position': -153.0, 'value': -29554.70622253418}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",82255.74978735967,97033.10289862676,,1.1728058024815151,,,0.002169514425320207,0.9703310289862666
+2024-06-07,"{'position': -153.0, 'value': -29920.950439453125}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",81705.1961226781,96665.67134240466,,1.1873393031529018,,,-0.0037866619251161193,0.9666567134240455
+2024-06-08,,,,,,,,,0.0,0.9666567134240455
+2024-06-09,,,,,,,,,0.0,0.9666567134240455
+2024-06-10,"{'position': -153.0, 'value': -29348.029220581055}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",82563.41334665206,97237.42795694259,,1.1646043341500418,,,0.005914784499997605,0.9723742795694247
+2024-06-11,"{'position': -153.0, 'value': -31480.13754272461}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",79364.00165162947,95104.07042299178,,1.2492118072509766,,,-0.02193967465794633,0.9510407042299166
+2024-06-12,"{'position': -153.0, 'value': -32379.789962768555}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",78013.23810926345,94203.13309064772,,1.2849123001098632,,,-0.009473173212639407,0.9420313309064761
+2024-06-13,"{'position': -153.0, 'value': -32557.590362548828}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",77745.24554172151,94024.04072299592,,1.2919678715297154,,,-0.0019011296310014192,0.940240407229958
+2024-06-14,"{'position': -153.0, 'value': -32291.65200805664}","defaultdict(<class 'int'>, {'AAPL': 39939.58217550036})",78142.87165869756,94288.69766272588,,1.2814147622244698,,,0.0028147794723019093,0.9428869766272577
+2024-06-15,,,,,,,,,0.0,0.9428869766272577
+2024-06-16,,,,,,,,,0.0,0.9428869766272577
+2024-06-17,"{'position': 104.0, 'value': 22381.66455078125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94415.69807419891,3.3409999999999997,,BUY 257.0 AAPL @ 212.23 | ,0.0014103820604476102 | ,0.0013469314416381106,0.9441569807419881
+2024-06-18,"{'position': 104.0, 'value': 22135.8134765625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94169.84699998016,,,,,-0.002603921585428992,0.9416984699998006
+2024-06-19,,,,,,,,,0.0,0.9416984699998006
+2024-06-20,"{'position': 104.0, 'value': 21659.609130859375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,93693.64265427704,,,,,-0.0050568665116682565,0.9369364265427693
+2024-06-21,"{'position': 104.0, 'value': 21433.385009765625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,93467.41853318329,,,,,-0.0024145087615869976,0.9346741853318318
+2024-06-22,,,,,,,,,0.0,0.9346741853318318
+2024-06-23,,,,,,,,,0.0,0.9346741853318318
+2024-06-24,"{'position': 104.0, 'value': 21500.530517578125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,93534.56404099579,,,,,0.0007183841050308892,0.9353456404099568
+2024-06-25,"{'position': 104.0, 'value': 21596.600708007812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,93630.63423142547,,,,,0.001027108977464053,0.9363063423142538
+2024-06-26,"{'position': 104.0, 'value': 22028.384155273438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94062.4176786911,,,,,0.004611561705311074,0.9406241767869101
+2024-06-27,"{'position': 104.0, 'value': 22116.188110351562}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94150.22163376922,,,,,0.0009334647911991567,0.9415022163376914
+2024-06-28,"{'position': 104.0, 'value': 21756.707641601562}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,93790.74116501922,,,,,-0.0038181584972611926,0.9379074116501914
+2024-06-29,,,,,,,,,0.0,0.9379074116501914
+2024-06-30,,,,,,,,,0.0,0.9379074116501914
+2024-07-01,"{'position': 104.0, 'value': 22389.927612304688}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94423.96113572235,,,,,0.006751412376505339,0.9442396113572226
+2024-07-02,"{'position': 104.0, 'value': 22753.5419921875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94787.57551560516,,,,,0.0038508697952224225,0.9478757551560506
+2024-07-03,"{'position': 104.0, 'value': 22885.760498046875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94919.79402146454,,,,,0.0013948927920157672,0.9491979402146443
+2024-07-04,,,,,,,,,0.0,0.9491979402146443
+2024-07-05,"{'position': 104.0, 'value': 23380.558715820312}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95414.59223923797,,,,,0.005212803323841442,0.9541459223923787
+2024-07-06,,,,,,,,,0.0,0.9541459223923787
+2024-07-07,,,,,,,,,0.0,0.9541459223923787
+2024-07-08,"{'position': 104.0, 'value': 23533.445190429688}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95567.47871384735,,,,,0.0016023385000276669,0.9556747871384724
+2024-07-09,"{'position': 104.0, 'value': 23622.279052734375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95656.31257615204,,,,,0.0009295407130147648,0.9565631257615194
+2024-07-10,"{'position': 104.0, 'value': 24066.462646484375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,96100.49616990204,,,,,0.00464353665521422,0.9610049616990193
+2024-07-11,"{'position': 104.0, 'value': 23507.616577148438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95541.6501005661,,,,,-0.005815225639916766,0.9554165010056599
+2024-07-12,"{'position': 104.0, 'value': 23814.4130859375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95848.44660935516,,,,,0.003211128428974419,0.9584844660935504
+2024-07-13,,,,,,,,,0.0,0.9584844660935504
+2024-07-14,,,,,,,,,0.0,0.9584844660935504
+2024-07-15,"{'position': 104.0, 'value': 24213.144287109375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,96247.17781052704,,,,,0.004160017353196821,0.9624717781052692
+2024-07-16,"{'position': 104.0, 'value': 24256.53369140625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,96290.56721482391,,,,,0.0004508122241495549,0.962905672148238
+2024-07-17,"{'position': 104.0, 'value': 23642.939086914062}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95676.97261033172,,,,,-0.006372323086676346,0.9567697261033161
+2024-07-18,"{'position': 104.0, 'value': 23157.435424804688}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95191.46894822235,,,,,-0.005074404518281672,0.9519146894822224
+2024-07-19,"{'position': 104.0, 'value': 23170.863891601562}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95204.89741501922,,,,,0.00014106796486323958,0.9520489741501911
+2024-07-20,,,,,,,,,0.0,0.9520489741501911
+2024-07-21,,,,,,,,,0.0,0.9520489741501911
+2024-07-22,"{'position': 104.0, 'value': 23134.71240234375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95168.74592576141,,,,,-0.0003797229999652485,0.9516874592576129
+2024-07-23,"{'position': 104.0, 'value': 23243.173217773438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95277.2067411911,,,,,0.0011396684318432104,0.9527720674119099
+2024-07-24,"{'position': 104.0, 'value': 22574.833251953125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94608.86677537079,,,,,-0.0070146889133282375,0.9460886677537067
+2024-07-25,"{'position': 104.0, 'value': 22466.370849609375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94500.40437302704,,,,,-0.0011464295688190518,0.9450040437302692
+2024-07-26,"{'position': 104.0, 'value': 22514.9208984375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94548.95442185516,,,,,0.0005137549320579637,0.9454895442185504
+2024-07-27,,,,,,,,,0.0,0.9454895442185504
+2024-07-28,,,,,,,,,0.0,0.9454895442185504
+2024-07-29,"{'position': 104.0, 'value': 22543.843994140625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94577.87751755829,,,,,0.00030590603439217823,0.9457787751755815
+2024-07-30,"{'position': 104.0, 'value': 22601.691772460938}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94635.7252958786,,,,,0.0006116417479296032,0.9463572529587846
+2024-07-31,"{'position': 104.0, 'value': 22940.510620117188}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94974.54414353485,,,,,0.0035802425204323196,0.9497454414353471
+2024-08-01,"{'position': 104.0, 'value': 22556.239379882812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94590.27290330047,,,,,-0.004046044586996089,0.9459027290330034
+2024-08-02,"{'position': 104.0, 'value': 22711.187255859375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94745.22077927704,,,,,0.0016380952419385864,0.9474522077927691
+2024-08-03,,,,,,,,,0.0,0.9474522077927691
+2024-08-04,,,,,,,,,0.0,0.9474522077927691
+2024-08-05,"{'position': 104.0, 'value': 21617.257568359375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,93651.29109177704,,,,,-0.011546014442759822,0.9365129109177691
+2024-08-06,"{'position': 104.0, 'value': 21406.528076171875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,93440.56159958954,,,,,-0.0022501504221761337,0.9344056159958941
+2024-08-07,"{'position': 104.0, 'value': 21674.073852539062}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,93708.10737595672,,,,,0.0028632723496855306,0.9370810737595661
+2024-08-08,"{'position': 104.0, 'value': 22034.582641601562}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94068.61616501922,,,,,0.00384714619852633,0.9406861616501911
+2024-08-09,"{'position': 104.0, 'value': 22337.248413085938}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94371.2819365036,,,,,0.003217499989087047,0.9437128193650349
+2024-08-10,,,,,,,,,0.0,0.9437128193650349
+2024-08-11,,,,,,,,,0.0,0.9437128193650349
+2024-08-12,"{'position': 104.0, 'value': 22496.511108398438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94530.5446318161,,,,,0.0016876182249982996,0.9453054463181599
+2024-08-13,"{'position': 104.0, 'value': 22883.29443359375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94917.32795701141,,,,,0.004091622731063005,0.949173279570113
+2024-08-14,"{'position': 104.0, 'value': 22929.832275390625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94963.86579880829,,,,,0.0004902986925416908,0.9496386579880818
+2024-08-15,"{'position': 104.0, 'value': 23240.086669921875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95274.12019333954,,,,,0.0032670783978883122,0.9527412019333943
+2024-08-16,"{'position': 104.0, 'value': 23377.632446289062}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95411.66596970672,,,,,0.0014436845608027937,0.9541166596970663
+2024-08-17,,,,,,,,,0.0,0.9541166596970663
+2024-08-18,,,,,,,,,0.0,0.9541166596970663
+2024-08-19,"{'position': 104.0, 'value': 23361.085693359375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95395.11921677704,,,,,-0.00017342484025950622,0.9539511921677694
+2024-08-20,"{'position': 104.0, 'value': 23425.204956054688}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95459.23847947235,,,,,0.0006721440595887085,0.9545923847947225
+2024-08-21,"{'position': 104.0, 'value': 23413.828369140625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95447.86189255829,,,,,-0.00011917743211942167,0.954478618925582
+2024-08-22,"{'position': 104.0, 'value': 23220.435913085938}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95254.4694365036,,,,,-0.0020261580743671237,0.9525446943650351
+2024-08-23,"{'position': 104.0, 'value': 23459.333129882812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95493.36665330047,,,,,0.0025079895800177443,0.9549336665330038
+2024-08-24,,,,,,,,,0.0,0.9549336665330038
+2024-08-25,,,,,,,,,0.0,0.9549336665330038
+2024-08-26,"{'position': 104.0, 'value': 23494.492797851562}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95528.52632126922,,,,,0.0003681896366309889,0.9552852632126914
+2024-08-27,"{'position': 104.0, 'value': 23582.39990234375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95616.43342576141,,,,,0.0009202183669885233,0.9561643342576132
+2024-08-28,"{'position': 104.0, 'value': 23423.13720703125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95457.17073044891,,,,,-0.0016656414552018717,0.9545717073044881
+2024-08-29,"{'position': 104.0, 'value': 23764.415771484375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95798.44929490204,,,,,0.0035752009182927758,0.9579844929490194
+2024-08-30,"{'position': 104.0, 'value': 23682.716674804688}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95716.75019822235,,,,,-0.0008528227469338789,0.9571675019822226
+2024-08-31,,,,,,,,,0.0,0.9571675019822226
+2024-09-01,,,,,,,,,0.0,0.9571675019822226
+2024-09-02,,,,,,,,,0.0,0.9571675019822226
+2024-09-03,"{'position': 104.0, 'value': 23038.421630859375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95072.45515427704,,,,,-0.0067312674386773574,0.9507245515427695
+2024-09-04,"{'position': 104.0, 'value': 22839.859008789062}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94873.89253220672,,,,,-0.0020885399640526714,0.9487389253220664
+2024-09-05,"{'position': 104.0, 'value': 22998.088623046875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95032.12214646454,,,,,0.0016677887881968445,0.9503212214646445
+2024-09-06,"{'position': 104.0, 'value': 22836.758178710938}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94870.7917021286,,,,,-0.0016976411837599237,0.9487079170212851
+2024-09-07,,,,,,,,,0.0,0.9487079170212851
+2024-09-08,,,,,,,,,0.0,0.9487079170212851
+2024-09-09,"{'position': 104.0, 'value': 22846.0654296875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94880.09895310516,,,,,9.810449359148876e-05,0.9488009895310507
+2024-09-10,"{'position': 104.0, 'value': 22763.328491210938}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94797.3620146286,,,,,-0.000872015727106823,0.9479736201462852
+2024-09-11,"{'position': 104.0, 'value': 23027.046630859375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95061.08015427704,,,,,0.0027819143280352066,0.9506108015427696
+2024-09-12,"{'position': 104.0, 'value': 23038.421630859375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95072.45515427704,,,,,0.00011965990688866945,0.9507245515427696
+2024-09-13,"{'position': 104.0, 'value': 23010.496704101562}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95044.53022751922,,,,,-0.00029372257940007973,0.9504453022751914
+2024-09-14,,,,,,,,,0.0,0.9504453022751914
+2024-09-15,,,,,,,,,0.0,0.9504453022751914
+2024-09-16,"{'position': 104.0, 'value': 22371.375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94405.40852341766,,,,,-0.006724444874119717,0.9440540852341759
+2024-09-17,"{'position': 104.0, 'value': 22419.980590820312}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94454.01411423797,,,,,0.000514860235028225,0.9445401411423789
+2024-09-18,"{'position': 104.0, 'value': 22823.312255859375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94857.34577927704,,,,,0.004270137895370452,0.9485734577927696
+2024-09-19,"{'position': 104.0, 'value': 23669.270751953125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95703.30427537079,,,,,0.008918218079411622,0.957033042753707
+2024-09-20,"{'position': 104.0, 'value': 23599.979736328125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95634.01325974579,,,,,-0.0007240190518984502,0.956340132597457
+2024-09-21,,,,,,,,,0.0,0.956340132597457
+2024-09-22,,,,,,,,,0.0,0.956340132597457
+2024-09-23,"{'position': 104.0, 'value': 23421.06787109375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95455.10139451141,,,,,-0.0018707974196214838,0.9545510139451132
+2024-09-24,"{'position': 104.0, 'value': 23514.1435546875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95548.17707810516,,,,,0.0009750729110755696,0.9554817707810508
+2024-09-25,"{'position': 104.0, 'value': 23410.724365234375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95444.75788865204,,,,,-0.0010823774206449865,0.9544475788865195
+2024-09-26,"{'position': 104.0, 'value': 23529.6572265625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95563.69074998016,,,,,0.001246091078850764,0.9556369074998008
+2024-09-27,"{'position': 104.0, 'value': 23557.577392578125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95591.61091599579,,,,,0.0002921629103742607,0.955916109159957
+2024-09-28,,,,,,,,,0.0,0.955916109159957
+2024-09-29,,,,,,,,,0.0,0.955916109159957
+2024-09-30,"{'position': 104.0, 'value': 24096.387084960938}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,96130.4206083786,,,,,0.005636579269035602,0.9613042060837851
+2024-10-01,"{'position': 104.0, 'value': 23394.17919921875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95428.21272263641,,,,,-0.007304741634314493,0.9542821272263632
+2024-10-02,"{'position': 104.0, 'value': 23453.126708984375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95487.16023240204,,,,,0.0006177157476159323,0.9548716023240194
+2024-10-03,"{'position': 104.0, 'value': 23338.33251953125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95372.36604294891,,,,,-0.001202195029925801,0.9537236604294881
+2024-10-04,"{'position': 104.0, 'value': 23455.196044921875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95489.22956833954,,,,,0.0012253394797607786,0.9548922956833943
+2024-10-05,,,,,,,,,0.0,0.9548922956833943
+2024-10-06,,,,,,,,,0.0,0.9548922956833943
+2024-10-07,"{'position': 104.0, 'value': 22926.729858398438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94960.7633818161,,,,,-0.0055343015009375884,0.9496076338181599
+2024-10-08,"{'position': 104.0, 'value': 23348.676025390625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95382.70954880829,,,,,0.004443373788978855,0.9538270954880818
+2024-10-09,"{'position': 104.0, 'value': 23738.561767578125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95772.59529099579,,,,,0.004087593485567753,0.9577259529099569
+2024-10-10,"{'position': 104.0, 'value': 23686.852172851562}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95720.88569626922,,,,,-0.000539920575081454,0.9572088569626913
+2024-10-11,"{'position': 104.0, 'value': 23532.76123046875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95566.79475388641,,,,,-0.0016097943647508384,0.9556679475388632
+2024-10-12,,,,,,,,,0.0,0.9556679475388632
+2024-10-13,,,,,,,,,0.0,0.9556679475388632
+2024-10-14,"{'position': 104.0, 'value': 23920.576049804688}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95954.60957322235,,,,,0.004058049873229219,0.9595460957322225
+2024-10-15,"{'position': 104.0, 'value': 24184.294189453125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,96218.32771287079,,,,,0.002748363427472311,0.9621832771287068
+2024-10-16,"{'position': 104.0, 'value': 23970.217895507812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,96004.25141892547,,,,,-0.0022249014198640893,0.9600425141892537
+2024-10-17,"{'position': 104.0, 'value': 24008.481567382812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,96042.51509080047,,,,,0.00039856226478995893,0.9604251509080036
+2024-10-18,"{'position': 104.0, 'value': 24303.222290039062}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,96337.25581345672,,,,,0.003068856770125139,0.9633725581345661
+2024-10-19,,,,,,,,,0.0,0.9633725581345661
+2024-10-20,,,,,,,,,0.0,0.9633725581345661
+2024-10-21,"{'position': 104.0, 'value': 24456.280151367188}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,96490.31367478485,,,,,0.001588771239493303,0.9649031367478474
+2024-10-22,"{'position': 104.0, 'value': 24392.162475585938}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,96426.1959990036,,,,,-0.0006644985733734732,0.964261959990035
+2024-10-23,"{'position': 104.0, 'value': 23864.729370117188}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95898.76289353485,,,,,-0.005469811393101098,0.9589876289353475
+2024-10-24,"{'position': 104.0, 'value': 23845.083374023438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95879.1168974411,,,,,-0.00020486183034040817,0.95879116897441
+2024-10-25,"{'position': 104.0, 'value': 23931.95263671875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95965.98616013641,,,,,0.0009060290239033542,0.959659861601363
+2024-10-26,,,,,,,,,0.0,0.959659861601363
+2024-10-27,,,,,,,,,0.0,0.959659861601363
+2024-10-28,"{'position': 104.0, 'value': 24137.753173828125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,96171.78669724579,,,,,0.0021445154199317695,0.9617178669724566
+2024-10-29,"{'position': 104.0, 'value': 24165.678100585938}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,96199.7116240036,,,,,0.0002903650614884956,0.9619971162400347
+2024-10-30,"{'position': 104.0, 'value': 23796.474609375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95830.50813279266,,,,,-0.0038378856337321077,0.9583050813279254
+2024-10-31,"{'position': 104.0, 'value': 23363.155029296875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95397.18855271454,,,,,-0.004521728920373391,0.9539718855271441
+2024-11-01,"{'position': 104.0, 'value': 23052.900634765625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95086.93415818329,,,,,-0.0032522383441081493,0.9508693415818316
+2024-11-02,,,,,,,,,0.0,0.9508693415818316
+2024-11-03,,,,,,,,,0.0,0.9508693415818316
+2024-11-04,"{'position': 104.0, 'value': 22959.823364257812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,94993.85688767547,,,,,-0.0009788649863604615,0.9499385688767534
+2024-11-05,"{'position': 104.0, 'value': 23108.745727539062}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95142.77925095672,,,,,0.0015677051986355828,0.951427792509566
+2024-11-06,"{'position': 104.0, 'value': 23033.249877929688}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95067.28340134735,,,,,-0.0007935005704451381,0.9506728340134722
+2024-11-07,"{'position': 104.0, 'value': 23525.520141601562}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95559.55366501922,,,,,0.005178124861248579,0.955595536650191
+2024-11-08,"{'position': 104.0, 'value': 23497.566650390625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95531.60017380829,,,,,-0.0002925242965128305,0.9553160017380816
+2024-11-09,,,,,,,,,0.0,0.9553160017380816
+2024-11-10,,,,,,,,,0.0,0.9553160017380816
+2024-11-11,"{'position': 104.0, 'value': 23214.922973632812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95248.95649705047,,,,,-0.0029586406617660987,0.9524895649705035
+2024-11-12,"{'position': 104.0, 'value': 23214.922973632812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95248.95649705047,,,,,0.0,0.9524895649705035
+2024-11-13,"{'position': 104.0, 'value': 23307.067138671875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95341.10066208954,,,,,0.0009674034071114335,0.9534110066208941
+2024-11-14,"{'position': 104.0, 'value': 23628.015747070312}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95662.04927048797,,,,,0.00336631952190225,0.9566204927048785
+2024-11-15,"{'position': 104.0, 'value': 23294.644775390625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95328.67829880829,,,,,-0.0034848821891434456,0.9532867829880817
+2024-11-16,,,,,,,,,0.0,0.9532867829880817
+2024-11-17,,,,,,,,,0.0,0.9532867829880817
+2024-11-18,"{'position': 104.0, 'value': 23607.311279296875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95641.34480271454,,,,,0.0032798787257513062,0.9564134480271442
+2024-11-19,"{'position': 104.0, 'value': 23634.226928710938}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95668.2604521286,,,,,0.0002814227410705694,0.9566826045212847
+2024-11-20,"{'position': 104.0, 'value': 23708.770629882812}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95742.80415330047,,,,,0.000779189470150099,0.9574280415330035
+2024-11-21,"{'position': 104.0, 'value': 23659.076416015625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95693.10993943329,,,,,-0.0005190386296564098,0.9569310993943316
+2024-11-22,"{'position': 104.0, 'value': 23798.843872070312}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,95832.87739548797,,,,,0.001460580141487089,0.9583287739548784
+2024-11-23,,,,,,,,,0.0,0.9583287739548784
+2024-11-24,,,,,,,,,0.0,0.9583287739548784
+2024-11-25,"{'position': 104.0, 'value': 24109.437866210938}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,96143.4713896286,,,,,0.003240996227827475,0.9614347138962847
+2024-11-26,"{'position': 104.0, 'value': 24336.174560546875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,96370.20808396454,,,,,0.0023583160776157186,0.9637020808396441
+2024-11-27,"{'position': 104.0, 'value': 24322.712768554688}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,96356.74629197235,,,,,-0.00013968831509070245,0.9635674629197223
+2024-11-28,,,,,,,,,0.0,0.9635674629197223
+2024-11-29,"{'position': 104.0, 'value': 24571.190185546875}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,96605.22370896454,,,,,0.002578723613593903,0.9660522370896442
+2024-11-30,,,,,,,,,0.0,0.9660522370896442
+2024-12-01,,,,,,,,,0.0,0.9660522370896442
+2024-12-02,"{'position': 104.0, 'value': 24805.172729492188}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,96839.20625290985,,,,,0.0024220485700672256,0.9683920625290974
+2024-12-03,"{'position': 104.0, 'value': 25121.977905273438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,97156.0114286911,,,,,0.0032714557258335386,0.9715601142869099
+2024-12-04,"{'position': 104.0, 'value': 25159.249755859375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,97193.28327927704,,,,,0.0003836288669929466,0.9719328327927693
+2024-12-05,"{'position': 104.0, 'value': 25162.35693359375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,97196.39045701141,,,,,3.1969058247094395e-05,0.9719639045701132
+2024-12-06,"{'position': 104.0, 'value': 25141.649291992188}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,97175.68281540985,,,,,-0.0002130494919019288,0.9717568281540975
+2024-12-07,,,,,,,,,0.0,0.9717568281540975
+2024-12-08,,,,,,,,,0.0,0.9717568281540975
+2024-12-09,"{'position': 104.0, 'value': 25546.4599609375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,97580.49348435516,,,,,0.004165760993048773,0.9758049348435506
+2024-12-10,"{'position': 104.0, 'value': 25652.061157226562}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,97686.09468064422,,,,,0.0010821957598112775,0.9768609468064412
+2024-12-11,"{'position': 104.0, 'value': 25519.542724609375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,97553.57624802704,,,,,-0.0013565741680063859,0.9755357624802693
+2024-12-12,"{'position': 104.0, 'value': 25671.732543945312}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,97705.76606736297,,,,,0.0015600639688391205,0.9770576606736288
+2024-12-13,"{'position': 104.0, 'value': 25689.334594726562}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,97723.36811814422,,,,,0.0001801536540750881,0.9772336811814412
+2024-12-14,,,,,,,,,0.0,0.9772336811814412
+2024-12-15,,,,,,,,,0.0,0.9772336811814412
+2024-12-16,"{'position': 104.0, 'value': 25990.61181640625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,98024.64533982391,,,,,0.003082959863964785,0.9802464533982381
+2024-12-17,"{'position': 104.0, 'value': 26243.227905273438}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,98277.2614286911,,,,,0.002577067103802788,0.9827726142869101
+2024-12-18,"{'position': 104.0, 'value': 25681.052490234375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,97715.08601365204,,,,,-0.005720299964269704,0.9771508601365194
+2024-12-19,"{'position': 104.0, 'value': 25861.19580078125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,97895.22932419891,,,,,0.0018435567924661722,0.9789522932419883
+2024-12-20,"{'position': 104.0, 'value': 26347.79443359375}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,98381.82795701141,,,,,0.004970606189613536,0.9838182795701133
+2024-12-21,,,,,,,,,0.0,0.9838182795701133
+2024-12-22,,,,,,,,,0.0,0.9838182795701133
+2024-12-23,"{'position': 104.0, 'value': 26428.54931640625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,98462.58283982391,,,,,0.0008208312905895188,0.9846258283982383
+2024-12-24,"{'position': 104.0, 'value': 26731.900634765625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,98765.93415818329,,,,,0.0030808791483041276,0.9876593415818321
+2024-12-25,,,,,,,,,0.0,0.9876593415818321
+2024-12-26,"{'position': 104.0, 'value': 26816.791015625}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,98850.82453904266,,,,,0.000859510737005964,0.9885082453904259
+2024-12-27,"{'position': 104.0, 'value': 26461.679321289062}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,98495.71284470672,,,,,-0.003592399921719225,0.9849571284470665
+2024-12-28,,,,,,,,,0.0,0.9849571284470665
+2024-12-29,,,,,,,,,0.0,0.9849571284470665
+2024-12-30,"{'position': 104.0, 'value': 26110.706298828125}","defaultdict(<class 'int'>, {'AAPL': 0})",72034.03352341766,98144.73982224579,,,,,-0.0035633329850031092,0.9814473982224571

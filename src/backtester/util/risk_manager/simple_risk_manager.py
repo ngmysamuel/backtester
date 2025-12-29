@@ -18,6 +18,9 @@ class SimpleRiskManager(RiskManager):
         self.order_timestamps = collections.deque([])
 
     def is_allowed(self, order: OrderEvent, daily_open_value: dict[str, float], history: list[BarTuple], symbol_list: list[str], holdings: dict) -> bool:
+        if not history:
+            return False
+
         estimated_current_price = history[-1].close
 
         if self.MAX_ORDER_QTY != -1 and order.quantity > self.MAX_ORDER_QTY:

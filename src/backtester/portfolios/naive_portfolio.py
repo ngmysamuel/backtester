@@ -141,55 +141,64 @@ class NaivePortfolio(Portfolio):
         ticker = event.ticker
         strategy_name = event.strategy
         order_type = OrderType.MKT
-        cur_quantity = self.current_holdings[ticker]["position"]
+        current_signed_quantity = self.current_holdings[ticker]["position"]
 
         # Get quantity we would like to risk
-        print(self.current_holdings["total"])
         target_quantity = self.position_sizer.get_position_size(self.risk_per_trade, self.current_holdings["total"], self.rounding_number[ticker], ticker)
 
         if target_quantity is None:
             target_quantity = self.position_dict[ticker]  # use the last used position size
         self.position_dict[ticker] = target_quantity  # update the last used position size
 
-        target_quantity *= event.strength # apply signal strength
+        # Apply signal strength and the direction of the signal
+        target_signed_quantity = target_quantity * event.signal_type.value * event.strength
 
-        bars = self.history[(ticker, self.interval)]
-        if not bars:
-            print(f"WARN: No data for {ticker}, cannot size position.")
+        # Get the actual amount of securities to place an order for
+        actual_signed_quantity = target_signed_quantity - current_signed_quantity
+        if actual_signed_quantity == 0:
             return
-        estimated_price = bars[-1].close
-        eff_cash_available = self.current_holdings["cash"]
-        delta_quantity = target_quantity # the holdings we need our holdings to be at
 
-        if event.signal_type.value == -1:  # SHORT
-            if cur_quantity > 0:  # currently LONG, need to exit first
-                eff_cash_available += cur_quantity * estimated_price # cash received from selling what is currently held
-                target_quantity += cur_quantity
-            order = OrderEvent(DirectionType(-1), ticker, strategy_name, order_type, target_quantity, event.timestamp)
-        elif event.signal_type.value == 1:  # LONG
-            if cur_quantity < 0:  # currently SHORT, need to exit first
-                eff_cash_available += self.margin_holdings[ticker] # margin held for short position is released
-                target_quantity += abs(cur_quantity)
-            order = OrderEvent(DirectionType(1), ticker, strategy_name, order_type, target_quantity, event.timestamp)
-        else:  # EXIT
-            if cur_quantity > 0:  # EXIT a long position
-                order = OrderEvent(DirectionType(-1), ticker, strategy_name, order_type, cur_quantity, event.timestamp)
-            elif cur_quantity < 0:  # EXIT a short position
-                order = OrderEvent(DirectionType(1), ticker, strategy_name, order_type, abs(cur_quantity), event.timestamp)
+        # Convert signed quantity to order to DirectionType
+        direction = DirectionType.BUY if actual_signed_quantity > 0 else DirectionType.SELL
 
-        if estimated_price > 0:
-            if order.direction == DirectionType.BUY:
-                max_affordable_qty = (eff_cash_available * self.cash_buffer) / estimated_price
-            elif order.direction == DirectionType.SELL:
-                max_affordable_qty = (eff_cash_available * self.cash_buffer) / (1 + self.maintenance_margin * estimated_price)
-            # clamp. We can't buy more than cash allows or sell more than the margin that can be afforded
-            if target_quantity > max_affordable_qty:
-                print(f"WARN: Sizer requested {target_quantity}, but maximum affordable qty is {max_affordable_qty}. Clamping.")
+        order = OrderEvent(direction, ticker, strategy_name, order_type, abs(actual_signed_quantity), event.timestamp)
+
+        # Clamp the quantity ordered if needed
+        try:
+            self._clamp_quantity(order)
+        except ValueError:
+            return
+
+        if self.risk_manager.is_allowed(order, self.daily_open_value, self.history[(ticker, self.interval)], self.symbol_list, self.current_holdings):
+            self.events.put(order)
+
+    def _clamp_quantity(self, order: OrderEvent) -> None:
+        if self.history[(order.ticker, self.interval)]:
+            estimated_price = self.history[(order.ticker, self.interval)][-1].close
+        else:
+            raise ValueError("Unable to estimate price")
+        if estimated_price == 0:
+            raise ValueError("Unable to estimate price")
+        current_cash_available = self.current_holdings["cash"]
+        current_signed_quantity = self.current_holdings[order.ticker]["position"]
+        if order.direction == DirectionType.BUY:
+            if current_signed_quantity < 0: # currently SHORT but BUYing, closing/reducing the SHORT
+                # doesn't matter if flipping from SHORT to LONG or just reducing the SHORT
+                # margin would be available to use
+                current_cash_available += self.margin_holdings[order.ticker]
+            max_affordable_qty = (current_cash_available * self.cash_buffer) / estimated_price
+            if order.quantity > max_affordable_qty:
+                order.quantity = max_affordable_qty
+        elif order.direction == DirectionType.SELL:
+            if current_signed_quantity > 0: # currently LONG but SELLing, closing/reducing the LONG
+                # we will get additional cash from selling off the securities owned
+                current_cash_available += abs(current_signed_quantity) * estimated_price
+            quantity_shorted = order.quantity - abs(current_signed_quantity)
+            max_affordable_qty = (current_cash_available * self.cash_buffer) / ((1 + self.maintenance_margin) * estimated_price)
+            if quantity_shorted > max_affordable_qty:
                 order.quantity = max_affordable_qty
 
-        if order and self.risk_manager.is_allowed(order, self.daily_open_value, bars, self.symbol_list, self.current_holdings):
-            print(f"=== PORTFOLIO ORDER: dir: {order.direction} qty: {order.quantity}, type: {order.order_type} ===")
-            self.events.put(order)
+
 
     def on_fill(self, event: FillEvent):
         """
