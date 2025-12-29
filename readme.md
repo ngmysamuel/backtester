@@ -84,6 +84,17 @@ dat.to_csv("MSFT_1m.csv")
     2. Total portfolio value is calculated as the sum of the useable cash, value of positions (shorts are considered negative), and margin locked up
     3. Cash shown is useable cash i.e. not locked up as margin
     4. Initial trade size is defined by backtester_settings.initial_position_size
+    5. Short sold instruments are a negative to your total portfolio value - they are a liability that you must pay back eventually
+    6. How a short sell impacts the portfolio's cash and total?
+        - Say, you have 1 AAPL stock, $0 cash, 50% margin maintenance
+        - You sell 2 AAPL stock at $10 each
+        - You now have $20 cash BUT -$10 equity as the short sold instrument is considered a liability on your equity
+        - Hence, portfolio equity is $10
+        - And because of the maintenance margin of 1.5x, which works out to $15 having to be kept as margin
+        - Hence, cash is $5
+2. Quantity
+    1. The quantity in an OrderEvent is always positive, the direction of the order is given in the direction attribute
+    2. The quantity in the current_holdings attribute of the portfolio module has polarity, indicating if it is in a short sold position
 2. Shorting
     1. Short sold position in a stock is possible but many assumptions are made. You can borrow the shares indefinitely. 
     2. Borrow costs and margin are calculated at the end of the trading day

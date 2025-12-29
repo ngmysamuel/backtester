@@ -216,9 +216,8 @@ class NaivePortfolio(Portfolio):
             margin_diff = self.margin_holdings[event.ticker] + (self.current_holdings[event.ticker]["value"]) * (1 + self.maintenance_margin)  # margin change
             self.current_holdings["cash"] += margin_diff  # cash frozen for margin, reduction if margin_diff is -ve
             self.margin_holdings[event.ticker] -= margin_diff
-            self.current_holdings["total"] += self.margin_holdings[event.ticker]  # total portfolio value is inclusive of margin
         else:  # nett LONG position
-            self.current_holdings["cash"] += self.margin_holdings[event.ticker]  # release any margin being held
+            self.current_holdings["cash"] += self.margin_holdings[event.ticker]  # total portfolio value is inclusive of margin - elease any margin being held
             self.margin_holdings[event.ticker] = 0  # reset margin
 
         self.current_holdings["margin"] = self.margin_holdings
