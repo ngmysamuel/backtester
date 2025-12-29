@@ -325,7 +325,6 @@ def test_signal_flip_long_to_short(portfolio):
     # Closing the Long releases $10,000 proceeds.
     # $10,000 + $1000 (start) = $11,000 Cash Available.
     # $11,000 > $7,500 Margin Requirement. 
-    # This trade SHOULD be allowed with your NEW logic.
     portfolio.current_holdings["cash"] = 1000.0 
 
     # 2. Signal: SHORT
@@ -342,7 +341,6 @@ def test_signal_flip_long_to_short(portfolio):
 def test_on_signal_no_data(portfolio):
     """Tests that on_signal handles missing history gracefully (no crash)."""
     # Initialize the key with an empty list
-    # The code expects the key to exist, even if data is not populated yet
     portfolio.history = {("MSFT", "1d"): []}
     
     signal = SignalEvent(1, "MSFT", 12345, SignalType.LONG, 1.0)
@@ -350,7 +348,6 @@ def test_on_signal_no_data(portfolio):
     
     # Should simply return without generating events or crashing
     assert portfolio.events.empty()
-
 
 
 def test_flip_long_to_short_standard(portfolio):
@@ -424,8 +421,6 @@ def test_reduce_long_position(portfolio):
     Tests reducing a position (Profit Taking).
     Current: Long 100. Signal: Long (Target 20).
     Expected: Sell 80.
-    Note: Your current NaivePortfolio forces Direction=BUY for Long Signals.
-    This test will likely FAIL (it will try to BUY 80 or clamp), highlighting a design limitation.
     """
     portfolio.position_sizer.get_position_size = MagicMock(return_value=20)
     portfolio.history = {("MSFT", "1d"): [SimpleNamespace(Index=1, close=100)]}
@@ -439,7 +434,6 @@ def test_reduce_long_position(portfolio):
     order = portfolio.events.get()
     
     # If the sizer says "Hold 20" and we hold 100, we should Sell 80.
-    # If your portfolio sees "Signal LONG", it currently hardcodes DirectionType(1) (BUY).
-    # This assertion checks if your portfolio is smart enough to sell to reduce exposure.
+    # This assertion checks if the portfolio is smart enough to sell to reduce exposure.
     assert order.direction == DirectionType.SELL
     assert order.quantity == 80.0
