@@ -200,6 +200,8 @@ dat.to_csv("MSFT_1m.csv")
 - Portfolio auto rebal
 - Look through commissions calculations again
 - AS-IS time interval for live data - when a tick comes in, push it out immediately
+- CSVs can have missing bar data - to interpolate
+- margin should be immediately locked
 
 ## Notes
 

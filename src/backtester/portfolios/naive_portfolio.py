@@ -85,12 +85,12 @@ class NaivePortfolio(Portfolio):
         self.risk_manager = risk_manager
 
         self.history = {}
-        self.margin_holdings = collections.defaultdict(int)
+        self.margin_holdings = collections.defaultdict(int) # up to date values of the margin held for each ticker
         self.position_dict = {sym: self.initial_position_size for sym in self.symbol_list}  # holds the position size last used (backup for sizer derivations)
         self.daily_open_value = collections.defaultdict(float)  # holds the opening value of each strategy - used in riskmanager pnl
 
         self.current_holdings = {sym: {"position": 0, "value": 0.0} for sym in self.symbol_list}
-        self.current_holdings["margin"] = collections.defaultdict(int)
+        self.current_holdings["margin"] = collections.defaultdict(int) # only updated with self.margin_holdings at the end of the day or when there is a new order
         self.current_holdings["cash"] = initial_capital
         self.current_holdings["total"] = initial_capital
         self.current_holdings["commissions"] = 0.0
@@ -220,6 +220,8 @@ class NaivePortfolio(Portfolio):
         else:  # nett LONG position
             self.current_holdings["cash"] += self.margin_holdings[event.ticker]  # release any margin being held
             self.margin_holdings[event.ticker] = 0  # reset margin
+
+        self.current_holdings["margin"] = self.margin_holdings
 
     def end_of_day(self):
         """
