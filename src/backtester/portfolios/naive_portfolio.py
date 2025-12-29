@@ -220,7 +220,7 @@ class NaivePortfolio(Portfolio):
             self.current_holdings["cash"] += self.margin_holdings[event.ticker]  # total portfolio value is inclusive of margin - elease any margin being held
             self.margin_holdings[event.ticker] = 0  # reset margin
 
-        self.current_holdings["margin"] = self.margin_holdings
+        self.current_holdings["margin"] = self.margin_holdings.copy()
 
     def end_of_day(self):
         """
@@ -246,7 +246,7 @@ class NaivePortfolio(Portfolio):
                 self.current_holdings["cash"] += self.margin_holdings[ticker]  # release any margin being held
                 self.margin_holdings[ticker] = 0  # reset margin
         self.current_holdings["total"] += self.current_holdings["cash"]
-        self.current_holdings["margin"] = self.margin_holdings.copy()
+        # self.current_holdings["margin"] = self.margin_holdings.copy()
         self.daily_open_value = collections.defaultdict(float)  # reset the daily pnl dictionary
 
 
