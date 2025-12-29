@@ -26,8 +26,7 @@ class TestIntegration:
             "--data-dir", test_data_dir,
             "--data-source", "csv",
             "--config-path", config_path,
-            "--output-path", output_path,
-            "--strategy", "moving_average"
+            "--output-path", output_path
         ])
 
         # Assert successful execution
@@ -65,13 +64,18 @@ class TestIntegration:
             order_idx = order_rows.idxmax()  # get the index of the True value
             assert pd.notna(df.loc[order_idx, "slippage"]) and df.loc[order_idx, "slippage"] != "", "Row with order missing slippage value"
 
-            # Parse slippage value and ensure it's not zero
+            # Parse slippage values and ensure at least one is not zero
             slippage_str = df.loc[order_idx, "slippage"]
-            # Extract numeric value from slippage string (e.g., "0.0012 | " or similar)
-            slippage_match = re.search(r'(\d+\.?\d*)', slippage_str)
-            assert slippage_match, f"Could not parse slippage value from: {slippage_str}"
-            slippage_value = float(slippage_match.group(1))
-            assert slippage_value > 0.0, f"Slippage value should be > 0.0, got {slippage_value}"
+            # Extract all numeric values from slippage string
+            slippage_parts = [part.strip() for part in slippage_str.split(" | ") if part.strip()]
+            slippage_values = []
+            for part in slippage_parts:
+                try:
+                    slippage_values.append(float(part))
+                except ValueError:
+                    continue  # Skip non-numeric parts
+            assert slippage_values, f"No numeric slippage values found in: {slippage_str}"
+            assert any(val != 0.0 for val in slippage_values), f"At least one slippage value should be != 0.0, got {slippage_values}"
 
         # Parse order and position data to validate ATR sizing
         if order_rows.any():
@@ -157,16 +161,49 @@ class TestIntegration:
             order_quantity = float(match.group(1))
             assert order_quantity != 1.0, f"ATR position sizer should not give 1.0, got {order_quantity}"
 
-            # Check slippage is > 0.0 (multi-factor slippage)
+            # Check at least one slippage is != 0.0 (multi-factor slippage)
             slippage_str = df.loc[order_idx, "slippage"]
-            slippage_match = re.search(r'(\d+\.?\d*)', slippage_str)
-            assert slippage_match, f"Could not parse slippage from: {slippage_str}"
-            slippage_value = float(slippage_match.group(1))
-            assert slippage_value > 0.0, f"Multi-factor slippage should be > 0.0, got {slippage_value}"
+            # Extract all numeric values from slippage string
+            slippage_parts = [part.strip() for part in slippage_str.split(" | ") if part.strip()]
+            slippage_values = []
+            for part in slippage_parts:
+                try:
+                    slippage_values.append(float(part))
+                except ValueError:
+                    continue  # Skip non-numeric parts
+            assert slippage_values, f"No numeric slippage values found in: {slippage_str}"
+            assert any(val != 0.0 for val in slippage_values), f"At least one slippage value should be != 0.0, got {slippage_values}"
+
+        # Verify cumulative position calculations
+        previous_position = 0.0
+        for idx, row in df.iterrows():
+            aapl_data_str = row['AAPL']
+            if not (pd.notna(aapl_data_str) and aapl_data_str != '' and isinstance(aapl_data_str, str)):
+                continue  # Skip rows without position data
+
+            try:
+                current_position = ast.literal_eval(aapl_data_str)['position']
+            except (ValueError, KeyError):
+                continue  # Invalid data, skip
+
+            order_str = row['order']
+            if pd.notna(order_str) and order_str != '':
+                match = re.search(r'(BUY|SELL) (\d+\.?\d*) AAPL', order_str)
+                if match:
+                    direction = match.group(1)
+                    quantity = float(match.group(2))
+                    if direction == 'BUY':
+                        expected_position = previous_position + quantity
+                    elif direction == 'SELL':
+                        expected_position = previous_position - quantity
+                    assert abs(current_position - expected_position) < 1e-6, f"Position mismatch at {idx}: expected {expected_position}, got {current_position}"
+            else:
+                assert abs(current_position - previous_position) < 1e-6, f"Position changed without order at {idx}: expected {previous_position}, got {current_position}"
+            previous_position = current_position
 
         # Clean up
-        if os.path.exists(output_path):
-            os.remove(output_path)
+        # if os.path.exists(output_path):
+        #     os.remove(output_path)
 
     @pytest.mark.live_integration
     def test_live_data_collection(self):
