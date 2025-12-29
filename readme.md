@@ -79,7 +79,7 @@ dat.to_csv("MSFT_1m.csv")
     2. As a result, the base frequency has to be the most granular
     3. Implemented by the bar_aggregator and bar_manager classes which interacts with the rest of the system with the on_interval method
     4. Classes which require this information must implement the OnIntervalProtocol - the subscription method of the bar_manager only accepts classes which implements the protocol 
-1. Portfolio
+2. Portfolio
     1. Value of positions are calculated using the closing price of each interval. 
     2. Total portfolio value is calculated as the sum of the useable cash, value of positions (shorts are considered negative), and margin locked up
     3. Cash shown is useable cash i.e. not locked up as margin
@@ -92,18 +92,22 @@ dat.to_csv("MSFT_1m.csv")
         - Hence, portfolio equity is $10
         - And because of the maintenance margin of 1.5x, which works out to $15 having to be kept as margin
         - Hence, cash is $5
-2. Quantity
+3. Strategies
+    1. Returns the Target Holding, not the trade delta. For Target Holding Size, see Position Sizer
+    2. Signals only bullish / bearish
+    3. Practically stateless
+3. Quantity
     1. The quantity in an OrderEvent is always positive, the direction of the order is given in the direction attribute
     2. The quantity in the current_holdings attribute of the portfolio module has polarity, indicating if it is in a short sold position
-2. Shorting
+4. Shorting
     1. Short sold position in a stock is possible but many assumptions are made. You can borrow the shares indefinitely. 
     2. Borrow costs and margin are calculated at the end of the trading day
     3. Required margin is immediately deducted from the useable cash balance
     4. If there is a negative cash balance at the start of a bar, an exception is raised (pass continue=1 to continue)
-3. Simulated Execution
+5. Simulated Execution
     1. Market Orders are filled at open i.e. at the opening price of the next interval from the order placed. Market On Close are filled at close when the current interval of market data is the last slice of the day.
     2. All orders are filled entirely i.e. no partial filling
-4. Data Handling (Live)
+6. Data Handling (Live)
     1. Consolidates all ticks within interval timespan (backtester_settings.interval) into a single bar of high, low, open, and close.
     2. Stop when the time spent listening for messages exceeds the period (backtester_settings.period)
     3. For short periods, use the buy_and_hold_simple strategy to ensure the tearsheet generation works (there will be no buy signals generated using moving_average strategy as the time span of its windows are too long)
@@ -117,12 +121,16 @@ dat.to_csv("MSFT_1m.csv")
             - If the result is smaller than the previous interval value, it is ignored
             - It is reset to 0 at the end of every interval
 6. Position Sizing (General)
+    1. At any given moment, how much exposure to the market should I have? That is, the Market Risk and not Liquidity Risk (which might be handled instead with a dedicated Time-Weighted Average Price executor)
+    2. Works with the strategy. Say the strategy is bearish on a stock. This position sizer will say how much exposure we want to that stategy's signal, say risking 50 shares is ok. I own 100 shares at the moment. Selling the 100 shares reduces market risk as they are off the market, it only expriences liquidity risk. But I still want exposure to the 50 shares as stated by the position sizer. So another 50 is sold. 
     1. return None if there is not enough data to generate a value. This will cause the portfolio module to reuse the last used position size
     2. if it is the first trade, it will be backtester_settings.initial_position_size in config.yaml
 7. Position Sizing (ATR)
     1. Implemented as part of the position sizer module with attributes defined in config.yaml
+    2. Calculates the share count such that some multipler of the securiy' ATR move against the position results in a loss of exactly X% of the portfolio equity.
     2. Calculated at the end of the interval, before new bars are added
-    3. position_size = capital_to_risk / (atr * atr_multiplier) where
+    4. stop_loss_distance = atr * atr_multiplier where if the price moves 2x the ATR, and we stop loss, we at most loss capital_to_risk
+    3. position_size = capital_to_risk / stop_loss_distance where
     4. position_size = number of stocks to buy, rounded to the decimal you have specified in config.yaml
     5. captial_to_risk = risk_per_trade * total_portfolio_value where
         1. risk_per_trade = a percent that you are willing lose in a single trade
