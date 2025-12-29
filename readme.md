@@ -85,7 +85,7 @@ dat.to_csv("MSFT_1m.csv")
     3. Cash shown is useable cash i.e. not locked up as margin
     4. Initial trade size is defined by backtester_settings.initial_position_size
     5. Short sold instruments are a negative to your total portfolio value - they are a liability that you must pay back eventually
-    6. How a short sell impacts the portfolio's cash and total?
+    6. How does a short sell impacts the portfolio's cash and total?
         - Say, you have 1 AAPL stock, $0 cash, 50% margin maintenance
         - You sell 2 AAPL stock at $10 each
         - You now have $20 cash BUT -$10 equity as the short sold instrument is considered a liability on your equity

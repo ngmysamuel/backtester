@@ -11,7 +11,7 @@ backtester_settings:
   maintenance_margin: 0.3
   risk_per_trade: 0.01
   base_interval: "1m"
-  metrics_interval: "1d"
+  metrics_interval: "1m"
 
 risk_manager:
   simple_risk_manager:

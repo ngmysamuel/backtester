@@ -42,10 +42,11 @@ class SimpleRiskManager(RiskManager):
         if len(history) >= self.PARTICIPATION_WINDOW:
             total_volume = sum([bar.volume for bar in history[-self.PARTICIPATION_WINDOW:]])
             avg_volume = total_volume / self.PARTICIPATION_WINDOW
-            participation_rate = order.quantity / avg_volume
-            if participation_rate > self.PARTICIPATION_LIMIT:
-                print(f"participation check failed - {participation_rate} > {self.PARTICIPATION_LIMIT}")
-                return False
+            if avg_volume != 0:
+                participation_rate = order.quantity / avg_volume
+                if participation_rate > self.PARTICIPATION_LIMIT:
+                    print(f"participation check failed - {participation_rate} > {self.PARTICIPATION_LIMIT}")
+                    return False
 
         last_time_step = time.time() - self.RATE_INTERVAL
         while self.order_timestamps:
