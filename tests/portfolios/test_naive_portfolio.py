@@ -9,12 +9,8 @@ import pytest
 
 from backtester.enums.direction_type import DirectionType
 from backtester.enums.signal_type import SignalType
-from backtester.enums.order_type import OrderType
-from backtester.events.event import Event
 from backtester.events.fill_event import FillEvent
-from backtester.events.market_event import MarketEvent
 from backtester.events.signal_event import SignalEvent
-from backtester.events.order_event import OrderEvent
 from backtester.exceptions.negative_cash_exception import NegativeCashException
 from backtester.portfolios.naive_portfolio import NaivePortfolio
 from backtester.util.position_sizer.no_position_sizer import NoPositionSizer

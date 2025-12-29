@@ -32,14 +32,16 @@ class SimpleRiskManager(RiskManager):
             return False
 
         open_value = daily_open_value.get(order.strategy_name,0.0)
-        pnl = (holdings["total"] - open_value) / open_value
-        if pnl < -self.MAX_DAILY_LOSS and order.direction == DirectionType.BUY:
-            print(f"Daily loss limit failed - {pnl} < {-self.MAX_DAILY_LOSS} and is BUY order")
-            return False
+        if open_value != 0:
+            pnl = (holdings["total"] - open_value) / open_value
+            if pnl < -self.MAX_DAILY_LOSS and order.direction == DirectionType.BUY:
+                print(f"Daily loss limit failed - {pnl} < {-self.MAX_DAILY_LOSS} and is BUY order")
+                return False
 
         exposure = sum([abs(holdings[ticker]["value"]) for ticker in symbol_list])
-        if self.MAX_EXPOSURE != -1 and exposure > self.MAX_EXPOSURE:
-            print(f"Exposure check failed - {exposure} > {self.MAX_EXPOSURE}")
+        estimated_future_exposure = exposure + order.quantity * estimated_current_price
+        if self.MAX_EXPOSURE != -1 and estimated_future_exposure > self.MAX_EXPOSURE:
+            print(f"Exposure check failed - {estimated_future_exposure} > {self.MAX_EXPOSURE}")
             return False
 
         if len(history) >= self.PARTICIPATION_WINDOW:
@@ -50,6 +52,9 @@ class SimpleRiskManager(RiskManager):
                 if participation_rate > self.PARTICIPATION_LIMIT:
                     print(f"participation check failed - {participation_rate} > {self.PARTICIPATION_LIMIT}")
                     return False
+            else:
+                print(f"participation check failed - zero volume over the pass {self.PARTICIPATION_WINDOW} periods")
+                return False
 
         last_time_step = time.time() - self.RATE_INTERVAL
         while self.order_timestamps:
