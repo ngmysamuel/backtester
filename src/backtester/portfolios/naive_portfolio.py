@@ -14,6 +14,7 @@ from backtester.util.position_sizer.position_sizer import PositionSizer
 from backtester.util import util
 from backtester.events.fill_event import FillEvent
 from backtester.util.util import BarTuple
+from backtester.util.risk_manager.risk_manager import RiskManager
 
 class NaivePortfolio(Portfolio):
     """
@@ -32,6 +33,8 @@ class NaivePortfolio(Portfolio):
         interval: str,
         metrics_interval: str,
         position_sizer: PositionSizer,
+        strategy_name: str,
+        risk_manager: RiskManager,
         allocation: float = 1,
         borrow_cost: float = 0.01,
         maintenance_margin: float = 0.5,
@@ -48,6 +51,9 @@ class NaivePortfolio(Portfolio):
           events (queue.Queue): The event queue to communicate with other components.
           start_date (float): The starting timestamp for the portfolio.
           interval (str):  one of the following - 1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
+          position_sizer:
+          strategy_name: name of the strategy currently testing - TODO: enhance for multi strategy testing
+          risk_manager: 
           allocation (float): The percentage of the portfolio that an asset is maximally allowed to take (default is 1).
           borrow_cost (float): The annualized interest rate for borrowing stocks to short sell (default is 0.01, i.e., 1%).
           maintenance_margin (float): The minimum equity percentage required to maintain a short position (default is 0.5, i.e., 50%).
@@ -75,10 +81,13 @@ class NaivePortfolio(Portfolio):
         self.maintenance_margin = maintenance_margin
         self.risk_per_trade = risk_per_trade
         self.position_sizer = position_sizer
+        self.strategy_name = strategy_name
+        self.risk_manager = risk_manager
 
         self.history = {}
         self.margin_holdings = collections.defaultdict(int)
         self.position_dict = {sym: self.initial_position_size for sym in self.symbol_list}  # holds the position size last used (backup for sizer derivations)
+        self.daily_open_value = collections.defaultdict(float)  # holds the opening value of each strategy - used in riskmanager pnl
 
         self.current_holdings = {sym: {"position": 0, "value": 0.0} for sym in self.symbol_list}
         self.current_holdings["margin"] = collections.defaultdict(int)
@@ -92,7 +101,8 @@ class NaivePortfolio(Portfolio):
         self.historical_holdings = []
 
     def on_interval(self, histories: dict[str, list[BarTuple]]):
-        self.history = histories # TODO: to set this up only once, not needed on every hearbeat
+        if not self.history: # TODO: to check only once, not needed on every hearbeat
+            self.history = histories
         self.on_market()
 
     def on_market(self):
@@ -120,16 +130,21 @@ class NaivePortfolio(Portfolio):
             self.current_holdings["total"] += self.current_holdings[ticker]["value"] - initial_holding
             self.current_holdings["timestamp"] = bar.Index
 
+        if self.strategy_name not in self.daily_open_value:
+            self.daily_open_value[self.strategy_name] = self.current_holdings["total"]
+
         if self.current_holdings["cash"] < 0:
             raise NegativeCashException(self.current_holdings["cash"])
 
     def on_signal(self, event):
         order = None
         ticker = event.ticker
+        strategy_name = event.strategy
         order_type = OrderType.MKT
         cur_quantity = self.current_holdings[ticker]["position"]
 
         # Get quantity we would like to risk
+        print(self.current_holdings["total"])
         target_quantity = self.position_sizer.get_position_size(self.risk_per_trade, self.current_holdings["total"], self.rounding_number[ticker], ticker)
 
         if target_quantity is None:
@@ -150,17 +165,17 @@ class NaivePortfolio(Portfolio):
             if cur_quantity > 0:  # currently LONG, need to exit first
                 eff_cash_available += cur_quantity * estimated_price # cash received from selling what is currently held
                 target_quantity += cur_quantity
-            order = OrderEvent(DirectionType(-1), ticker, order_type, target_quantity, event.timestamp)
+            order = OrderEvent(DirectionType(-1), ticker, strategy_name, order_type, target_quantity, event.timestamp)
         elif event.signal_type.value == 1:  # LONG
             if cur_quantity < 0:  # currently SHORT, need to exit first
                 eff_cash_available += self.margin_holdings[ticker] # margin held for short position is released
                 target_quantity += abs(cur_quantity)
-            order = OrderEvent(DirectionType(1), ticker, order_type, target_quantity, event.timestamp)
+            order = OrderEvent(DirectionType(1), ticker, strategy_name, order_type, target_quantity, event.timestamp)
         else:  # EXIT
             if cur_quantity > 0:  # EXIT a long position
-                order = OrderEvent(DirectionType(-1), ticker, order_type, cur_quantity, event.timestamp)
+                order = OrderEvent(DirectionType(-1), ticker, strategy_name, order_type, cur_quantity, event.timestamp)
             elif cur_quantity < 0:  # EXIT a short position
-                order = OrderEvent(DirectionType(1), ticker, order_type, abs(cur_quantity), event.timestamp)
+                order = OrderEvent(DirectionType(1), ticker, strategy_name, order_type, abs(cur_quantity), event.timestamp)
 
         if estimated_price > 0:
             if order.direction == DirectionType.BUY:
@@ -168,12 +183,12 @@ class NaivePortfolio(Portfolio):
             elif order.direction == DirectionType.SELL:
                 max_affordable_qty = (eff_cash_available * self.cash_buffer) / (1 + self.maintenance_margin * estimated_price)
             # clamp. We can't buy more than cash allows or sell more than the margin that can be afforded
-            if delta_quantity > max_affordable_qty:
-                print(f"WARN: Sizer requested {delta_quantity}, but maximum affordable qty is {max_affordable_qty}. Clamping.")
-                order.quantity = cur_quantity + max_affordable_qty
+            if target_quantity > max_affordable_qty:
+                print(f"WARN: Sizer requested {target_quantity}, but maximum affordable qty is {max_affordable_qty}. Clamping.")
+                order.quantity = max_affordable_qty
 
-        print(f"=== PORTFOLIO ORDER: dir: {order.direction} qty: {order.quantity}, type: {order.order_type} ===")
-        if order:
+        if order and self.risk_manager.is_allowed(order, self.daily_open_value, bars, self.symbol_list, self.current_holdings):
+            print(f"=== PORTFOLIO ORDER: dir: {order.direction} qty: {order.quantity}, type: {order.order_type} ===")
             self.events.put(order)
 
     def on_fill(self, event: FillEvent):
@@ -231,6 +246,7 @@ class NaivePortfolio(Portfolio):
                 self.margin_holdings[ticker] = 0  # reset margin
         self.current_holdings["total"] += self.current_holdings["cash"]
         self.current_holdings["margin"] = self.margin_holdings.copy()
+        self.daily_open_value = collections.defaultdict(float)  # reset the daily pnl dictionary
 
 
     def create_equity_curve(self):

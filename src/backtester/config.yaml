@@ -15,12 +15,17 @@ backtester_settings:
   base_interval: "1m" # 1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
   metrics_interval: "1m" # the granularity of the output equity curve
 
-risk_settings:
-  max_order_quantity: -1
-  max_notional_value: -1
-  max_daily_loss: 0.01
-  rate_limit: 50 # max orders per second
-  participation_limit: 0.05
+risk_manager:
+  simple_risk_manager:
+    name: backtester.util.risk_manager.simple_risk_manager.SimpleRiskManager
+    additional_parameters:
+      max_order_quantity: -1
+      max_notional_value: -1
+      max_daily_loss: 0.05
+      max_exposure: -1
+      participation_window: 10
+      participation_limit: 0.1
+      rate_limit: 50 # max orders per second
 
 data_handler:
   yf: 
@@ -80,9 +85,9 @@ strategies:
     additional_parameters:
       long_window: 200
       short_window: 50
-      interval: "1d"
-      symbol_list: ["MSFT"]
-      rounding_list: [0]
-      # interval: "1m"
-      # symbol_list: ["BTC-USD"]
-      # rounding_list: [8]
+      # interval: "1d"
+      # symbol_list: ["MSFT"]
+      # rounding_list: [0]
+      interval: "1m"
+      symbol_list: ["BTC-USD"]
+      rounding_list: [8]

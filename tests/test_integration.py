@@ -26,7 +26,8 @@ class TestIntegration:
             "--data-dir", test_data_dir,
             "--data-source", "csv",
             "--config-path", config_path,
-            "--output-path", output_path
+            "--output-path", output_path,
+            "--strategy", "moving_average"
         ])
 
         # Assert successful execution

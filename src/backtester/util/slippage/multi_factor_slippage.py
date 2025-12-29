@@ -170,7 +170,7 @@ class MultiFactorSlippage(Slippage):
         momentum_cost = characteristics["momentum_cost_magnitude"] * (market_direction * direction.value)
 
         # 4. Noise
-        # use lognormal to ensure we skew to worst scenario
+        # use lognormal for multiplicative relation
         rng = np.random.default_rng()
         noise = rng.lognormal(sigma=self.random_noise)
 

@@ -13,12 +13,17 @@ backtester_settings:
   base_interval: "1m"
   metrics_interval: "1d"
 
-risk_settings:
-  max_order_quantity: -1
-  max_notional_value: -1
-  max_daily_loss: 0.01
-  rate_limit: 50
-  participation_limit: 0.05
+risk_manager:
+  simple_risk_manager:
+    name: backtester.util.risk_manager.simple_risk_manager.SimpleRiskManager
+    additional_parameters:
+      max_order_quantity: -1
+      max_notional_value: -1
+      max_daily_loss: 0.5
+      max_exposure: -1
+      participation_window: 10
+      participation_limit: 0.5
+      rate_limit: 50 # max orders per second
 
 data_handler:
   yf:
@@ -73,6 +78,9 @@ strategies:
     additional_parameters:
       long_window: 200
       short_window: 50
-      interval: "1d"
-      symbol_list: ["MSFT"]
-      rounding_list: [0]
+      # interval: "1d"
+      # symbol_list: ["MSFT"]
+      # rounding_list: [0]
+      interval: "1m"
+      symbol_list: ["BTC-USD"]
+      rounding_list: [8]

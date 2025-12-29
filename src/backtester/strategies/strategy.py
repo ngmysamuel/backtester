@@ -6,8 +6,9 @@ class Strategy(ABC):
     """
     Abstract base class for trading strategies.
     """
-    def __init__(self, events: queue.Queue, symbol_list: list[str], interval: int):
+    def __init__(self, events: queue.Queue, name: str, symbol_list: list[str], interval: int):
         self.events = events
+        self.name = name
         self.symbol_list = symbol_list
         self.interval = interval
 

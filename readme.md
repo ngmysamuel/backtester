@@ -3,10 +3,10 @@
 <h3 align="center"> ⚠ Work in progress ⚠</h3>
 <p align="center"> You might notice some formatting issues / lack of documentation in the meantime.</p>
 
-### Prerequisites
+## Prerequisites
 1. Poetry
 
-### Run
+## Run
 Trigger a backtest
 ```
 git clone https://github.com/ngmysamuel/backtester.git
@@ -33,13 +33,13 @@ There are 5 parameters
     - Available options are in config.yaml under "strategies"
     - Default is "buy_and_hold_simple"
 
-### Dashboard
+## Dashboard
 Run this to view and interact with the data generated from a backtest. You must have ran a backtest at least once.
 ```
 poetry run backtester dashboard
 ```
 
-### Test
+## Test
 Run the all testcases (including integration tests)
 ```
 poetry run pytest
@@ -61,7 +61,7 @@ Static type checking
 poetry run mypy src\backtester\util\bar_aggregator.py
 ```
 
-### Pulling CSV data
+## Pulling CSV data
 Identical to using data-source = "yf"
 ```
 import yfinance as yf
@@ -69,11 +69,16 @@ dat = yf.download("msft", start="2025-11-24", end="2025-11-29", interval="1m",mu
 dat.to_csv("MSFT_1m.csv")
 ```
 
-### Important Caveats
+## Important Caveats
 1. Intervals
     - The base interval must be most granular time interval across all strategies, etc.
 
-### Implementation Details
+## Implementation Details
+1. Dual Frequency
+    1. The backtester runs on a single frequency (the base frequency) and all other frequencies required by the strategies are resampled from it
+    2. As a result, the base frequency has to be the most granular
+    3. Implemented by the bar_aggregator and bar_manager classes which interacts with the rest of the system with the on_interval method
+    4. Classes which require this information must implement the OnIntervalProtocol - the subscription method of the bar_manager only accepts classes which implements the protocol 
 1. Portfolio
     1. Value of positions are calculated using the closing price of each interval. 
     2. Total portfolio value is calculated as the sum of the useable cash, value of positions (shorts are considered negative), and margin locked up
@@ -167,7 +172,7 @@ dat.to_csv("MSFT_1m.csv")
         - Explanations: https://quantjourney.substack.com/p/slippage-a-comprehensive-analysis
 11. One way negative cash arises because we use market orders - we might have position sized to use up all remaining cash based on the ATR of the ticker. But on the next open, price rockets and the order fulfilled for a value more than what cash is available.
 
-### To Do
+## To Do
 - Slippage model  - supporting other time periods automatically 
     - switches variables to use when the trading interval changes. The slippage model only supports daily data now e.g. 252 trading periods in a year. The trading interval would be the variable in config.yaml
     - Intraday data support
@@ -192,9 +197,11 @@ dat.to_csv("MSFT_1m.csv")
 - Risk manager
 - Multi strategy backtesting
 - Update all files to pass static type checking
-- If metrics_interval is daily, automatically assumes business days. To instead, leave it as days, and remove blank records in the csv file instead.
+- Portfolio auto rebal
+- Look through commissions calculations again
+- AS-IS time interval for live data - when a tick comes in, push it out immediately
 
-### Notes
+## Notes
 
 Periods for pandas: https://pandas.pydata.org/docs/reference/api/pandas.Period.asfreq.html
 
