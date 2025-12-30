@@ -12,7 +12,7 @@ Trigger a backtest
 git clone https://github.com/ngmysamuel/backtester.git
 cd backtester
 poetry install
-poetry run backtester run --data-dir path\to\data_dir\ --strategy moving_average
+poetry run backtester run --strategy moving_average
 ```
 There are 5 parameters
 1. data-dir
