@@ -151,12 +151,13 @@ class NaivePortfolio(Portfolio):
         self.position_dict[ticker] = target_quantity  # update the last used position size
 
         # Apply signal strength and the direction of the signal
-        target_signed_quantity = target_quantity * event.signal_type.value * event.strength
-
-        # Get the actual amount of securities to place an order for
-        actual_signed_quantity = target_signed_quantity - current_signed_quantity
-        if actual_signed_quantity == 0:
-            return
+        if event.signal_type.value != 0: # either a SHORT or LONG
+            target_signed_quantity = target_quantity * event.signal_type.value * event.strength
+            actual_signed_quantity = target_signed_quantity - current_signed_quantity # Get the actual amount of securities to place an order for
+            if actual_signed_quantity == 0:
+                return
+        else: # EXIT
+            actual_signed_quantity = current_signed_quantity * -1
 
         # Convert signed quantity to order to DirectionType
         direction = DirectionType.BUY if actual_signed_quantity > 0 else DirectionType.SELL

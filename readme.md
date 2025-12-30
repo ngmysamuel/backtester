@@ -96,15 +96,34 @@ dat.to_csv("MSFT_1m.csv")
     1. Returns the Target Holding, not the trade delta. For Target Holding Size, see Position Sizer
     2. Signals only bullish / bearish
     3. Practically stateless
-3. Quantity
+4. Risk Manager (Simple)
+    1. The final hurdle before an order is sent into the queue
+    2. Across 6 metrics
+        - Max Order Quantity
+            - A hard limit on the number of shares/contracts per single order.
+            - Set -1 to skip this check.
+        - Max Notional Value
+            - A limit on the dollar value of a single order.
+            - Set -1 to skip this check.
+        - Max Daily Drawdown
+            - If the strategy has lost more than X% since the market opened today, it is forbidden from opening new positions. It can only issue "Close" orders to reduce risk.
+        - Gross Exposure Limit
+            - Set -1 to skip this check.
+        - Net Exposure Limit
+            - Set -1 to skip this check.
+        - Percent of Volume (POV) Check
+            - Large orders move the market (slippage). You cannot buy 10,000 shares if only 500 traded in the last minute.
+        - Order Rate Limits (Messages Per Second)
+            - Limit the number of orders sent within a rolling time window
+5. Quantity
     1. The quantity in an OrderEvent is always positive, the direction of the order is given in the direction attribute
     2. The quantity in the current_holdings attribute of the portfolio module has polarity, indicating if it is in a short sold position
-4. Shorting
+6. Shorting
     1. Short sold position in a stock is possible but many assumptions are made. You can borrow the shares indefinitely. 
     2. Borrow costs and margin are calculated at the end of the trading day
     3. Required margin is immediately deducted from the useable cash balance
     4. If there is a negative cash balance at the start of a bar, an exception is raised (pass continue=1 to continue)
-5. Simulated Execution
+7. Simulated Execution
     1. Market Orders are filled at open i.e. at the opening price of the next interval from the order placed. Market On Close are filled at close when the current interval of market data is the last slice of the day.
     2. All orders are filled entirely i.e. no partial filling
 6. Data Handling (Live)
@@ -202,24 +221,19 @@ dat.to_csv("MSFT_1m.csv")
 - Other order types e.g. Limit order
     - Modelling probability of fill for limit orders
 - Use the decimal library instead of float types
-- An integrated test across different data source modes, comparing the output csv with a reference csv
 - Warm up historical data for calculations like ATR position sizing
     - another config parameter that contains the names of all the window parameters
     - For historical CSV, check if there exists a data point that is the max of all those window parameters behind
     - For live, check if the data dir is give. If so, look for a data point that is the max of all those window parameters behind
     - If at any point, there isn't, send a warning
 - Handling web socket failure - auto reconnect
-- Dual frequency
-    - only yf handles dual freq now, to extend for CSV and Live
-        CSV - naming of the excels will have to change
-        Live - how to test?
-- Risk manager
 - Multi strategy backtesting
 - Update all files to pass static type checking
 - Portfolio auto rebal
 - Look through commissions calculations again
 - AS-IS time interval for live data - when a tick comes in, push it out immediately
 - use pytest.approx for float assertions
+- update test cases
 
 ## Notes
 

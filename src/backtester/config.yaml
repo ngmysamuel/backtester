@@ -22,7 +22,8 @@ risk_manager:
       max_order_quantity: -1
       max_notional_value: -1
       max_daily_loss: 0.05
-      max_exposure: -1
+      max_gross_exposure: -1
+      max_net_exposure: -1
       participation_window: 10
       participation_limit: 0.1
       rate_limit: 50 # max orders per second
