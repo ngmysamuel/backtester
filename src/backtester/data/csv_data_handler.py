@@ -9,6 +9,7 @@ from backtester.data.data_handler import DataHandler
 from backtester.events.event import Event
 from backtester.events.market_event import MarketEvent
 from backtester.util.util import BarTuple
+from backtester.util.util import str_to_pandas
 
 
 class CSVDataHandler(DataHandler):
@@ -75,7 +76,7 @@ class CSVDataHandler(DataHandler):
             self.latest_symbol_data[symbol] = []
 
             if combined_index is None:
-                combined_index = df.index
+                combined_index = pd.date_range(self.start_date, self.end_date, freq=str_to_pandas(self.interval))
             else:
                 combined_index = combined_index.union(df.index)  # include any dates not in the previous files
 

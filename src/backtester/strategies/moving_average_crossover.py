@@ -5,8 +5,8 @@ import queue
 from backtester.util.util import BarTuple
 
 class MovingAverageCrossover(Strategy):
-    def __init__(self, events: queue.Queue, **kwargs):
-        super().__init__(events, kwargs["symbol_list"], kwargs["interval"])
+    def __init__(self, events: queue.Queue, name: str, **kwargs):
+        super().__init__(events, name, kwargs["symbol_list"], kwargs["interval"])
         self.short_window = kwargs.get("short_window", 40)
         self.long_window = kwargs.get("long_window", 100)
         self.current_positions = {sym: 0 for sym in self.symbol_list}  # to track position history
@@ -28,8 +28,8 @@ class MovingAverageCrossover(Strategy):
             short_avg /= self.short_window
             long_avg /= self.long_window
             if short_avg < long_avg and self.current_positions[ticker] >= 0:  # GO SHORT
-                self.events.put(SignalEvent(timestamp, ticker, SignalType.SHORT))
+                self.events.put(SignalEvent(timestamp, ticker, self.name, SignalType.SHORT))
                 self.current_positions[ticker] = -1
             elif short_avg > long_avg and self.current_positions[ticker] <= 0:  # GO LONG
-                self.events.put(SignalEvent(timestamp, ticker, SignalType.LONG))
+                self.events.put(SignalEvent(timestamp, ticker, self.name, SignalType.LONG))
                 self.current_positions[ticker] = 1

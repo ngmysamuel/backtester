@@ -3,16 +3,16 @@
 <h3 align="center"> ⚠ Work in progress ⚠</h3>
 <p align="center"> You might notice some formatting issues / lack of documentation in the meantime.</p>
 
-### Prerequisites
+## Prerequisites
 1. Poetry
 
-### Run
+## Run
 Trigger a backtest
 ```
 git clone https://github.com/ngmysamuel/backtester.git
 cd backtester
 poetry install
-poetry run backtester run --data-dir path\to\data_dir\ --strategy moving_average
+poetry run backtester run --strategy moving_average
 ```
 There are 5 parameters
 1. data-dir
@@ -33,13 +33,13 @@ There are 5 parameters
     - Available options are in config.yaml under "strategies"
     - Default is "buy_and_hold_simple"
 
-### Dashboard
+## Dashboard
 Run this to view and interact with the data generated from a backtest. You must have ran a backtest at least once.
 ```
 poetry run backtester dashboard
 ```
 
-### Test
+## Test
 Run the all testcases (including integration tests)
 ```
 poetry run pytest
@@ -61,7 +61,7 @@ Static type checking
 poetry run mypy src\backtester\util\bar_aggregator.py
 ```
 
-### Pulling CSV data
+## Pulling CSV data
 Identical to using data-source = "yf"
 ```
 import yfinance as yf
@@ -69,25 +69,64 @@ dat = yf.download("msft", start="2025-11-24", end="2025-11-29", interval="1m",mu
 dat.to_csv("MSFT_1m.csv")
 ```
 
-### Important Caveats
+## Important Caveats
 1. Intervals
     - The base interval must be most granular time interval across all strategies, etc.
 
-### Implementation Details
-1. Portfolio
+## Implementation Details
+1. Dual Frequency
+    1. The backtester runs on a single frequency (the base frequency) and all other frequencies required by the strategies are resampled from it
+    2. As a result, the base frequency has to be the most granular
+    3. Implemented by the bar_aggregator and bar_manager classes which interacts with the rest of the system with the on_interval method
+    4. Classes which require this information must implement the OnIntervalProtocol - the subscription method of the bar_manager only accepts classes which implements the protocol 
+2. Portfolio
     1. Value of positions are calculated using the closing price of each interval. 
     2. Total portfolio value is calculated as the sum of the useable cash, value of positions (shorts are considered negative), and margin locked up
     3. Cash shown is useable cash i.e. not locked up as margin
     4. Initial trade size is defined by backtester_settings.initial_position_size
-2. Shorting
+    5. Short sold instruments are a negative to your total portfolio value - they are a liability that you must pay back eventually
+    6. How does a short sell impacts the portfolio's cash and total?
+        - Say, you have 1 AAPL stock, $0 cash, 50% margin maintenance
+        - You sell 2 AAPL stock at $10 each
+        - You now have $20 cash BUT -$10 equity as the short sold instrument is considered a liability on your equity
+        - Hence, portfolio equity is $10
+        - And because of the maintenance margin of 1.5x, which works out to $15 having to be kept as margin
+        - Hence, cash is $5
+3. Strategies
+    1. Returns the Target Holding, not the trade delta. For Target Holding Size, see Position Sizer
+    2. Signals only bullish / bearish
+    3. Practically stateless
+4. Risk Manager (Simple)
+    1. The final hurdle before an order is sent into the queue
+    2. Across 6 metrics
+        - Max Order Quantity
+            - A hard limit on the number of shares/contracts per single order.
+            - Set -1 to skip this check.
+        - Max Notional Value
+            - A limit on the dollar value of a single order.
+            - Set -1 to skip this check.
+        - Max Daily Drawdown
+            - If the strategy has lost more than X% since the market opened today, it is forbidden from opening new positions. It can only issue "Close" orders to reduce risk.
+        - Gross Exposure Limit
+            - Set -1 to skip this check.
+        - Net Exposure Limit
+            - Set -1 to skip this check.
+        - Percent of Volume (POV) Check
+            - Large orders move the market (slippage). You cannot buy 10,000 shares if only 500 traded in the last minute.
+        - Order Rate Limits (Messages Per Second)
+            - Limit the number of orders sent within a rolling time window
+5. Quantity
+    1. The quantity in an OrderEvent is always positive, the direction of the order is given in the direction attribute
+    2. The quantity in the current_holdings attribute of the portfolio module has polarity, indicating if it is in a short sold position
+6. Shorting
     1. Short sold position in a stock is possible but many assumptions are made. You can borrow the shares indefinitely. 
     2. Borrow costs and margin are calculated at the end of the trading day
     3. Required margin is immediately deducted from the useable cash balance
     4. If there is a negative cash balance at the start of a bar, an exception is raised (pass continue=1 to continue)
-3. Simulated Execution
+7. Simulated Execution
     1. Market Orders are filled at open i.e. at the opening price of the next interval from the order placed. Market On Close are filled at close when the current interval of market data is the last slice of the day.
     2. All orders are filled entirely i.e. no partial filling
-4. Data Handling (Live)
+6. Data Handling (Live)
     1. Consolidates all ticks within interval timespan (backtester_settings.interval) into a single bar of high, low, open, and close.
     2. Stop when the time spent listening for messages exceeds the period (backtester_settings.period)
     3. For short periods, use the buy_and_hold_simple strategy to ensure the tearsheet generation works (there will be no buy signals generated using moving_average strategy as the time span of its windows are too long)
@@ -101,12 +140,16 @@ dat.to_csv("MSFT_1m.csv")
             - If the result is smaller than the previous interval value, it is ignored
             - It is reset to 0 at the end of every interval
 6. Position Sizing (General)
+    1. At any given moment, how much exposure to the market should I have? That is, the Market Risk and not Liquidity Risk (which might be handled instead with a dedicated Time-Weighted Average Price executor)
+    2. Works with the strategy. Say the strategy is bearish on a stock. This position sizer will say how much exposure we want to that stategy's signal, say risking 50 shares is ok. I own 100 shares at the moment. Selling the 100 shares reduces market risk as they are off the market, it only expriences liquidity risk. But I still want exposure to the 50 shares as stated by the position sizer. So another 50 is sold. 
     1. return None if there is not enough data to generate a value. This will cause the portfolio module to reuse the last used position size
     2. if it is the first trade, it will be backtester_settings.initial_position_size in config.yaml
 7. Position Sizing (ATR)
     1. Implemented as part of the position sizer module with attributes defined in config.yaml
+    2. Calculates the share count such that some multipler of the securiy' ATR move against the position results in a loss of exactly X% of the portfolio equity.
     2. Calculated at the end of the interval, before new bars are added
-    3. position_size = capital_to_risk / (atr * atr_multiplier) where
+    4. stop_loss_distance = atr * atr_multiplier where if the price moves 2x the ATR, and we stop loss, we at most loss capital_to_risk
+    3. position_size = capital_to_risk / stop_loss_distance where
     4. position_size = number of stocks to buy, rounded to the decimal you have specified in config.yaml
     5. captial_to_risk = risk_per_trade * total_portfolio_value where
         1. risk_per_trade = a percent that you are willing lose in a single trade
@@ -167,7 +210,7 @@ dat.to_csv("MSFT_1m.csv")
         - Explanations: https://quantjourney.substack.com/p/slippage-a-comprehensive-analysis
 11. One way negative cash arises because we use market orders - we might have position sized to use up all remaining cash based on the ATR of the ticker. But on the next open, price rockets and the order fulfilled for a value more than what cash is available.
 
-### To Do
+## To Do
 - Slippage model  - supporting other time periods automatically 
     - switches variables to use when the trading interval changes. The slippage model only supports daily data now e.g. 252 trading periods in a year. The trading interval would be the variable in config.yaml
     - Intraday data support
@@ -178,23 +221,21 @@ dat.to_csv("MSFT_1m.csv")
 - Other order types e.g. Limit order
     - Modelling probability of fill for limit orders
 - Use the decimal library instead of float types
-- An integrated test across different data source modes, comparing the output csv with a reference csv
 - Warm up historical data for calculations like ATR position sizing
     - another config parameter that contains the names of all the window parameters
     - For historical CSV, check if there exists a data point that is the max of all those window parameters behind
     - For live, check if the data dir is give. If so, look for a data point that is the max of all those window parameters behind
     - If at any point, there isn't, send a warning
 - Handling web socket failure - auto reconnect
-- Dual frequency
-    - only yf handles dual freq now, to extend for CSV and Live
-        CSV - naming of the excels will have to change
-        Live - how to test?
-- Risk manager
 - Multi strategy backtesting
 - Update all files to pass static type checking
-- If metrics_interval is daily, automatically assumes business days. To instead, leave it as days, and remove blank records in the csv file instead.
+- Portfolio auto rebal
+- Look through commissions calculations again
+- AS-IS time interval for live data - when a tick comes in, push it out immediately
+- use pytest.approx for float assertions
+- update test cases
 
-### Notes
+## Notes
 
 Periods for pandas: https://pandas.pydata.org/docs/reference/api/pandas.Period.asfreq.html
 

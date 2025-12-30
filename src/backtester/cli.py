@@ -50,7 +50,7 @@ def load_class(path_to_class: str):
 
 
 @app.command()
-def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", position_calc: Optional[str] = "atr", slippage: Optional[str] = "multi_factor_slippage", strategy: Optional[str] = "buy_and_hold_simple", exception_contd: Optional[int] = 0, config_path: Optional[str] = None, output_path: Optional[str] = None):
+def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", position_calc: Optional[str] = "atr", slippage: Optional[str] = "multi_factor_slippage", strategy: Optional[str] = "buy_and_hold_simple", risk_manager: Optional[str] = "simple_risk_manager", exception_contd: Optional[int] = 0, config_path: Optional[str] = None, output_path: Optional[str] = None):
     """
     Run the backtester with a given strategy and date range.
     args:
@@ -59,6 +59,7 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
         position_calc: the method to caculcate position size
         slippage (str): the model used to calculate slippage
         strategy: the strategy to backtest; this name should match those found in config.yaml.
+        risk_manager: the class used to quantify risk and decide to go ahead with the trade
         exception_contd: 1 or 0
         config_path: Path to a custom config file (optional)
         output_path: Path to save the equity curve CSV (optional, default: equity_curve.csv)
@@ -128,7 +129,7 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
 
     StrategyClass = load_class(config["strategies"][strategy]["name"])
     strategy_settings = config["strategies"][strategy].get("additional_parameters", {})
-    strategy_instance = StrategyClass(event_queue, **strategy_settings)
+    strategy_instance = StrategyClass(event_queue, strategy, **strategy_settings)
     for ticker in symbol_list:
         bar_manager.subscribe(strategy_interval, ticker, strategy_instance)
 
@@ -138,7 +139,11 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     for ticker in symbol_list:
         bar_manager.subscribe(strategy_interval, ticker, slippage_model)
 
-    portfolio = NaivePortfolio(cash_buffer, initial_capital, initial_position_size, symbol_list, rounding_list, event_queue, start_timestamp, base_interval, metrics_interval, position_sizer)
+    RiskManagerClass = load_class(config["risk_manager"][risk_manager]["name"])
+    risk_manager_settings = config["risk_manager"][risk_manager].get("additional_parameters", None)
+    risk_manager_instance = RiskManagerClass(risk_manager_settings)
+
+    portfolio = NaivePortfolio(cash_buffer, initial_capital, initial_position_size, symbol_list, rounding_list, event_queue, start_timestamp, base_interval, metrics_interval, position_sizer, strategy, risk_manager_instance)
     for ticker in symbol_list:
         bar_manager.subscribe(base_interval, ticker, portfolio)
 
