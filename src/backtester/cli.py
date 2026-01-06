@@ -17,6 +17,7 @@ from rich.table import Table
 from backtester.execution.simulated_execution_handler import SimulatedExecutionHandler
 from backtester.portfolios.naive_portfolio import NaivePortfolio
 from backtester.util.bar_manager import BarManager
+from backtester.data.news_data_handler import NewsDataHandler
 
 console = Console()
 app = typer.Typer()
@@ -50,7 +51,7 @@ def load_class(path_to_class: str):
 
 
 @app.command()
-def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", position_calc: Optional[str] = "atr", slippage: Optional[str] = "multi_factor_slippage", strategy: Optional[str] = "buy_and_hold_simple", risk_manager: Optional[str] = "simple_risk_manager", exception_contd: Optional[int] = 0, config_path: Optional[str] = None, output_path: Optional[str] = None):
+def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", position_calc: Optional[str] = "atr", slippage: Optional[str] = "multi_factor_slippage", strategy: Optional[str] = "buy_and_hold_simple", analyze_sentiment: Optional[bool] = True, risk_manager: Optional[str] = "simple_risk_manager", exception_contd: Optional[int] = 0, config_path: Optional[str] = None, output_path: Optional[str] = None):
     """
     Run the backtester with a given strategy and date range.
     args:
@@ -59,6 +60,7 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
         position_calc: the method to caculcate position size
         slippage (str): the model used to calculate slippage
         strategy: the strategy to backtest; this name should match those found in config.yaml.
+        analyze_sentiment: true / false - starts up the news api data handler to parse news feeds
         risk_manager: the class used to quantify risk and decide to go ahead with the trade
         exception_contd: 1 or 0
         config_path: Path to a custom config file (optional)
@@ -79,6 +81,7 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     end_timestamp = pd.to_datetime(backtester_settings["end_date"], dayfirst=True).timestamp()
     base_interval = backtester_settings["base_interval"]
     metrics_interval = backtester_settings["metrics_interval"]
+    sentiment_interval = backtester_settings["sentiment_interval"]
     period = backtester_settings["period"]
     exchange_closing_time = backtester_settings["exchange_closing_time"]
     benchmark_ticker = backtester_settings["benchmark"]
@@ -86,6 +89,7 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     # TODO: enhance for multi strategy handling
     strategy_interval = config["strategies"][strategy]["additional_parameters"]["interval"]
     symbol_list = config["strategies"][strategy]["additional_parameters"]["symbol_list"]
+    keyword_dict = config["strategies"][strategy]["additional_parameters"].get("keyword_dict", None)
     rounding_list = config["strategies"][strategy]["additional_parameters"]["rounding_list"]
 
     ####################
@@ -108,6 +112,7 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     typer_tbl.add_row("Metrics Interval", metrics_interval)
     typer_tbl.add_row("Strategy Interval", strategy_interval)
     typer_tbl.add_row("Period (only for live)", period)
+    typer_tbl.add_row("Analyzing Sentiments?", str(analyze_sentiment))
     console.print(typer_tbl)
 
     ####################
@@ -119,7 +124,13 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     data_handler_settings = backtester_settings | {"symbol_list": symbol_list + [benchmark_ticker], "data_dir": data_dir}
     data_handler = DataHandlerClass(event_queue, **data_handler_settings)
 
-    bar_manager = BarManager(data_handler, base_interval)
+    news_data_handler = None
+    if analyze_sentiment:
+        data_handler_settings = config["data_handler"]["news"].get("additional_parameters", {})
+        data_handler_settings = data_handler_settings | backtester_settings | {"symbol_list": symbol_list, "keyword_dict": keyword_dict, "sentiment_interval": sentiment_interval}
+        news_data_handler = NewsDataHandler(event_queue, **data_handler_settings)
+
+    bar_manager = BarManager(data_handler, news_data_handler, base_interval)
 
     PositionSizerClass = load_class(config["position_sizer"][position_calc]["name"])
     position_sizer_settings = config["position_sizer"][position_calc].get("additional_parameters", None)

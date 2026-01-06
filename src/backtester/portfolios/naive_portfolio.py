@@ -136,7 +136,8 @@ class NaivePortfolio(Portfolio):
         if self.current_holdings["cash"] < 0:
             raise NegativeCashException(self.current_holdings["cash"])
 
-    def on_signal(self, event):
+    def on_signal(self, event): #TODO: on placing order, should immediately freeze the expected payment in case another signal event comes in BEFORE the order is filled
+        print("signal received: ", event)
         order = None
         ticker = event.ticker
         strategy_name = event.strategy
@@ -167,14 +168,15 @@ class NaivePortfolio(Portfolio):
         # Clamp the quantity ordered if needed
         try:
             self._clamp_quantity(order)
-        except ValueError:
+        except ValueError: # unable to clamp so NO order is made
+            print("unable to clamp so no order is made")
             return
-
+        print("making order: ", order)
         if self.risk_manager.is_allowed(order, self.daily_open_value, self.history[(ticker, self.interval)], self.symbol_list, self.current_holdings):
             self.events.put(order)
 
     def _clamp_quantity(self, order: OrderEvent) -> None:
-        if self.history[(order.ticker, self.interval)]:
+        if self.history and self.history[(order.ticker, self.interval)]:
             estimated_price = self.history[(order.ticker, self.interval)][-1].close
         else:
             raise ValueError("Unable to estimate price")

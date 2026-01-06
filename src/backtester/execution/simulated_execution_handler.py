@@ -43,7 +43,7 @@ class SimulatedExecutionHandler:
             bar = self.data_handler.get_latest_bars(order.ticker)
             if not bar:
                 raise IndexError(f"There is no data for {order.ticker}")
-            bar = bar[0]
+            bar = bar[-1]
             current_time = bar.Index.timestamp()
             if order.timestamp >= current_time:
                 self.order_queue.appendleft(order)  # put it back and wait for next market event

@@ -11,7 +11,7 @@ import yfinance as yf  # type: ignore
 from backtester.data.data_handler import DataHandler
 from backtester.events.event import Event
 from backtester.events.market_event import MarketEvent
-from backtester.util.util import BarDict, BarTuple, str_to_seconds
+from backtester.util.util import BarDict, BarTuple, str_to_seconds, SentimentTuple
 
 
 class LiveDataHandler(DataHandler):
@@ -64,14 +64,18 @@ class LiveDataHandler(DataHandler):
                 message = self.message_queue.get(block=False)
                 ticker = message["id"]
                 price = message["price"]
-                message_vol = int(message["day_volume"])
+                try:
+                    message_vol = int(message["day_volume"])
+                except KeyError:
+                    print(f"message has no day_volume key: {message}")
+                    message_vol = self.day_vol[ticker] # if no volume data, we just assume there is no volume
                 if message_vol >= self.day_vol[ticker]: # start of a new day, no prior intervals / valid volume information
                     if self.day_vol[ticker] == 0 :
                         self.day_vol[ticker] = message_vol # init the day volume - starting the engine in the middle of the day
                     self.interval_vol[ticker] = max(self.interval_vol[ticker], message_vol - self.day_vol[ticker])
                 current_time = float(message["time"]) / 1000
                 if self.symbol_bar_dict[ticker] is None:  # if empty dictionary for that ticker. we are in a new interval, reset bar_dict
-                    self.symbol_bar_dict[ticker] = {"Index": pd.to_datetime(self.start_time, unit="s").tz_localize(None), "open": price, "high": price, "low": price, "close": price, "volume": self.interval_vol[ticker], "raw_volume": message_vol}
+                    self.symbol_bar_dict[ticker] = {"Index": pd.to_datetime(self.start_time, unit="s").tz_localize(None), "open": price, "high": price, "low": price, "close": price, "volume": self.interval_vol[ticker], "raw_volume": message_vol, "sentiment": SentimentTuple(Index=datetime.now(), score=0.0)}
                 if current_time > self.end_time:  # we are in a new interval alr, break, and let the interval end handling happen below
                     break
                 else:  # we are still in the same interval, continue updating high, low, and close prices
@@ -114,6 +118,7 @@ class LiveDataHandler(DataHandler):
             else:
                 final_bar = BarTuple(**bar_data)
 
+            print(f"final bar: {final_bar}")
             if final_bar is not None:
                 self.symbol_raw_data[symbol].append(final_bar)
                 self.latest_symbol_data[symbol].append(final_bar)

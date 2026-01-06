@@ -32,6 +32,15 @@ There are 5 parameters
 5. strategy
     - Available options are in config.yaml under "strategies"
     - Default is "buy_and_hold_simple"
+6. to-analyze-sentiment
+    - --analyze-sentiment for True
+    - --no-analyze_sentiment for False
+    - Default is True
+
+```
+poetry run python -c "from transformers import pipeline;pipe = pipeline('text-classification', model='mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis');print(pipe(['Shell profits collapsed due to falling oil prices.', 'BP faces huge crsis']))"
+poetry run backtester run --strategy sentiment --to-analyze-sentiment True
+```
 
 ## Dashboard
 Run this to view and interact with the data generated from a backtest. You must have ran a backtest at least once.
@@ -234,6 +243,11 @@ dat.to_csv("MSFT_1m.csv")
 - AS-IS time interval for live data - when a tick comes in, push it out immediately
 - use pytest.approx for float assertions
 - update test cases
+- if there are no messages while using the live data handler, an exception will be thrown in data_aggregator.py
+    - there should be a part where it takes the previous bar's data
+    - it is only acceptable to skip sending out the MarketEvent if there is no previous bar data at all
+- if there are two signal events before their corresponding fill event, you run the risk of negative cash. To reserve cash.
+- to switch from yf websocket to alpaca websocket - yf websockets have no vol data for SPY
 
 ## Notes
 
