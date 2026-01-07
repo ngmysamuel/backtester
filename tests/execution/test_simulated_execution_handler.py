@@ -1,3 +1,4 @@
+import uuid
 from queue import Queue
 from types import SimpleNamespace
 
@@ -21,7 +22,7 @@ class MockDataHandler:
 class MockSlippageModel:
     def __init__(self, slippage=0.0):
         self.slippage = slippage
-    def calculate_slippage(self, ticker, timestamp, quantity):
+    def calculate_slippage(self, ticker, timestamp, quantity, direction):
         return self.slippage
 
 @pytest.fixture
@@ -46,6 +47,7 @@ def execution_handler(mock_data_handler, mock_slippage_model):
 def create_mock_order(ticker, order_type, timestamp_str, direction=DirectionType.BUY):
     """Helper to create a mock order event."""
     return SimpleNamespace(
+        order_id=uuid.uuid4(),
         ticker=ticker,
         order_type=order_type,
         direction=direction,

@@ -88,6 +88,7 @@ class NaivePortfolio(Portfolio):
         self.margin_holdings = collections.defaultdict(int) # up to date values of the margin held for each ticker
         self.position_dict = {sym: self.initial_position_size for sym in self.symbol_list}  # holds the position size last used (backup for sizer derivations)
         self.daily_open_value = collections.defaultdict(float)  # holds the opening value of each strategy - used in riskmanager pnl
+        self.in_flight_cash = {} # holds the cash that has been reserved for use by an order before the order has been filled, uesful if there are 2 orders in flight before either has been filled. {orderId: orderEvent}
 
         self.current_holdings = {sym: {"position": 0, "value": 0.0} for sym in self.symbol_list}
         self.current_holdings["margin"] = collections.defaultdict(int) # only updated with self.margin_holdings at the end of the day or when there is a new order
@@ -171,9 +172,9 @@ class NaivePortfolio(Portfolio):
         except ValueError: # unable to clamp so NO order is made
             print("unable to clamp so no order is made")
             return
-        print("making order: ", order)
         if self.risk_manager.is_allowed(order, self.daily_open_value, self.history[(ticker, self.interval)], self.symbol_list, self.current_holdings):
             self.events.put(order)
+            self.in_flight_cash[order.id] = order
 
     def _clamp_quantity(self, order: OrderEvent) -> None:
         if self.history and self.history[(order.ticker, self.interval)]:
@@ -182,7 +183,9 @@ class NaivePortfolio(Portfolio):
             raise ValueError("Unable to estimate price")
         if estimated_price == 0:
             raise ValueError("Unable to estimate price")
-        current_cash_available = self.current_holdings["cash"]
+        current_cash = self.current_holdings["cash"]
+        cash_in_flight = sum([in_flight_order.quantity * estimated_price for in_flight_order in self.in_flight_cash.values()])
+        current_cash_available = current_cash - cash_in_flight
         current_signed_quantity = self.current_holdings[order.ticker]["position"]
         if order.direction == DirectionType.BUY:
             if current_signed_quantity < 0: # currently SHORT but BUYing, closing/reducing the SHORT
@@ -233,6 +236,12 @@ class NaivePortfolio(Portfolio):
             self.margin_holdings[event.ticker] = 0  # reset margin
 
         self.current_holdings["margin"] = self.margin_holdings.copy()
+
+        # In Flight Cash update
+        in_flight_order = self.in_flight_cash.get(event.order_id)
+        if in_flight_order and event.quantity < in_flight_order.quantity:
+            in_flight_order.quantity -= event.quantity
+        self.in_flight_cash.pop(event.order_id, "")
 
     def end_of_day(self):
         """

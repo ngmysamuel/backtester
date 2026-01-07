@@ -140,7 +140,7 @@ def test_accounting_user_scenario_short_sell(mock_risk_manager):
     pf.history = {("AAPL", "1d"): [SimpleNamespace(Index=1, close=10.0)]}
 
     # --- Step 1: Establish Initial State (1 AAPL, $0 Cash) ---
-    fill_buy = FillEvent(1, "AAPL", "EXCH", 1, DirectionType.BUY, 10.0, 10.0, commission=0)
+    fill_buy = FillEvent(1, "AAPL", "EXCH", 1, DirectionType.BUY, 10.0, 10.0, "1", commission=0)
     pf.on_fill(fill_buy)
     
     assert pf.current_holdings["AAPL"]["position"] == 1
@@ -148,7 +148,7 @@ def test_accounting_user_scenario_short_sell(mock_risk_manager):
     assert pf.current_holdings["total"] == 10.0
 
     # --- Step 2: The Short Transaction ---
-    fill_sell = FillEvent(2, "AAPL", "EXCH", 2, DirectionType.SELL, 20.0, 10.0, commission=0)
+    fill_sell = FillEvent(2, "AAPL", "EXCH", 2, DirectionType.SELL, 20.0, 10.0, "2", commission=0)
     pf.on_fill(fill_sell)
 
     # --- Step 3: Verification ---
@@ -282,7 +282,7 @@ def test_on_fill_multiple_tickers(portfolio):
 
     # First fill: BUY MSFT
     # Explicitly set commission=0 to ensure math matches expectation exactly
-    fill_msft = FillEvent(123, "MSFT", "ARCA", quantity_msft, DirectionType.BUY, quantity_msft*opening_msft_price, opening_msft_price, commission=0.0)
+    fill_msft = FillEvent(123, "MSFT", "ARCA", quantity_msft, DirectionType.BUY, quantity_msft*opening_msft_price, opening_msft_price, "1", commission=0.0)
     portfolio.on_fill(fill_msft)
 
     assert portfolio.current_holdings["MSFT"]["position"] == quantity_msft
@@ -295,7 +295,7 @@ def test_on_fill_multiple_tickers(portfolio):
     quantity_aapl = 50
 
     # Second fill: BUY AAPL
-    fill_aapl = FillEvent(124, "AAPL", "ARCA", quantity_aapl, DirectionType.BUY, quantity_aapl*opening_aapl_price, opening_aapl_price, commission=0.0)
+    fill_aapl = FillEvent(124, "AAPL", "ARCA", quantity_aapl, DirectionType.BUY, quantity_aapl*opening_aapl_price, opening_aapl_price, "2", commission=0.0)
     portfolio.on_fill(fill_aapl)
 
     assert portfolio.current_holdings["AAPL"]["position"] == quantity_aapl
