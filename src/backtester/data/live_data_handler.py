@@ -118,7 +118,6 @@ class LiveDataHandler(DataHandler):
             else:
                 final_bar = BarTuple(**bar_data)
 
-            print(f"final bar: {final_bar}")
             if final_bar is not None:
                 self.symbol_raw_data[symbol].append(final_bar)
                 self.latest_symbol_data[symbol].append(final_bar)

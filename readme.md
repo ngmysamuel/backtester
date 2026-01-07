@@ -218,6 +218,13 @@ dat.to_csv("MSFT_1m.csv")
         - Heavily adapted from: https://github.com/QuantJourneyOrg/qj_public_code/blob/main/slippage-analysis.py
         - Explanations: https://quantjourney.substack.com/p/slippage-a-comprehensive-analysis
 11. One way negative cash arises because we use market orders - we might have position sized to use up all remaining cash based on the ATR of the ticker. But on the next open, price rockets and the order fulfilled for a value more than what cash is available.
+12. Issue: if there are no messages while using the live data handler, an exception will be thrown in data_aggregator.py
+    - Fix: check in bar_aggregator.py on_heartbeat() if the return of get_latest_bars() is empty or not before indexing on it
+    - Consideration: 
+        - this case would only happen when using the live data handler and since the start of the backtest there has been no data coming in
+        - initially considered handling it in the data handler classes where we would skip sending out the MarketEvent if there is no previous bar data at all
+        - However, did not feel right to handle it in the data handler method. Since there can multiple tickers and suppose only one ticker has data. We should still push a market event to ensure that that one ticker is not short changed. But remember that market event has NO ticker information. The bar manager will have every bar aggregator check get the new records. It might succeed with the one ticker that has data but it will still fail on all the tickers that had no data. 
+        - Hence, it would better to handle it in the data aggregator method (line 26)
 
 ## To Do
 - Slippage model  - supporting other time periods automatically 
@@ -243,9 +250,6 @@ dat.to_csv("MSFT_1m.csv")
 - AS-IS time interval for live data - when a tick comes in, push it out immediately
 - use pytest.approx for float assertions
 - update test cases
-- if there are no messages while using the live data handler, an exception will be thrown in data_aggregator.py
-    - there should be a part where it takes the previous bar's data
-    - it is only acceptable to skip sending out the MarketEvent if there is no previous bar data at all
 - if there are two signal events before their corresponding fill event, you run the risk of negative cash. To reserve cash.
 - to switch from yf websocket to alpaca websocket - yf websockets have no vol data for SPY
 

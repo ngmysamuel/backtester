@@ -23,7 +23,10 @@ class BarAggregator:
         if self.interval_start_time is None:
             self.interval_start_time = event.timestamp
 
-        bar = self.data_handler.get_latest_bars(self.ticker)[-1]  # get the base frequency's latest data
+        bars = self.data_handler.get_latest_bars(self.ticker)
+        if not bars: # there is entirely no data at all - typically when using the live data handler off trading hours
+            return
+        bar = bars[-1]  # get the base frequency's latest data
 
         if self.bar:
             self.bar["high"] = max(self.bar["high"], bar.high)
