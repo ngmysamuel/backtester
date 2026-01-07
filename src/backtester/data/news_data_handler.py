@@ -31,7 +31,6 @@ class NewsDataHandler(DataHandler):
         self.sentiment_interval: str = str_to_seconds(kwargs["sentiment_interval"])
         self.base_url = "https://newsapi.org/v2/top-headlines"
         self.api_key = os.getenv('NEWS_API')
-        # self.api_key = "123"
 
         self.beginning_time = datetime.now().timestamp()
         self.start_time = self.beginning_time
@@ -40,7 +39,7 @@ class NewsDataHandler(DataHandler):
 
         self.pipe = pipeline("text-classification", model=kwargs["model"])
         self.seen_articles: dict[str, int] = {} # {articledesc: 1 / -1}
-        self._symbol_data: dict[str, list[tuple[str, int]]] = defaultdict(list) # {ticker: [(timestamp: xxx, sentiment_score: xxx), (...)]}
+        self._symbol_data: dict[str, list[SentimentTuple]] = defaultdict(list) # {ticker: [(timestamp: xxx, sentiment_score: xxx), (...)]}
 
         self._thread = threading.Thread(target=self._poll_and_process)
         self._thread.daemon = True
@@ -84,12 +83,12 @@ class NewsDataHandler(DataHandler):
                 total_articles = len(scores) + len(old_scores)
 
                 if total_articles > 0:
-                    self._symbol_data[ticker].append(SentimentTuple(**{"Index": pd.to_datetime(self.start_time, unit='s'), "score": consolidated_sentiment/total_articles}))
+                    self._symbol_data[ticker].append(SentimentTuple(Index=pd.to_datetime(self.start_time, unit='s'), score=consolidated_sentiment/total_articles))
                 elif total_articles == 0:
                     if self._symbol_data[ticker]:
                         self._symbol_data[ticker].append(self._symbol_data[ticker][-1].copy())
                     else:
-                        self._symbol_data[ticker].append(SentimentTuple(**{"Index": pd.to_datetime(self.start_time, unit='s'), "score": 0}))
+                        self._symbol_data[ticker].append(SentimentTuple(Index=pd.to_datetime(self.start_time, unit='s'), score=0))
 
             print(f"Timestamp (sentiments):: {self.start_time} <> {self.end_time} ")
             self.start_time = self.end_time + 1
@@ -102,7 +101,7 @@ class NewsDataHandler(DataHandler):
         """
         if symbol in self._symbol_data:
             return self._symbol_data[symbol][-n:]
-        return [SentimentTuple(Index=datetime.now(), sentiment=0.0)]
+        return [SentimentTuple(Index=datetime.now(), score=0.0)]
 
     def update_bars(self):
         pass

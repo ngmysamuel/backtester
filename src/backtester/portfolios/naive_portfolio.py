@@ -137,8 +137,7 @@ class NaivePortfolio(Portfolio):
         if self.current_holdings["cash"] < 0:
             raise NegativeCashException(self.current_holdings["cash"])
 
-    def on_signal(self, event): #TODO: on placing order, should immediately freeze the expected payment in case another signal event comes in BEFORE the order is filled
-        print("signal received: ", event)
+    def on_signal(self, event):
         order = None
         ticker = event.ticker
         strategy_name = event.strategy

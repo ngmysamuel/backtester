@@ -2,6 +2,10 @@ from datetime import datetime
 import re
 from typing import NamedTuple, Optional, TypedDict  # identical to collections.namedtuple
 
+class SentimentDict(TypedDict):
+    Index: datetime # not to be confused with the timestamp in the BarTuple. This is the sentiment as of this index
+    score: float
+
 class SentimentTuple(NamedTuple):
     Index: datetime # not to be confused with the timestamp in the BarTuple. This is the sentiment as of this index
     score: float

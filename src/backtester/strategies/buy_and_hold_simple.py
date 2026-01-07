@@ -25,4 +25,3 @@ class BuyAndHoldSimple(Strategy):
             if not self.bought[ticker] and self.counter >= self.days_before_buying:
                 self.bought[ticker] = True
                 self.events.put(SignalEvent(timestamp, ticker, self.name, SignalType.LONG))
-                print("=== STRATEGY BUYING ===")

@@ -11,7 +11,7 @@ from backtester.util.util import BarTuple, str_to_seconds
 class BarManager:
     def __init__(self, data_handler: DataHandler, news_data_handler: DataHandler, base_interval: str):
         self.data_handler = data_handler
-        self.news_data_handler = data_handler
+        self.news_data_handler = news_data_handler
         self.base_interval = base_interval
 
         self.aggregators: dict[tuple[str, str], BarAggregator] = {}  # (ticker, interval) -> aggregator
@@ -34,8 +34,8 @@ class BarManager:
         for key, agg in self.aggregators.items():
             bar = agg.on_heartbeat(event)
             if bar:
-                print(f"self.news_data_handler.get_latest_bars(): {self.news_data_handler.get_latest_bars(key[0])}")
-                bar.sentiment = self.news_data_handler.get_latest_bars(key[0])[-1]
+                bar["sentiment"] = self.news_data_handler.get_latest_bars(key[0])[-1]
+                bar = BarTuple(**bar)
                 self.history[key].append(bar)
                 for subscriber in self.subscribers[key]:
                     rtn_slice[subscriber][key] = self.history[key]

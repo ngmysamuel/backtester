@@ -2,7 +2,7 @@ from typing import Optional
 import datetime
 from backtester.data.data_handler import DataHandler
 from backtester.events.market_event import MarketEvent
-from backtester.util.util import BarTuple, BarDict, SentimentTuple
+from backtester.util.util import BarTuple, BarDict, SentimentDict
 
 class BarAggregator:
     def __init__(self, base_interval: int, interval: int, ticker: str, data_handler: DataHandler):
@@ -34,20 +34,20 @@ class BarAggregator:
             self.bar["close"] = bar.close
             self.bar["volume"] += bar.volume
         else:
-            self.bar = {
+            self.bar = BarDict({
                 "Index": bar.Index,
                 "open": bar.open,
                 "high": bar.high,
                 "low": bar.low,
                 "close": bar.close,
                 "volume": bar.volume,
-                "sentiment": SentimentTuple(Index=datetime.datetime.now(), score=0.0),
+                "sentiment": SentimentDict(Index=datetime.datetime.now(), score=0.0),
                 "raw_volume": None
-            }
+            })
 
         if event.timestamp >= self.interval_start_time + self.interval - self.base_interval:  # start of a new interval
             if self.bar:
-                to_return = BarTuple(**self.bar)
+                to_return = self.bar.copy()
             self.bar = None
             self.interval_start_time = self.interval_start_time + self.interval
 
