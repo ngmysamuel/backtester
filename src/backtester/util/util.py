@@ -1,25 +1,34 @@
-import datetime
+from datetime import datetime
 import re
 from typing import NamedTuple, Optional, TypedDict  # identical to collections.namedtuple
 
+class SentimentDict(TypedDict):
+    Index: datetime # not to be confused with the timestamp in the BarTuple. This is the sentiment as of this index
+    score: float
+
+class SentimentTuple(NamedTuple):
+    Index: datetime # not to be confused with the timestamp in the BarTuple. This is the sentiment as of this index
+    score: float
 
 class BarDict(TypedDict):
-    Index: datetime.datetime
+    Index: datetime
     open: float
     high: float
     low: float
     close: float
     volume: int
     raw_volume: Optional[int] 
+    sentiment: SentimentTuple = SentimentTuple(Index=datetime.now(), score=0.0)
 
 class BarTuple(NamedTuple):
-    Index: datetime.datetime
+    Index: datetime
     open: float
     high: float
     low: float
     close: float
     volume: int
     raw_volume: Optional[int]
+    sentiment: SentimentTuple = SentimentTuple(Index=datetime.now(), score=0.0)
 
 
 MONTHS_IN_YEAR = 12.0
@@ -95,7 +104,7 @@ def str_to_seconds(interval: str) -> int:
         case "1d":
             return 86400
         case _:
-            raise ValueError(f"{interval} is not supported")
+            raise ValueError(f"Interval {interval} is not supported")
 
 
 def str_to_pandas(interval: str) -> str:

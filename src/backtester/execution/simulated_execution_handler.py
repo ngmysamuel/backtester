@@ -43,7 +43,7 @@ class SimulatedExecutionHandler:
             bar = self.data_handler.get_latest_bars(order.ticker)
             if not bar:
                 raise IndexError(f"There is no data for {order.ticker}")
-            bar = bar[0]
+            bar = bar[-1]
             current_time = bar.Index.timestamp()
             if order.timestamp >= current_time:
                 self.order_queue.appendleft(order)  # put it back and wait for next market event
@@ -63,7 +63,7 @@ class SimulatedExecutionHandler:
                 else:
                     self.order_queue.append(order)  # put it back and wait for next market event
                     continue
-            fill_event = FillEvent(current_time, order.ticker, "", order.quantity, order.direction, fill_cost, unit_cost, slippage)
+            fill_event = FillEvent(current_time, order.ticker, "", order.quantity, order.direction, fill_cost, unit_cost, order.id, slippage)
 
             print(f"=== EXECUTION: unit_cost: {fill_event.unit_cost}, slippage: {slippage}, total cost: {fill_event.fill_cost} ===")
             self.events.put(fill_event)

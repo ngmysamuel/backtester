@@ -14,7 +14,7 @@ cd backtester
 poetry install
 poetry run backtester run --strategy moving_average
 ```
-There are 5 parameters
+There are 6 parameters
 1. data-dir
     - The path to the directory where the CSVs of OHLC data of the tickers you specified in config.yaml
     - Necessary if data-source is csv
@@ -31,7 +31,17 @@ There are 5 parameters
     - Default is "multi_factor_slippage"
 5. strategy
     - Available options are in config.yaml under "strategies"
-    - Default is "buy_and_hold_simple"
+    - Default is "moving_average"
+6. to-analyze-sentiment
+    - --analyze-sentiment for True
+    - --no-analyze_sentiment for False
+    - Only works if data-source = live
+    - Default is False
+
+```
+poetry run python -c "from transformers import pipeline;pipe = pipeline('text-classification', model='mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis');print(pipe(['Shell profits collapsed due to falling oil prices.', 'BP faces huge crsis']))"
+poetry run backtester run --strategy sentiment --to-analyze-sentiment True
+```
 
 ## Dashboard
 Run this to view and interact with the data generated from a backtest. You must have ran a backtest at least once.
@@ -69,9 +79,12 @@ dat = yf.download("msft", start="2025-11-24", end="2025-11-29", interval="1m",mu
 dat.to_csv("MSFT_1m.csv")
 ```
 
-## Important Caveats
+## Important Notes
 1. Intervals
     - The base interval must be most granular time interval across all strategies, etc.
+2. Live Sentiment
+    - You need an API key from https://newsapi.org/
+    - Store it as an environment variable under the name "NEWS_API"
 
 ## Implementation Details
 1. Dual Frequency
@@ -209,6 +222,34 @@ dat.to_csv("MSFT_1m.csv")
         - Heavily adapted from: https://github.com/QuantJourneyOrg/qj_public_code/blob/main/slippage-analysis.py
         - Explanations: https://quantjourney.substack.com/p/slippage-a-comprehensive-analysis
 11. One way negative cash arises because we use market orders - we might have position sized to use up all remaining cash based on the ATR of the ticker. But on the next open, price rockets and the order fulfilled for a value more than what cash is available.
+12. Issue: if there are no messages while using the live data handler, an exception will be thrown in data_aggregator.py
+    - Fix: 
+        - check in bar_aggregator.py on_heartbeat() if the return of get_latest_bars() is empty or not before indexing on it
+    - Consideration: 
+        - this case would only happen when using the live data handler and since the start of the backtest there has been no data coming in
+        - initially considered handling it in the data handler classes where we would skip sending out the MarketEvent if there is no previous bar data at all
+        - However, did not feel right to handle it in the data handler method. Since there can multiple tickers and suppose only one ticker has data. We should still push a market event to ensure that that one ticker is not short changed. But remember that market event has NO ticker information. The bar manager will have every bar aggregator check get the new records. It might succeed with the one ticker that has data but it will still fail on all the tickers that had no data. 
+        - Hence, it would better to handle it in the data aggregator method (line 26)
+13. Issue: if there are two signal events before their corresponding fill event, you run the risk of negative cash.
+    - Fix: 
+        - reserve cash in the portfolio for each order and unreserve it when the fill comes in
+    - Considerations:
+        - Order Event
+            - Each order has an ID
+            - Store it in a dict (id: order estimated cost) in the portfolio 
+        - Execution Handler
+            - It creates the Fill Event with a parameter pointing to the order ID
+        - Portfolio
+            - In the on fill method, lookup the dict for that order using the order id in the fill event. Remove it if entirely filled or reduce it if partial fill
+            - If the total fill cost is more than the estimated cost in the order, just remove the order from the dict
+        - On signal
+            - Total cash minus sum of the estimate pot = new usable cash 
+        - Not possible to have the estimated cost as one pot. If the actual fill cost is more than the estimate, you are reducing the estimate pot by more than it should be. See example below 
+            - Start out with InFlight -> 5 7, Cash -> 10, 
+            - Fill quantity -> 6
+            - It should become InFlight: 7, Cash: 4
+        - We could instead keep the estimated cost in the order event, have the fill event copy it. And in the on fill method, subtract the estimated cost from the estimate pot. But I think we keep responsibilities separate, no need to pass information everywhere. 
+
 
 ## To Do
 - Slippage model  - supporting other time periods automatically 
@@ -234,6 +275,8 @@ dat.to_csv("MSFT_1m.csv")
 - AS-IS time interval for live data - when a tick comes in, push it out immediately
 - use pytest.approx for float assertions
 - update test cases
+- to switch from yf websocket to alpaca websocket - yf websockets have no vol data for SPY
+- to build historical sentiment reader
 
 ## Notes
 

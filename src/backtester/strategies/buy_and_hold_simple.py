@@ -14,15 +14,11 @@ class BuyAndHoldSimple(Strategy):
     def generate_signals(self, histories: dict[tuple[str,str], list[BarTuple]]):
         self.counter += 1
         for (ticker,interval), history in histories.items():
-            timestamp = history[-1].Index.timestamp()
-            # Retrieve latest bar(s) for ticker. If no data is available, do not generate a signal.
-            ohlcv_data = history[-1]
-
             # No market data available for this ticker at the moment; skip signal generation.
-            if not ohlcv_data:
+            if not history:
                 continue
+            timestamp = history[-1].Index.timestamp()
 
             if not self.bought[ticker] and self.counter >= self.days_before_buying:
                 self.bought[ticker] = True
                 self.events.put(SignalEvent(timestamp, ticker, self.name, SignalType.LONG))
-                print("=== STRATEGY BUYING ===")

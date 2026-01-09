@@ -12,6 +12,7 @@ backtester_settings:
   risk_per_trade: 0.01
   base_interval: "1d"
   metrics_interval: "1d"
+  sentiment_interval: "1d"
 
 risk_manager:
   simple_risk_manager:
@@ -65,3 +66,6 @@ strategies:
       symbol_list: ["AAPL"]
       rounding_list: [0]
       days_before_buying: 22
+      keyword_dict: 
+        BTC-USD: ["bitcoin", "btc"]
+        MSFT: ["microsoft"]

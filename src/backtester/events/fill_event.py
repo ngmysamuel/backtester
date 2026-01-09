@@ -10,7 +10,7 @@ class FillEvent(ABC):
     the commission of the trade from the brokerage.
     """
 
-    def __init__(self, timestamp: float, ticker: str, exchange: str, quantity: float, direction: DirectionType, fill_cost: float, unit_cost: float, slippage: float = 0.0, commission: Optional[float]=None):
+    def __init__(self, timestamp: float, ticker: str, exchange: str, quantity: float, direction: DirectionType, fill_cost: float, unit_cost: float, order_id: str, slippage: float = 0.0, commission: Optional[float]=None):
         """
         Initialises the FillEvent object. Sets the ticker, exchange,
         quantity, direction, cost of fill and an optional
@@ -40,6 +40,7 @@ class FillEvent(ABC):
         self.direction = direction
         self.fill_cost = fill_cost
         self.unit_cost = unit_cost
+        self.order_id = order_id
         self.slippage = slippage
 
         # Calculate commission

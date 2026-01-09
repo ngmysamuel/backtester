@@ -14,6 +14,7 @@ backtester_settings:
   risk_per_trade: 0.01 # percentage of total portfolio value willing to risk in a single trade
   base_interval: "1d" # 1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo
   metrics_interval: "1d" # the granularity of the output equity curve
+  sentiment_interval: "1m" # how often the News API is polled
 
 risk_manager:
   simple_risk_manager:
@@ -35,6 +36,10 @@ data_handler:
     name: backtester.data.csv_data_handler.CSVDataHandler
   live:
     name: backtester.data.live_data_handler.LiveDataHandler
+  news:
+    name: backtester.data.news_data_handler.NewsDataHandler
+    additional_parameters:
+      model: "mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis"
 
 position_sizer:
   atr:
@@ -80,6 +85,9 @@ strategies:
       # symbol_list: ["BTC-USD"]
       # rounding_list: [8]
       days_before_buying: 5
+      keyword_dict: 
+        BTC-USD: ["bitcoin"]
+        MSFT: ["microsoft"]
   moving_average:
     name: "backtester.strategies.moving_average_crossover.MovingAverageCrossover"
     display_name: "Moving Average"
@@ -92,3 +100,16 @@ strategies:
       # interval: "1m"
       # symbol_list: ["BTC-USD"]
       # rounding_list: [8]
+      keyword_dict: 
+        BTC-USD: ["bitcoin", "btc"]
+        MSFT: ["microsoft"]
+  z_score_sentiment:
+    name: "backtester.strategies.z_score_sentiment.ZScoreSentiment"
+    additional_parameters:
+      sell_threshold: 0
+      buy_threshold: 0.5
+      interval: "1m"
+      symbol_list: ["BTC-USD"]
+      rounding_list: [8]
+      keyword_dict: 
+        BTC-USD: ["bitcoin", "btc"]
