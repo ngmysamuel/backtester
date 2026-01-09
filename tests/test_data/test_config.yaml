@@ -12,6 +12,7 @@ backtester_settings:
   risk_per_trade: 0.01
   base_interval: "1m"
   metrics_interval: "1m"
+  sentiment_interval: "1m"
 
 risk_manager:
   simple_risk_manager:
@@ -73,6 +74,8 @@ strategies:
       symbol_list: ["BTC-USD"]
       rounding_list: [8]
       days_before_buying: 22
+      keyword_dict: 
+        BTC-USD: ["bitcoin", "btc"]
   moving_average:
     name: "backtester.strategies.moving_average_crossover.MovingAverageCrossover"
     display_name: "Moving Average"
@@ -85,3 +88,6 @@ strategies:
       interval: "1m"
       symbol_list: ["BTC-USD"]
       rounding_list: [8]
+      keyword_dict: 
+        BTC-USD: ["bitcoin", "btc"]
+        MSFT: ["microsoft"]

@@ -51,7 +51,7 @@ def load_class(path_to_class: str):
 
 
 @app.command()
-def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", position_calc: Optional[str] = "atr", slippage: Optional[str] = "multi_factor_slippage", strategy: Optional[str] = "buy_and_hold_simple", analyze_sentiment: Optional[bool] = True, risk_manager: Optional[str] = "simple_risk_manager", exception_contd: Optional[int] = 0, config_path: Optional[str] = None, output_path: Optional[str] = None):
+def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", position_calc: Optional[str] = "atr", slippage: Optional[str] = "multi_factor_slippage", strategy: Optional[str] = "moving_average", analyze_sentiment: Optional[bool] = False, risk_manager: Optional[str] = "simple_risk_manager", exception_contd: Optional[int] = 0, config_path: Optional[str] = None, output_path: Optional[str] = None):
     """
     Run the backtester with a given strategy and date range.
     args:
@@ -60,12 +60,19 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
         position_calc: the method to caculcate position size
         slippage (str): the model used to calculate slippage
         strategy: the strategy to backtest; this name should match those found in config.yaml.
-        analyze_sentiment: true / false - starts up the news api data handler to parse news feeds
+        analyze_sentiment: starts up the news api data handler to parse news feeds
         risk_manager: the class used to quantify risk and decide to go ahead with the trade
         exception_contd: 1 or 0
         config_path: Path to a custom config file (optional)
         output_path: Path to save the equity curve CSV (optional, default: equity_curve.csv)
     """
+
+    ####################
+    # sanity checks on passed in variables
+    ####################
+    if analyze_sentiment and data_source != "live":
+        console.print("[bold red]Unable to analyze sentiment if data-source <> live. Try again with --data-source live[/bold red]")
+        return
 
     ####################
     # load data from yaml config file

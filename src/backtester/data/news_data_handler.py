@@ -1,16 +1,18 @@
 import os
 import queue
 import threading
+from collections import defaultdict
 from datetime import datetime
 from time import sleep
 
 import pandas as pd
+import requests
 from transformers import pipeline
 
 from backtester.data.data_handler import DataHandler
 from backtester.events.event import Event
-from backtester.util.util import str_to_seconds, SentimentTuple
-from collections import defaultdict
+from backtester.util.util import SentimentTuple, str_to_seconds
+
 
 class NewsDataHandler(DataHandler):
     def __init__(self, event_queue: queue.Queue[Event], **kwargs):
@@ -53,12 +55,11 @@ class NewsDataHandler(DataHandler):
                 sleep(sleep_time)
             for ticker in self.symbol_list:
                 keyword_list = self.keyword_dict[ticker]
-                articles, total_results, page_number = [], 100, 1
+                articles, total_results, page_number = [], 100, 0
                 while len(articles) < total_results:
-                    # req = requests.get(self.base_url, params={"q": " OR ".join(keyword_list), "category": "business", "pageSize": 100, "page": page_number}, headers={"Authorization": self.api_key})
-                    # print(req.url)
-                    # resp = req.json()
-                    resp = {'status': 'ok', 'totalResults': 2, 'articles': [{'source': {'id': 'fortune', 'name': 'Fortune'}, 'author': 'Jim Edwards', 'title': 'Michael Saylor’s Strategy flirts again with the danger threshold at which his company is worth less than his Bitcoin - Fortune', 'description': 'Why hold a stock that is worth less than the underlying asset it represents?', 'url': 'https://fortune.com/2026/01/02/michael-saylor-strategy-mnav-bitcoin/', 'urlToImage': 'https://fortune.com/img-assets/wp-content/uploads/2025/10/GettyImages-2217059347-e1761011704696.jpg?resize=1200,600', 'publishedAt': '2026-01-02T16:10:00Z', 'content': 'Stock in Michael Saylors Bitcoin treasury company, Strategy, was up 1.22% in early trading today, giving the company a brief period of relief. The stock has declined 66% since its high last July, and… [+2611 chars]'}, {'source': {'id': None, 'name': 'NPR'}, 'author': 'Rafael Nam', 'title': 'Crypto soared in 2025 — and then crashed. Now what? - NPR', 'description': 'For most of 2025, cryptocurrencies such as bitcoin surged as President Trump vowed to make the U.S. a crypto leader. But now, a severe sell-off has shaken the sector.', 'url': 'https://www.npr.org/2026/01/01/nx-s1-5642654/trump-crypto-winter-bitcoin', 'urlToImage': 'https://npr.brightspotcdn.com/dims3/default/strip/false/crop/5667x3188+0+178/resize/1400/quality/100/format/jpeg/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2F43%2F94%2Feeeff2a44e2fb7a81ce417dcd254%2Fgettyimages-2231710765.jpg', 'publishedAt': '2026-01-01T10:00:00Z', 'content': 'This was supposed to be crypto\'s year.\r\nPresident Trump got elected vowing to make the U.S. "the crypto capital of the world\r\n" and by many measures, he delivered.\r\nFrom the crypto-friendly regulator… [+8406 chars]'}]}
+                    # {'status': 'ok', 'totalResults': 2, 'articles': [{'source': {'id': 'fortune', 'name': 'Fortune'}, 'author': 'Jim Edwards', 'title': 'Michael Saylor’s Strategy flirts again with the danger threshold at which his company is worth less than his Bitcoin - Fortune', 'description': 'Why hold a stock that is worth less than the underlying asset it represents?', 'url': 'https://fortune.com/2026/01/02/michael-saylor-strategy-mnav-bitcoin/', 'urlToImage': 'https://fortune.com/img-assets/wp-content/uploads/2025/10/GettyImages-2217059347-e1761011704696.jpg?resize=1200,600', 'publishedAt': '2026-01-02T16:10:00Z', 'content': 'Stock in Michael Saylors Bitcoin treasury company, Strategy, was up 1.22% in early trading today, giving the company a brief period of relief. The stock has declined 66% since its high last July, and… [+2611 chars]'}, {'source': {'id': None, 'name': 'NPR'}, 'author': 'Rafael Nam', 'title': 'Crypto soared in 2025 — and then crashed. Now what? - NPR', 'description': 'For most of 2025, cryptocurrencies such as bitcoin surged as President Trump vowed to make the U.S. a crypto leader. But now, a severe sell-off has shaken the sector.', 'url': 'https://www.npr.org/2026/01/01/nx-s1-5642654/trump-crypto-winter-bitcoin', 'urlToImage': 'https://npr.brightspotcdn.com/dims3/default/strip/false/crop/5667x3188+0+178/resize/1400/quality/100/format/jpeg/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2F43%2F94%2Feeeff2a44e2fb7a81ce417dcd254%2Fgettyimages-2231710765.jpg', 'publishedAt': '2026-01-01T10:00:00Z', 'content': 'This was supposed to be crypto\'s year.\r\nPresident Trump got elected vowing to make the U.S. "the crypto capital of the world\r\n" and by many measures, he delivered.\r\nFrom the crypto-friendly regulator… [+8406 chars]'}]}
+                    req = requests.get(self.base_url, params={"q": " OR ".join(keyword_list), "category": "business", "pageSize": 100, "page": page_number}, headers={"Authorization": self.api_key})
+                    resp = req.json()
                     if resp["status"] != "ok":
                         raise ValueError(resp)
                     total_results = resp["totalResults"]
@@ -86,11 +87,11 @@ class NewsDataHandler(DataHandler):
                     self._symbol_data[ticker].append(SentimentTuple(Index=pd.to_datetime(self.start_time, unit='s'), score=consolidated_sentiment/total_articles))
                 elif total_articles == 0:
                     if self._symbol_data[ticker]:
-                        self._symbol_data[ticker].append(self._symbol_data[ticker][-1].copy())
+                        self._symbol_data[ticker].append(self._symbol_data[ticker][-1]._replace())
                     else:
                         self._symbol_data[ticker].append(SentimentTuple(Index=pd.to_datetime(self.start_time, unit='s'), score=0))
 
-            print(f"Timestamp (sentiments):: {self.start_time} <> {self.end_time} ")
+            print(f"Timestamp:: {self.start_time} <> {self.end_time}: {total_articles} articles")
             self.start_time = self.end_time + 1
             self.end_time = self.start_time + self.sentiment_interval - 1
 

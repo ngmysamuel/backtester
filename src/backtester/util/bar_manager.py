@@ -34,7 +34,8 @@ class BarManager:
         for key, agg in self.aggregators.items():
             bar = agg.on_heartbeat(event)
             if bar:
-                bar["sentiment"] = self.news_data_handler.get_latest_bars(key[0])[-1]
+                if self.news_data_handler:
+                    bar["sentiment"] = self.news_data_handler.get_latest_bars(key[0])[-1]
                 bar = BarTuple(**bar)
                 self.history[key].append(bar)
                 for subscriber in self.subscribers[key]:

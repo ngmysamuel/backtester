@@ -14,7 +14,7 @@ cd backtester
 poetry install
 poetry run backtester run --strategy moving_average
 ```
-There are 5 parameters
+There are 6 parameters
 1. data-dir
     - The path to the directory where the CSVs of OHLC data of the tickers you specified in config.yaml
     - Necessary if data-source is csv
@@ -31,11 +31,12 @@ There are 5 parameters
     - Default is "multi_factor_slippage"
 5. strategy
     - Available options are in config.yaml under "strategies"
-    - Default is "buy_and_hold_simple"
+    - Default is "moving_average"
 6. to-analyze-sentiment
     - --analyze-sentiment for True
     - --no-analyze_sentiment for False
-    - Default is True
+    - Only works if data-source = live
+    - Default is False
 
 ```
 poetry run python -c "from transformers import pipeline;pipe = pipeline('text-classification', model='mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis');print(pipe(['Shell profits collapsed due to falling oil prices.', 'BP faces huge crsis']))"
@@ -78,9 +79,12 @@ dat = yf.download("msft", start="2025-11-24", end="2025-11-29", interval="1m",mu
 dat.to_csv("MSFT_1m.csv")
 ```
 
-## Important Caveats
+## Important Notes
 1. Intervals
     - The base interval must be most granular time interval across all strategies, etc.
+2. Live Sentiment
+    - You need an API key from https://newsapi.org/
+    - Store it as an environment variable under the name "NEWS_API"
 
 ## Implementation Details
 1. Dual Frequency
@@ -272,6 +276,7 @@ dat.to_csv("MSFT_1m.csv")
 - use pytest.approx for float assertions
 - update test cases
 - to switch from yf websocket to alpaca websocket - yf websockets have no vol data for SPY
+- to build historical sentiment reader
 
 ## Notes
 

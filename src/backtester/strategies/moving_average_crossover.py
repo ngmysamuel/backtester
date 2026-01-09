@@ -14,6 +14,8 @@ class MovingAverageCrossover(Strategy):
 
     def generate_signals(self, histories: dict[tuple[str,str], list[BarTuple]]):
         for (ticker,interval), history in histories.items(): #TODO: should loop over this strategy's tickers rather than all tickers in histories
+            if not history:
+                continue
             timestamp = history[-1].Index.timestamp()
 
             data = history[-self.long_window - 1:]
