@@ -51,7 +51,7 @@ def load_class(path_to_class: str):
 
 
 @app.command()
-def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", position_calc: Optional[str] = "atr", slippage: Optional[str] = "multi_factor_slippage", strategy: Optional[str] = "moving_average", analyze_sentiment: Optional[bool] = False, risk_manager: Optional[str] = "simple_risk_manager", exception_contd: Optional[int] = 0, config_path: Optional[str] = None, output_path: Optional[str] = None):
+def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", position_calc: Optional[str] = "atr", slippage: Optional[str] = "multi_factor_slippage", strategy: Optional[str] = "moving_average", analyze_sentiment: Optional[bool] = False, risk_manager: Optional[str] = "simple_risk_manager", exception_contd: Optional[int] = 0, config_path: Optional[str] = None, output_path: Optional[str] = ".", start_date: str = None, end_date: str = None, initial_capital: float = None, ticker_list: list[str] = None, benchmark: str = None):
     """
     Run the backtester with a given strategy and date range.
     args:
@@ -65,7 +65,14 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
         exception_contd: 1 or 0
         config_path: Path to a custom config file (optional)
         output_path: Path to save the equity curve CSV (optional, default: equity_curve.csv)
+        start_date: optional override to the value given in config
+        end_date: optional override to the value given in config
+        initial_capital: optional override to the value given in config
+        ticker_list: optional override to the value given in config
+        benchmark: optional override to the value given in config
     """
+    
+    print("RUN IS CALLED")
 
     ####################
     # sanity checks on passed in variables
@@ -80,22 +87,28 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     config = load_config(config_path)
 
     backtester_settings = config["backtester_settings"]
+    if start_date:
+        backtester_settings["start_date"] = start_date
+    if end_date:
+        backtester_settings["end_date"] = end_date
+    if initial_capital:
+        backtester_settings["initial_capital"] = initial_capital
 
     cash_buffer = backtester_settings["cash_buffer"]
     initial_capital = backtester_settings["initial_capital"]
     initial_position_size = backtester_settings["initial_position_size"]
-    start_timestamp = pd.to_datetime(backtester_settings["start_date"], dayfirst=True).timestamp()
-    end_timestamp = pd.to_datetime(backtester_settings["end_date"], dayfirst=True).timestamp()
+    start_timestamp = pd.to_datetime(start_date or backtester_settings["start_date"], dayfirst=True).timestamp()
+    end_timestamp = pd.to_datetime(end_date or backtester_settings["end_date"], dayfirst=True).timestamp()
     base_interval = backtester_settings["base_interval"]
     metrics_interval = backtester_settings["metrics_interval"]
     sentiment_interval = backtester_settings["sentiment_interval"]
     period = backtester_settings["period"]
     exchange_closing_time = backtester_settings["exchange_closing_time"]
-    benchmark_ticker = backtester_settings["benchmark"]
+    benchmark_ticker = benchmark or backtester_settings["benchmark"]
 
     # TODO: enhance for multi strategy handling
     strategy_interval = config["strategies"][strategy]["additional_parameters"]["interval"]
-    symbol_list = config["strategies"][strategy]["additional_parameters"]["symbol_list"]
+    symbol_list = ticker_list or config["strategies"][strategy]["additional_parameters"]["symbol_list"]
     keyword_dict = config["strategies"][strategy]["additional_parameters"].get("keyword_dict", None)
     rounding_list = config["strategies"][strategy]["additional_parameters"]["rounding_list"]
 
@@ -113,8 +126,8 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     typer_tbl.add_row("Symbols", ", ".join(symbol_list))
     typer_tbl.add_row("Initial Capital", str(initial_capital))
     typer_tbl.add_row("Initial Position Size", str(initial_position_size))
-    typer_tbl.add_row("Start Date", backtester_settings["start_date"])
-    typer_tbl.add_row("End Date", backtester_settings["end_date"])
+    typer_tbl.add_row("Start Date", start_date or backtester_settings["start_date"])
+    typer_tbl.add_row("End Date", end_date or backtester_settings["end_date"])
     typer_tbl.add_row("Base Interval", base_interval)
     typer_tbl.add_row("Metrics Interval", metrics_interval)
     typer_tbl.add_row("Strategy Interval", strategy_interval)
@@ -147,6 +160,8 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
 
     StrategyClass = load_class(config["strategies"][strategy]["name"])
     strategy_settings = config["strategies"][strategy].get("additional_parameters", {})
+    if strategy_settings and ticker_list:
+        strategy_settings["symbol_list"] = ticker_list
     strategy_instance = StrategyClass(event_queue, strategy, **strategy_settings)
     for ticker in symbol_list:
         bar_manager.subscribe(strategy_interval, ticker, strategy_instance)
@@ -195,11 +210,14 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
             portfolio.end_of_day()  # deduct borrow costs and calculate margin
             mkt_close = False
 
+    print("backtest complete , plotting now")
     ####################
     # metrics and results
     ####################
     portfolio.create_equity_curve()
-    output_file = output_path or "equity_curve.csv"
+    output_path = Path(output_path)
+    output_file = str(output_path.joinpath("equity_curve.csv"))
+    print(f"Saving to {output_file}")
     portfolio.equity_curve.to_csv(output_file)
 
     benchmark_data = data_handler.symbol_raw_data[benchmark_ticker]
@@ -207,11 +225,11 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
     benchmark_returns.name = benchmark_ticker
 
     # TODO: if equity curve values are all the same, this will fail
-    qs.reports.html(portfolio.equity_curve["returns"], benchmark=benchmark_returns, output="strategy_report.html", title=strategy, match_dates=False)
+    qs.reports.html(portfolio.equity_curve["returns"], benchmark=benchmark_returns, output=str(output_path.joinpath("strategy_report.html")), title=strategy, match_dates=False)
 
 
 @app.command()
-def dashboard():
+def dashboard(is_docker: int = 0):
     """
     Plot the results of the last backtest.
     """
@@ -219,7 +237,7 @@ def dashboard():
     interval = config["backtester_settings"]["metrics_interval"]
     streamlit_script_path = Path("src/backtester/metrics/dashboard/streamlit_app.py").resolve()
     console.print(f"Loading [underline]{streamlit_script_path}[/underline]")
-    sys.argv = ["streamlit", "run", streamlit_script_path, "--global.disableWidgetStateDuplicationWarning", "true", f" -- --interval {interval}"]  # for more arguments, add ', " -- --what ee"' to the end
+    sys.argv = ["streamlit", "run", str(streamlit_script_path), "--global.disableWidgetStateDuplicationWarning", "true", f" -- --interval {interval}", f" -- --is_docker {is_docker}"]  # for more arguments, add ', " -- --what ee"' to the end
     runpy.run_module("streamlit", run_name="__main__")
 
 

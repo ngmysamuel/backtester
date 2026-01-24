@@ -1,0 +1,8 @@
+.git
+scratch.py
+*.csv
+*.html
+.vscode
+.pytest_cache
+.mypy_cache
+tests/

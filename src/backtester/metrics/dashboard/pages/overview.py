@@ -6,10 +6,13 @@ import backtester.metrics.dashboard._util as utils
 import os
 
 st.set_page_config(layout="wide")
+output_path = ROOT_DIR
+if "job_id" in st.session_state:
+    output_path = f"{st.session_state["path_prefix"]}{st.session_state["session_id"]}/{st.session_state["job_id"]}"
 
 @st.cache_resource
 def get_tearsheet():
-    return open(os.path.join(ROOT_DIR, "strategy_report.html"), "r")
+    return open(os.path.join(output_path, "strategy_report.html"), "r")
 
 tearsheet = get_tearsheet()
 
@@ -32,7 +35,7 @@ with colDwl:
 def load_data():
     """Loads the equity curve data from the CSV file."""
     try:
-        df = pd.read_csv(f"{ROOT_DIR}/equity_curve.csv")
+        df = pd.read_csv(f"{output_path}/equity_curve.csv")
         df["timestamp"] = pd.to_datetime(df["timestamp"])
         df = df.set_index("timestamp")
         return df

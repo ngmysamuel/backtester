@@ -3,11 +3,38 @@
 <h3 align="center"> ⚠ Work in progress ⚠</h3>
 <p align="center"> You might notice some formatting issues / lack of documentation in the meantime.</p>
 
-## Prerequisites
-1. Poetry
+# How to run
+## Docker
+### Prerequisites
+1. Docker
+### Notes
+For the full control over the options, run using the script method
+### Steps
+Visit localhost:8501 after spinning up the containers
+```
+git clone https://github.com/ngmysamuel/backtester.git
+cd backtester
+docker compose up
+```
+Misc
+```
+docker images
+docker rmi -f <image_id>
+docker volume ls
+docker volume rm <volume_name>
+docker compose up --build --force-recreate
+```
+```
+docker exec -it <container_name_or_id> redis-cli
+KEYS '*'
+```
 
-## Run
-Trigger a backtest
+## Script
+### Prerequisites
+1. Poetry
+### Notes
+More manual than via Docker but has the most options
+### Engine - triggering a backtest
 ```
 git clone https://github.com/ngmysamuel/backtester.git
 cd backtester
@@ -38,18 +65,13 @@ There are 6 parameters
     - Only works if data-source = live
     - Default is False
 
-```
-poetry run python -c "from transformers import pipeline;pipe = pipeline('text-classification', model='mrm8488/distilroberta-finetuned-financial-news-sentiment-analysis');print(pipe(['Shell profits collapsed due to falling oil prices.', 'BP faces huge crsis']))"
-poetry run backtester run --strategy sentiment --to-analyze-sentiment True
-```
-
-## Dashboard
+### Dashboard
 Run this to view and interact with the data generated from a backtest. You must have ran a backtest at least once.
 ```
 poetry run backtester dashboard
 ```
 
-## Test
+# Testing
 Run the all testcases (including integration tests)
 ```
 poetry run pytest
@@ -71,7 +93,7 @@ Static type checking
 poetry run mypy src\backtester\util\bar_aggregator.py
 ```
 
-## Pulling CSV data
+# Pulling CSV data
 Identical to using data-source = "yf"
 ```
 import yfinance as yf
@@ -79,14 +101,14 @@ dat = yf.download("msft", start="2025-11-24", end="2025-11-29", interval="1m",mu
 dat.to_csv("MSFT_1m.csv")
 ```
 
-## Important Notes
+# Important Notes
 1. Intervals
     - The base interval must be most granular time interval across all strategies, etc.
 2. Live Sentiment
     - You need an API key from https://newsapi.org/
     - Store it as an environment variable under the name "NEWS_API"
 
-## Implementation Details
+# Implementation Details
 1. Dual Frequency
     1. The backtester runs on a single frequency (the base frequency) and all other frequencies required by the strategies are resampled from it
     2. As a result, the base frequency has to be the most granular
@@ -251,7 +273,7 @@ dat.to_csv("MSFT_1m.csv")
         - We could instead keep the estimated cost in the order event, have the fill event copy it. And in the on fill method, subtract the estimated cost from the estimate pot. But I think we keep responsibilities separate, no need to pass information everywhere. 
 
 
-## To Do
+# To Do
 - Slippage model  - supporting other time periods automatically 
     - switches variables to use when the trading interval changes. The slippage model only supports daily data now e.g. 252 trading periods in a year. The trading interval would be the variable in config.yaml
     - Intraday data support
@@ -278,13 +300,13 @@ dat.to_csv("MSFT_1m.csv")
 - to switch from yf websocket to alpaca websocket - yf websockets have no vol data for SPY
 - to build historical sentiment reader
 
-## Notes
+# Notes
 
 Periods for pandas: https://pandas.pydata.org/docs/reference/api/pandas.Period.asfreq.html
 
 An event driven backtester is a pure chronological construct unlike a vectorized backtester which has the prices at all time periods already.
 
-#### Look Ahead Bias 
+### Look Ahead Bias 
 1. Incorporating future data releases (corporate and economic)  
 A strategy that relies on fundamental information to derive ideal price might use a future corporate release to calculate that ideal price and finds the prices BEFORE the corporate release to be ideal. But this is an unfair advantage.
 2. Using future-adjusted prices  
@@ -294,6 +316,6 @@ If a strategy depends on detecting sudden price drops (e.g., a "buy the dip" str
 3. Using next-bar data  
 A strategy that buys a stock if the closing price is higher than the opening price. On Monday morning, the backtest looks at Monday's historical data, sees that the closing price was indeed higher than the opening price, and records a profitable trade. 
 
-#### Numpy and Pandas
+### Numpy and Pandas
 1. Standard Deviation
     1. Numpy assumes population level s.d. (ddof = 0) while pandas assumes sample (ddof = 1)
