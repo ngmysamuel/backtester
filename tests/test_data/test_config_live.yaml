@@ -12,6 +12,7 @@ backtester_settings:
   risk_per_trade: 0.01
   base_interval: "1m"  # 1-minute bars for live testing
   metrics_interval: "1m"
+  sentiment_interval: "1m" # how often the News API is polled
 
 risk_manager:
   simple_risk_manager:

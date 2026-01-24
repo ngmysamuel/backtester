@@ -8,7 +8,7 @@
 ### Prerequisites
 1. Docker
 ### Notes
-For the full control over the options, run using the script method
+For the full control over the options, run using the script method (see below)
 ### Steps
 Visit localhost:8501 after spinning up the containers
 ```
@@ -24,8 +24,9 @@ docker volume ls
 docker volume rm <volume_name>
 docker compose up --build --force-recreate
 ```
+Check redis
 ```
-docker exec -it <container_name_or_id> redis-cli
+docker exec -it <container_id> redis-cli
 KEYS '*'
 ```
 
@@ -34,7 +35,7 @@ KEYS '*'
 1. Poetry
 ### Notes
 More effort than via Docker but has the most options
-### Engine - triggering a backtest
+### Triggering a backtest
 ```
 git clone https://github.com/ngmysamuel/backtester.git
 cd backtester
@@ -65,7 +66,7 @@ There are 6 parameters
     - Only works if data-source = live
     - Default is False
 
-### Dashboard
+### Visualizing a backtest
 Run this to view and interact with the data generated from a backtest. You must have ran a backtest at least once.
 ```
 poetry run backtester dashboard

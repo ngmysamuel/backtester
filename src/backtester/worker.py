@@ -13,7 +13,7 @@ r = redis.Redis(host=os.getenv('REDIS_HOST', 'localhost'), port=6379, db=0, deco
 def start_worker():
     print("Worker Listening for jobs...")
     while True:
-        # blpop blocks until an item is available (0 = infinite timeout)
+        # block until an item is available
         _, message = r.blpop('job_queue', 0)
         job_data = json.loads(message)
         job_id = job_data['job_id']

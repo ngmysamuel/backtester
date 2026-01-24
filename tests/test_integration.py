@@ -18,7 +18,7 @@ class TestIntegration:
         """End-to-end test: run backtest with CSV data and verify output CSV."""
         test_data_dir = os.path.abspath("tests/test_data")
         config_path = os.path.abspath("tests/test_data/test_config.yaml")
-        output_path = os.path.join(test_data_dir, "test_equity_curve.csv")
+        output_path = os.path.join(test_data_dir, "equity_curve.csv")
 
         # Run the backtest
         result = runner.invoke(app, [
@@ -26,7 +26,7 @@ class TestIntegration:
             "--data-dir", test_data_dir,
             "--data-source", "csv",
             "--config-path", config_path,
-            "--output-path", output_path,
+            "--output-path", test_data_dir,
             "--strategy","moving_average"
         ])
 
@@ -110,8 +110,9 @@ class TestIntegration:
         # Skip if yfinance not available or network issues
         pytest.importorskip("yfinance")
 
+        test_data_dir = os.path.abspath("tests/test_data")
         config_path = os.path.abspath("tests/test_data/test_config_yf.yaml")
-        output_path = os.path.join(os.path.dirname(config_path), "test_equity_curve_yf.csv")
+        output_path = os.path.join(test_data_dir, "equity_curve.csv")
 
         # Run the backtest with YF data
         result = runner.invoke(app, [
@@ -119,7 +120,7 @@ class TestIntegration:
             "--data-source", "yf",
             "--strategy", "moving_average",
             "--config-path", config_path,
-            "--output-path", output_path
+            "--output-path", test_data_dir
         ])
 
         # Assert successful execution
@@ -213,17 +214,19 @@ class TestIntegration:
         """Test that live data handler can collect real-time data."""
         runner = CliRunner()
 
+        test_data_dir = os.path.abspath("tests/test_data")
         config_path = os.path.abspath("tests/test_data/test_config_live.yaml")
-        output_path = os.path.join(os.path.dirname(config_path), "test_equity_curve_live.csv")
+        output_path = os.path.join(test_data_dir, "equity_curve.csv")
 
         # Run live backtest (this will take ~10 minutes)
         result = runner.invoke(app, [
             "run",
+            "--strategy", "buy_and_hold_simple",
             "--data-source", "live",
             "--position-calc", "no_position_sizer",
             "--slippage", "no_slippage",
             "--config-path", config_path,
-            "--output-path", output_path
+            "--output-path", test_data_dir
         ])
 
         # Should complete successfully
