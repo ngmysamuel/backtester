@@ -71,8 +71,6 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
         ticker_list: optional override to the value given in config
         benchmark: optional override to the value given in config
     """
-    
-    print("RUN IS CALLED")
 
     ####################
     # sanity checks on passed in variables
@@ -210,7 +208,7 @@ def run(data_dir: Optional["str"] = None, data_source: Optional[str] = "yf", pos
             portfolio.end_of_day()  # deduct borrow costs and calculate margin
             mkt_close = False
 
-    print("backtest complete , plotting now")
+    print("Backtest is complete, outputting results now...")
     ####################
     # metrics and results
     ####################

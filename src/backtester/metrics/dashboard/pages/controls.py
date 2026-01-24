@@ -1,15 +1,17 @@
-import streamlit as st
-import redis
-import uuid
-import pandas as pd
-import time
-import os
-import json
-from backtester.enums.st_session_status import ST_SESSION_STATUS
-from backtester.enums.st_job_status import ST_JOB_STATUS
-from pathlib import Path
 import datetime
-print("rerunning")
+import json
+import os
+import time
+import uuid
+from pathlib import Path
+
+import pandas as pd
+import redis
+import streamlit as st
+
+from backtester.enums.st_job_status import ST_JOB_STATUS
+from backtester.enums.st_session_status import ST_SESSION_STATUS
+
 r = redis.Redis(host=os.getenv('REDIS_HOST', 'localhost'), port=6379, db=0, decode_responses=True)
 if "session_id" not in st.session_state:
     st.session_state["session_id"] = str(uuid.uuid4())
@@ -93,15 +95,11 @@ if st.session_state["to_poll"]:
     job_id = st.session_state['job_id']
 
     if job_status not in [ST_JOB_STATUS.DONE.value, ST_JOB_STATUS.ERROR.value]:
-        print("Backtest in progress...")
         # Force a reload to poll again in a second
-        time.sleep(2)
-        print("finish sleeping, rerunning")
+        time.sleep(1)
         st.rerun()
     elif job_status == ST_JOB_STATUS.DONE.value:
         st.toast("Backend complete", icon="ℹ")
-        
-        # READ FROM SHARED VOLUME
         output_file = f"{st.session_state["path_prefix"]}{st.session_state["session_id"]}/{job_id}/equity_curve.csv"
         if os.path.exists(output_file):
             st.toast("Backtest Successful!", icon="🎉")

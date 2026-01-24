@@ -33,7 +33,7 @@ KEYS '*'
 ### Prerequisites
 1. Poetry
 ### Notes
-More manual than via Docker but has the most options
+More effort than via Docker but has the most options
 ### Engine - triggering a backtest
 ```
 git clone https://github.com/ngmysamuel/backtester.git

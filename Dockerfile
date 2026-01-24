@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 
-# Creates a clean "folder" for the project inside the container.
+# Create a "folder" for the project inside the container.
 WORKDIR /app
 
 # Install system deps
