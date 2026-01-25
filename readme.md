@@ -23,6 +23,7 @@ docker rmi -f <image_id>
 docker volume ls
 docker volume rm <volume_name>
 docker compose up --build --force-recreate
+docker system df
 ```
 Check redis
 ```

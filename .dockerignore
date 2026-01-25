@@ -6,3 +6,10 @@ scratch.py
 .pytest_cache
 .mypy_cache
 tests/
+
+.venv
+__pycache__
+dist
+build
+*.egg-info
+.env
