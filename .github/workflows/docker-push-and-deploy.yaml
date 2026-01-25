@@ -1,5 +1,5 @@
 #
-name: Create and publish a Docker image
+name: Create, Publish, and Deploy a Docker image
 
 # Configures this workflow to run every time a change is pushed to the branch called `release`.
 on:
@@ -57,4 +57,27 @@ jobs:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
+
+      # Copy the Compose file to the VM (SCP)
+      - name: Copy Compose file to VM
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "docker-compose.prd.yaml"
+          target: "/home/${{ secrets.VM_USER }}/"
       
+      # SSH into VM and Restart
+      - name: Deploy to VM
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /home/${{ secrets.VM_USER }}/
+            docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
+            docker compose -f docker-compose.prd.yaml pull
+            docker compose -f docker-compose.prd.yaml up -d
+            docker system prune -f 
