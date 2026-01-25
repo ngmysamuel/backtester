@@ -16,13 +16,15 @@ services:
     image: ghcr.io/ngmysamuel/backtester:feat-interaction
     command: backtester dashboard --is-docker 1
     ports:
-      - "8501:8501"
+      - "0.0.0.0:8501:8501"
     volumes:
       - shared_data:/output/
     depends_on:
       - redis
     environment:
       - REDIS_HOST=redis
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - STREAMLIT_SERVER_HEADLESS=true
 
 volumes:
   shared_data:
