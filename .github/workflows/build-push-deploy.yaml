@@ -1,5 +1,5 @@
 #
-name: Create, Publish, and Deploy a Docker image
+name: Build, Publish, and Deploy a Docker image
 
 # Configures this workflow to run every time a change is pushed to the branch called `release`.
 on:
@@ -75,6 +75,7 @@ jobs:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
             cd /home/${{ secrets.VM_USER }}/
             docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
