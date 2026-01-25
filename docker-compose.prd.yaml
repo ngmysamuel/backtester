@@ -4,7 +4,7 @@ services:
     ports:
       - "6379:6379"
   backend:
-    image: ghcr.io/ngmysamuel/backtester:sha256-1e9de7f57a65386f51f3feaeb358c8c1b88c85b2d0589c464d0f13550683d3f4
+    image: ghcr.io/ngmysamuel/backtester:latest
     command: python -m backtester.worker
     volumes:
       - shared_data:/output/
@@ -13,7 +13,7 @@ services:
     environment:
       - REDIS_HOST=redis
   frontend:
-    image: ghcr.io/ngmysamuel/backtester:sha256-1e9de7f57a65386f51f3feaeb358c8c1b88c85b2d0589c464d0f13550683d3f4
+    image: ghcr.io/ngmysamuel/backtester:latest
     command: backtester dashboard --is-docker 1
     ports:
       - "8501:8501"
