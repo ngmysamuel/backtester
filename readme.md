@@ -23,6 +23,7 @@ docker rmi -f <image_id>
 docker volume ls
 docker volume rm <volume_name>
 docker compose up --build --force-recreate
+docker compose up --build --force-recreate
 docker system df
 ```
 Check redis
@@ -30,6 +31,16 @@ Check redis
 docker exec -it <container_id> redis-cli
 KEYS '*'
 ```
+Powershell
+```
+Test-NetConnection -ComputerName 34.133.45.165 -Port 8501
+ssh -i <private_key> <username>>@34.133.45.165
+```
+Linux
+```
+sudo systemctl restart ssh
+```
+Public keys at ~/<user>/.ssh/authorized_keys
 
 ## Script
 ### Prerequisites

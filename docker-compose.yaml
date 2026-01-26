@@ -3,6 +3,10 @@ services:
     image: redis:alpine
     ports:
       - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
   backend:
     build: .
     image: backtester:latest
@@ -14,6 +18,10 @@ services:
       - redis
     environment:
       - REDIS_HOST=redis
+    deploy:
+      resources:
+        limits:
+          memory: 256M
   frontend:
     image: backtester:latest
     pull_policy: build
@@ -27,6 +35,10 @@ services:
       - redis
     environment:
       - REDIS_HOST=redis
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
 volumes:
   shared_data:
