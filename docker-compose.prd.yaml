@@ -6,6 +6,7 @@ services:
     deploy:
       resources:
         limits:
+          cpus: '0.25'
           memory: 256M
   backend:
     image: ghcr.io/ngmysamuel/backtester:feat-interaction
@@ -19,6 +20,7 @@ services:
     deploy:
       resources:
         limits:
+          cpus: '0.25'
           memory: 256M
   frontend:
     image: ghcr.io/ngmysamuel/backtester:feat-interaction
@@ -36,6 +38,7 @@ services:
     deploy:
       resources:
         limits:
+          cpus: '0.25'
           memory: 256M
 
 volumes:
