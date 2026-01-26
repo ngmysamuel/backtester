@@ -34,13 +34,13 @@ KEYS '*'
 Powershell
 ```
 Test-NetConnection -ComputerName 34.133.45.165 -Port 8501
-ssh -i <private_key> <username>>@34.133.45.165
+ssh -i <private_key> <username>@34.133.45.165
 ```
 Linux
 ```
 sudo systemctl restart ssh
 ```
-Public keys at ~/<user>/.ssh/authorized_keys
+
 
 ## Script
 ### Prerequisites

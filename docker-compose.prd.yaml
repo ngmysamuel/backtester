@@ -3,6 +3,10 @@ services:
     image: redis:alpine
     ports:
       - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
   backend:
     image: ghcr.io/ngmysamuel/backtester:feat-interaction
     command: python -m backtester.worker
@@ -12,6 +16,10 @@ services:
       - redis
     environment:
       - REDIS_HOST=redis
+    deploy:
+      resources:
+        limits:
+          memory: 256M
   frontend:
     image: ghcr.io/ngmysamuel/backtester:feat-interaction
     command: backtester dashboard --is-docker 1
@@ -25,6 +33,10 @@ services:
       - REDIS_HOST=redis
       - STREAMLIT_SERVER_ADDRESS=0.0.0.0
       - STREAMLIT_SERVER_HEADLESS=true
+    deploy:
+      resources:
+        limits:
+          memory: 256M
 
 volumes:
   shared_data:
