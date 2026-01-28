@@ -7,7 +7,7 @@ services:
       resources:
         limits:
           cpus: '0.25'
-          memory: 256M
+          memory: 64M
   backend:
     image: ghcr.io/ngmysamuel/backtester:feat-interaction
     command: python -m backtester.worker
@@ -20,8 +20,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
-          memory: 256M
+          cpus: '0.45'
+          memory: 384M
   frontend:
     image: ghcr.io/ngmysamuel/backtester:feat-interaction
     command: backtester dashboard --is-docker 1
@@ -38,8 +38,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.25'
-          memory: 256M
+          cpus: '0.45'
+          memory: 384M
 
 volumes:
   shared_data:
